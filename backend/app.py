@@ -1,9 +1,18 @@
 # FastAPI app skeleton for AI Workplace Learning
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from backend.prompts import CONCEPT_PROMPT, MICROLESSON_PROMPT, SIMULATION_PROMPT, RECOMMENDATION_PROMPT
 from backend.llm import ask_openai
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Or specify ["http://localhost:3000"] for more security
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def root():

@@ -9,16 +9,31 @@ function App() {
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
   const [active, setActive] = useState("");
+  const [resultTitle, setResultTitle] = useState("");
 
   const handleFetch = async (type) => {
     setLoading(true);
     setActive(type);
     let data;
-    if (type === "concepts") data = await fetchConcepts();
-    if (type === "micro-lesson") data = await fetchMicroLesson();
-    if (type === "simulation") data = await fetchSimulation();
-    if (type === "recommendation") data = await fetchRecommendation();
+    let title = "";
+    if (type === "concepts") {
+      data = await fetchConcepts();
+      title = "AI Concepts";
+    }
+    if (type === "micro-lesson") {
+      data = await fetchMicroLesson();
+      title = "Micro-Lesson";
+    }
+    if (type === "simulation") {
+      data = await fetchSimulation();
+      title = "Simulation";
+    }
+    if (type === "recommendation") {
+      data = await fetchRecommendation();
+      title = "Recommendation";
+    }
     setResult(data[type.replace("-", "_")] || JSON.stringify(data, null, 2));
+    setResultTitle(title);
     setLoading(false);
   };
 
@@ -47,9 +62,18 @@ function App() {
           </Button>
         </Box>
         {result && (
-          <Box sx={{ background: "#f5f5f5", borderRadius: 2, p: 2, mb: 3, fontFamily: "Consolas, monospace", whiteSpace: "pre-wrap" }}>
+          <div style={{
+            background: "#f5f5f5",
+            borderRadius: 8,
+            padding: 20,
+            marginBottom: 24,
+            whiteSpace: "pre-wrap",
+            fontFamily: "Consolas, monospace",
+            boxShadow: "0 1px 6px #0001"
+          }}>
+            <h3 style={{ marginTop: 0, color: "#1a237e" }}>{resultTitle}</h3>
             {result}
-          </Box>
+          </div>
         )}
         <Simulator />
       </Paper>
