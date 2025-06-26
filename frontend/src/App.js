@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { fetchConcepts } from "./api";
 import Simulator from "./Simulator";
 import './App.css';
+// import logo from './logo.svg'; // Uncomment if you want the logo
 
 function App() {
   const [concepts, setConcepts] = useState(null);
@@ -16,20 +17,9 @@ function App() {
 
   return (
     <div className="App">
-      <header className="App-header">
+      {/* <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      </header> */}
       <h1>AI Workplace Learning Chat UI</h1>
       <button onClick={handleGetConcepts} disabled={loading}>
         {loading ? "Loading..." : "Get AI Concepts"}
