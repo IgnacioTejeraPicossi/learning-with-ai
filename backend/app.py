@@ -1,6 +1,7 @@
 # FastAPI app skeleton for AI Workplace Learning
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 from backend.prompts import CONCEPT_PROMPT, MICROLESSON_PROMPT, SIMULATION_PROMPT, RECOMMENDATION_PROMPT
 from backend.llm import ask_openai
 
@@ -14,6 +15,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+class MicroLessonRequest(BaseModel):
+    topic: str
+
 @app.get("/")
 def root():
     return {"message": "AI Workplace Learning API is running."}
@@ -24,10 +28,10 @@ def generate_concepts():
     result = ask_openai(CONCEPT_PROMPT)
     return {"concepts": result}
 
-@app.get("/micro-lesson")
-def generate_micro_lesson():
-    """Generate a personalized micro-lesson."""
-    result = ask_openai(MICROLESSON_PROMPT)
+@app.post("/micro-lesson")
+async def generate_micro_lesson(request: MicroLessonRequest):
+    prompt = MICROLESSON_PROMPT.replace("{topic}", request.topic)
+    result = ask_openai(prompt)
     return {"micro_lesson": result}
 
 @app.get("/simulation")

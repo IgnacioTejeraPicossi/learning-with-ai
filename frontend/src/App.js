@@ -10,6 +10,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [active, setActive] = useState("");
   const [resultTitle, setResultTitle] = useState("");
+  const [microLessonTopic, setMicroLessonTopic] = useState("");
 
   const handleFetch = async (type) => {
     setLoading(true);
@@ -21,7 +22,7 @@ function App() {
       title = "AI Concepts";
     }
     if (type === "micro-lesson") {
-      data = await fetchMicroLesson();
+      data = await fetchMicroLesson(microLessonTopic || "agile sprint planning");
       title = "Micro-Lesson";
     }
     if (type === "simulation") {
@@ -51,9 +52,30 @@ function App() {
           <Button variant="contained" color="primary" onClick={() => handleFetch("concepts")} disabled={loading}>
             {loading && active === "concepts" ? "Loading..." : "Get AI Concepts"}
           </Button>
-          <Button variant="contained" color="success" onClick={() => handleFetch("micro-lesson")} disabled={loading}>
-            {loading && active === "micro-lesson" ? "Loading..." : "Get Micro-Lesson"}
-          </Button>
+          <Box sx={{ display: "flex", gap: 1 }}>
+            <input
+              type="text"
+              placeholder="Enter micro-lesson topic"
+              value={microLessonTopic}
+              onChange={e => setMicroLessonTopic(e.target.value)}
+              style={{ padding: 6, borderRadius: 4, border: "1px solid #ccc" }}
+            />
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => {
+                setMicroLessonTopic("");
+                setResult("");
+                setResultTitle("");
+              }}
+              disabled={loading}
+            >
+              Clear
+            </Button>
+            <Button variant="contained" color="success" onClick={() => handleFetch("micro-lesson")} disabled={loading}>
+              {loading && active === "micro-lesson" ? "Loading..." : "Get Micro-Lesson"}
+            </Button>
+          </Box>
           <Button variant="contained" color="warning" onClick={() => handleFetch("simulation")} disabled={loading}>
             {loading && active === "simulation" ? "Loading..." : "Get Simulation"}
           </Button>
@@ -62,17 +84,31 @@ function App() {
           </Button>
         </Box>
         {result && (
-          <div style={{
-            background: "#f5f5f5",
-            borderRadius: 8,
-            padding: 20,
-            marginBottom: 24,
-            whiteSpace: "pre-wrap",
-            fontFamily: "Consolas, monospace",
-            boxShadow: "0 1px 6px #0001"
-          }}>
-            <h3 style={{ marginTop: 0, color: "#1a237e" }}>{resultTitle}</h3>
-            {result}
+          <div>
+            <div style={{
+              background: "#f5f5f5",
+              borderRadius: 8,
+              padding: 20,
+              marginBottom: 24,
+              whiteSpace: "pre-wrap",
+              fontFamily: "Consolas, monospace",
+              boxShadow: "0 1px 6px #0001"
+            }}>
+              <h3 style={{ marginTop: 0, color: "#1a237e" }}>{resultTitle}</h3>
+              {result}
+            </div>
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => {
+                setResult("");
+                setResultTitle("");
+                setMicroLessonTopic("");
+              }}
+              style={{ marginTop: 8 }}
+            >
+              Clear
+            </Button>
           </div>
         )}
         <Simulator />

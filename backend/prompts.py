@@ -9,7 +9,7 @@ CONCEPT_PROMPT = (
 
 MICROLESSON_PROMPT = (
     "Create a 5-minute micro-lesson in project management for a newly hired IT project manager. "
-    "Focus: agile sprint planning. Break it down into: 1) Introduction, 2) Step-by-step guide, 3) Real-world example, 4) Quiz (3 questions)."
+    "Focus: {topic}. Break it down into: 1) Introduction, 2) Step-by-step guide, 3) Real-world example, 4) Quiz (3 questions)."
 )
 
 SIMULATION_PROMPT = (

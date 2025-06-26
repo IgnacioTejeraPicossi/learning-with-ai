@@ -5,8 +5,12 @@ export async function fetchConcepts() {
   return res.json();
 }
 
-export async function fetchMicroLesson() {
-  const res = await fetch(`${API_BASE}/micro-lesson`);
+export async function fetchMicroLesson(topic) {
+  const res = await fetch("http://127.0.0.1:8000/micro-lesson", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ topic }),
+  });
   return res.json();
 }
 
