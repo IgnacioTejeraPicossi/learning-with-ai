@@ -1,4 +1,4 @@
-# AI Workplace Learning With AI
+# Workplace Learning With AI
 
 This project is a full-stack demo for the Nordic Software AI Hackathon. It features an AI-powered backend (FastAPI + OpenAI) and a modern React frontend for interactive workplace learning, simulation, and recommendations.
 
