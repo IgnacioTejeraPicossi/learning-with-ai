@@ -23,3 +23,12 @@ export async function fetchRecommendation() {
   const res = await fetch(`${API_BASE}/recommendation`);
   return res.json();
 }
+
+export async function fetchSimulationStep(history, user_input) {
+  const res = await fetch("http://127.0.0.1:8000/simulation-step", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ history, user_input }),
+  });
+  return res.json();
+}

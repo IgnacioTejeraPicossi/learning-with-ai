@@ -18,6 +18,10 @@ app.add_middleware(
 class MicroLessonRequest(BaseModel):
     topic: str
 
+class SimulationRequest(BaseModel):
+    history: list  # List of dicts: [{"speaker": "Customer", "text": "...", "user_choice": "..."}]
+    user_input: str  # The user's latest choice/response
+
 @app.get("/")
 def root():
     return {"message": "AI Workplace Learning API is running."}
@@ -44,4 +48,22 @@ def generate_simulation():
 def generate_recommendation():
     """Generate learning analysis and recommendations."""
     result = ask_openai(RECOMMENDATION_PROMPT)
-    return {"recommendation": result} 
+    return {"recommendation": result}
+
+@app.post("/simulation-step")
+async def simulation_step(request: SimulationRequest):
+    # Build a prompt for the LLM based on the conversation history and user input
+    history_text = ""
+    for turn in request.history:
+        history_text += f"{turn['speaker']}: {turn['text']}\n"
+        if 'user_choice' in turn:
+            history_text += f"Employee: {turn['user_choice']}\n"
+    prompt = (
+        f"{SIMULATION_PROMPT}\n"
+        f"Conversation so far:\n{history_text}\n"
+        f"Employee's next response: {request.user_input}\n"
+        "Continue the scenario: What does the customer say next? "
+        "Give 2-3 choices for the employee, and provide feedback for each choice."
+    )
+    result = ask_openai(prompt)
+    return {"next_step": result} 
