@@ -3,41 +3,48 @@
 ```mermaid
 flowchart TD
   subgraph Frontend
-    A[App.js]
-    B[Simulator.jsx]
-    C[api.js]
+    App[App.jsx]
+    Concepts[Concepts.jsx]
+    MicroLesson[MicroLesson.jsx]
+    Recommendation[Recommendation.jsx]
+    Simulator[Simulator.jsx]
+    API[api.js]
   end
   subgraph Backend
-    D[app.py]
-    E[llm.py]
-    F[prompts.py]
-    G[vector_store.py]
+    AppPy[app.py]
+    LLM[llm.py]
+    Prompts[prompts.py]
+    VectorStore[vector_store.py]
   end
-  H(OpenAI API)
-  I[(Database?)]
+  OpenAI(OpenAI API)
+  DB[(Database?)]
 
   %% User interaction
-  User((User)) -->|Interacts with| A
-  A -->|Calls API functions| C
-  B -->|Scenario UI| A
-  C -->|HTTP requests| D
+  User((User)) -->|Interacts with| App
+  App --> Concepts
+  App --> MicroLesson
+  App --> Recommendation
+  App --> Simulator
+  App -->|Calls API functions| API
+  Simulator -->|Scenario UI| App
+  API -->|HTTP requests| AppPy
 
   %% Backend flow
-  D -->|Uses prompts| F
-  D -->|Calls LLM| E
-  D -->|Vector search| G
-  E -->|Sends prompt, gets response| H
-  G -->|Future: Embeddings| I
+  AppPy -->|Uses prompts| Prompts
+  AppPy -->|Calls LLM| LLM
+  AppPy -->|Vector search| VectorStore
+  LLM -->|Sends prompt, gets response| OpenAI
+  VectorStore -->|Future: Embeddings| DB
 
   %% Data flow
-  H -- AI response --> E
-  E -- AI result --> D
-  D -- JSON response --> C
-  C -- Data --> A
-  A -- Shows result --> User
+  OpenAI -- AI response --> LLM
+  LLM -- AI result --> AppPy
+  AppPy -- JSON response --> API
+  API -- Data --> App
+  App -- Shows result --> User
 
   %% Optional database connection
-  G -.->|Planned| I
+  VectorStore -.->|Planned| DB
 
   %% Styling
   classDef backend fill:#e3f2fd,stroke:#1976d2,stroke-width:2px;
@@ -62,19 +69,22 @@ This project is a full-stack demo for the Nordic Software AI Hackathon. It featu
 - Mocked AI responses if OpenAI API key is missing or invalid
 - CORS enabled for frontend-backend communication
 
-### Frontend (React + Material-UI)
-- Professional, responsive UI with color-coded buttons and branding
-- Dynamic user input for micro-lesson topics
-- Clear/Reset functionality for input and results
+### Frontend (React)
+- Modular, professional UI with each feature in its own card:
+  - **Concepts** (`Concepts.jsx`)
+  - **Micro-lesson** (`MicroLesson.jsx`)
+  - **Recommendation** (`Recommendation.jsx`)
+  - **Scenario Simulator** (`Simulator.jsx`)
+- Tooltips/hints on all main options and inputs for user guidance
+- Responsive, modern design with color-coded buttons
 - Displays API results in a styled, readable format
-- Scenario Simulator placeholder for future interactivity
 - Ready for further expansion (user input for other endpoints, authentication, etc.)
 
 ---
 
 ## Tech Stack
 - **Backend:** Python, FastAPI, OpenAI API, python-dotenv
-- **Frontend:** React, Material-UI (MUI), JavaScript
+- **Frontend:** React, JavaScript
 - **Dev Tools:** Docker (planned), Google Cloud Run (planned)
 
 ---
@@ -89,7 +99,10 @@ This project is a full-stack demo for the Nordic Software AI Hackathon. It featu
   vector_store.py
 /frontend/
   src/
-    App.js
+    App.jsx
+    Concepts.jsx
+    MicroLesson.jsx
+    Recommendation.jsx
     Simulator.jsx
     api.js
   package.json
@@ -133,13 +146,13 @@ README.md
 ## Usage
 - Click any button to call the backend API and display the result.
 - For "Micro-Lesson", enter a topic and click the button for a custom lesson.
-- Use the "Clear" button to reset the input and result.
+- Hover over any button or input for a helpful tooltip/hint.
 - If no valid OpenAI key is set, you will see a mocked response.
 
 ---
 
 ## Next Steps
-- Make the Scenario Simulator interactive
+- Make the Scenario Simulator interactive (done!)
 - Add user input for other endpoints
 - Add authentication/user profiles
 - Deploy to the cloud (Vercel, Google Cloud Run, etc.)
