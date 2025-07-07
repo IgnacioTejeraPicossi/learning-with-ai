@@ -1,4 +1,50 @@
-# Workplace Learning With AI
+# AI Workplace Learning With AI
+
+```mermaid
+flowchart TD
+  subgraph Frontend
+    A[App.js]
+    B[Simulator.jsx]
+    C[api.js]
+  end
+  subgraph Backend
+    D[app.py]
+    E[llm.py]
+    F[prompts.py]
+    G[vector_store.py]
+  end
+  H(OpenAI API)
+  I[(Database?)]
+
+  %% User interaction
+  User((User)) -->|Interacts with| A
+  A -->|Calls API functions| C
+  B -->|Scenario UI| A
+  C -->|HTTP requests| D
+
+  %% Backend flow
+  D -->|Uses prompts| F
+  D -->|Calls LLM| E
+  D -->|Vector search| G
+  E -->|Sends prompt, gets response| H
+  G -->|Future: Embeddings| I
+
+  %% Data flow
+  H -- AI response --> E
+  E -- AI result --> D
+  D -- JSON response --> C
+  C -- Data --> A
+  A -- Shows result --> User
+
+  %% Optional database connection
+  G -.->|Planned| I
+
+  %% Styling
+  classDef backend fill:#e3f2fd,stroke:#1976d2,stroke-width:2px;
+  classDef frontend fill:#fffde7,stroke:#fbc02d,stroke-width:2px;
+  class Backend backend;
+  class Frontend frontend;
+```
 
 This project is a full-stack demo for the Nordic Software AI Hackathon. It features an AI-powered backend (FastAPI + OpenAI) and a modern React frontend for interactive workplace learning, simulation, and recommendations.
 
