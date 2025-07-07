@@ -52,7 +52,7 @@ def generate_recommendation():
 
 @app.post("/simulation-step")
 async def simulation_step(request: SimulationRequest):
-    # Build a prompt for the LLM based on the conversation history and user input
+    # Build conversation history as text
     history_text = ""
     for turn in request.history:
         history_text += f"{turn['speaker']}: {turn['text']}\n"
@@ -62,8 +62,14 @@ async def simulation_step(request: SimulationRequest):
         f"{SIMULATION_PROMPT}\n"
         f"Conversation so far:\n{history_text}\n"
         f"Employee's next response: {request.user_input}\n"
-        "Continue the scenario: What does the customer say next? "
-        "Give 2-3 choices for the employee, and provide feedback for each choice."
+        "Continue the scenario."
     )
     result = ask_openai(prompt)
-    return {"next_step": result} 
+    # Try to parse the LLM's response as JSON
+    import json
+    try:
+        parsed = json.loads(result)
+    except Exception:
+        # If parsing fails, return the raw result for debugging
+        parsed = {"customerText": "Sorry, could not parse AI response.", "choices": []}
+    return parsed 

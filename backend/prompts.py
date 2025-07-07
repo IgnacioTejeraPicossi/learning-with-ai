@@ -14,7 +14,15 @@ MICROLESSON_PROMPT = (
 
 SIMULATION_PROMPT = (
     "You are simulating a customer service scenario between an employee and a frustrated customer. "
-    "Given the conversation so far, generate the next customer message, 2-3 possible employee responses, and feedback for each."
+    "Given the conversation so far, generate the next customer message, 2-3 possible employee responses, "
+    "and feedback for each. Respond in this JSON format:\n"
+    "{\n"
+    "  \"customerText\": \"...\",\n"
+    "  \"choices\": [\n"
+    "    {\"text\": \"...\", \"feedback\": \"...\"},\n"
+    "    {\"text\": \"...\", \"feedback\": \"...\"}\n"
+    "  ]\n"
+    "}\n"
 )
 
 RECOMMENDATION_PROMPT = (
