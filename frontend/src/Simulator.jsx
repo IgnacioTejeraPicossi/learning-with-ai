@@ -62,38 +62,52 @@ function Simulator() {
   // Initial scenario type input
   if (!started) {
     return (
-      <div style={{ marginTop: 24 }}>
-        <Tooltip title="Enter a scenario type (e.g., 'late delivery') and start the simulation. You will make choices, see feedback, and watch the conversation history grow. Restart anytime to try a new scenario or approach.">
-          <b style={{ cursor: 'help' }}>Start a Scenario Simulation</b>
-        </Tooltip>
+      <div style={{ marginTop: 24, background: "#f8fafc", borderRadius: 8, padding: 20, boxShadow: "0 1px 6px #0001" }}>
+        <b style={{ cursor: 'help', fontSize: 20 }}>Start a Scenario Simulation</b>
         <div style={{ margin: "12px 0" }}>
-          <Tooltip title="Type the scenario type or customer issue you want to simulate (e.g., 'late delivery', 'product defect', etc.)">
-            <input
-              type="text"
-              placeholder="Enter scenario type or customer issue (e.g., 'late delivery')"
-              value={scenarioType}
-              onChange={e => setScenarioType(e.target.value)}
-              style={{ padding: 6, borderRadius: 4, border: "1px solid #ccc", minWidth: 220 }}
-            />
-          </Tooltip>
+          <input
+            type="text"
+            placeholder="Enter scenario type or customer issue (e.g., 'late delivery')"
+            value={scenarioType}
+            onChange={e => setScenarioType(e.target.value)}
+            style={{ padding: 8, borderRadius: 6, border: "1px solid #bbb", minWidth: 220, fontSize: 15 }}
+            title="Type the scenario type or customer issue you want to simulate (e.g., 'late delivery', 'product defect', etc.)"
+          />
         </div>
-        <Tooltip title="Click to start the simulation with your chosen scenario. You will interact with the AI, make choices, and receive feedback.">
-          <span>
-            <button onClick={startSimulation} disabled={loading || !scenarioType.trim()} style={{ padding: "8px 18px", borderRadius: 6, background: "#3949ab", color: "#fff", border: 0, cursor: "pointer" }}>
-              {loading ? "Loading..." : "Start Simulation"}
-            </button>
-          </span>
-        </Tooltip>
+        <span>
+          <button
+            onClick={startSimulation}
+            disabled={loading || !scenarioType.trim()}
+            style={{
+              padding: "8px 18px",
+              borderRadius: 6,
+              background: "#3949ab",
+              color: "#fff",
+              border: 0,
+              fontWeight: 600,
+              fontSize: 16,
+              cursor: loading || !scenarioType.trim() ? "not-allowed" : "pointer",
+              boxShadow: "0 1px 4px #0001"
+            }}
+            title="Click to start the simulation with your chosen scenario. You will interact with the AI, make choices, and receive feedback."
+          >
+            {loading ? "Loading..." : "Start Simulation"}
+          </button>
+        </span>
       </div>
     );
   }
 
-  if (loading || !current) return <div>Loading simulation...</div>;
+  if (loading || !current) return <div style={{ marginTop: 24 }}>Loading simulation...</div>;
   if (!current.choices || current.choices.length === 0) {
     return (
-      <div style={{ marginTop: 24 }}>
-        <b>Simulation complete!</b>
-        <button onClick={handleRestart} style={{ marginLeft: 16, padding: "6px 16px", borderRadius: 6, background: "#1a237e", color: "#fff", border: 0 }}>
+      <div style={{ marginTop: 24, background: "#f8fafc", borderRadius: 8, padding: 20, boxShadow: "0 1px 6px #0001" }}>
+        <b style={{ fontSize: 20 }}>Simulation complete!</b>
+        <button
+          onClick={handleRestart}
+          style={{ marginLeft: 16, padding: "6px 16px", borderRadius: 6, background: "#1a237e", color: "#fff", border: 0, fontWeight: 600, fontSize: 16 }}
+          title="Restart the simulation to try a new scenario or approach."
+        >
           Restart
         </button>
       </div>
@@ -101,11 +115,11 @@ function Simulator() {
   }
 
   return (
-    <div style={{ marginTop: 24 }}>
-      <b>Scenario Simulator</b>
+    <div style={{ marginTop: 24, background: "#f8fafc", borderRadius: 8, padding: 20, boxShadow: "0 1px 6px #0001" }}>
+      <b style={{ fontSize: 20 }}>Scenario Simulator</b>
       {/* Conversation History */}
       {history.length > 0 && (
-        <div style={{ margin: "16px 0", background: "#f0f4ff", borderRadius: 8, padding: 12 }}>
+        <div style={{ margin: "16px 0", background: "#eef3fa", borderRadius: 8, padding: 12 }}>
           <b>Conversation History:</b>
           {history.map((turn, idx) => (
             <div key={idx} style={{ marginTop: 8 }}>
@@ -131,8 +145,12 @@ function Simulator() {
               border: "1px solid #3949ab",
               background: selectedChoice === idx ? "#3949ab" : "#fff",
               color: selectedChoice === idx ? "#fff" : "#3949ab",
-              cursor: showFeedback ? "not-allowed" : "pointer"
+              fontWeight: 600,
+              fontSize: 16,
+              cursor: showFeedback ? "not-allowed" : "pointer",
+              boxShadow: selectedChoice === idx ? "0 1px 4px #3949ab33" : "0 1px 4px #0001"
             }}
+            title="Click to select this response. You will see feedback after making a choice."
           >
             {choice.text}
           </button>
@@ -146,11 +164,18 @@ function Simulator() {
       )}
       {/* Next and Restart */}
       {showFeedback && (
-        <button onClick={handleNext} style={{ marginTop: 8, padding: "6px 16px", borderRadius: 6, background: "#1a237e", color: "#fff", border: 0 }}>
+        <button
+          onClick={handleNext}
+          style={{ marginTop: 8, padding: "6px 16px", borderRadius: 6, background: "#1a237e", color: "#fff", border: 0, fontWeight: 600, fontSize: 16 }}
+        >
           Next
         </button>
       )}
-      <button onClick={handleRestart} style={{ marginLeft: 16, padding: "6px 16px", borderRadius: 6, background: "#c62828", color: "#fff", border: 0 }}>
+      <button
+        onClick={handleRestart}
+        style={{ marginLeft: 16, padding: "6px 16px", borderRadius: 6, background: "#c62828", color: "#fff", border: 0, fontWeight: 600, fontSize: 16 }}
+        title="Restart the simulation to try a new scenario or approach."
+      >
         Restart
       </button>
     </div>
