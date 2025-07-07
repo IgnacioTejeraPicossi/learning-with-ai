@@ -4,12 +4,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from backend.prompts import CONCEPT_PROMPT, MICROLESSON_PROMPT, SIMULATION_PROMPT, RECOMMENDATION_PROMPT
 from backend.llm import ask_openai
+from typing import List
 
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Or specify ["http://localhost:3000"] for more security
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],  # Add both!
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -24,6 +25,14 @@ class SimulationRequest(BaseModel):
 
 class RecommendationRequest(BaseModel):
     skill_gap: str
+
+class Turn(BaseModel):
+    speaker: str
+    text: str
+
+class SimulationStepRequest(BaseModel):
+    history: List[Turn]
+    # ... other fields
 
 @app.get("/")
 def root():
@@ -58,6 +67,9 @@ async def simulation_step(request: SimulationRequest):
     # Build conversation history as text
     history_text = ""
     for turn in request.history:
+        if not isinstance(turn, dict) or 'speaker' not in turn or 'text' not in turn:
+            print("Malformed turn in history:", turn)
+            continue  # or raise an error, or handle as needed
         history_text += f"{turn['speaker']}: {turn['text']}\n"
         if 'user_choice' in turn:
             history_text += f"Employee: {turn['user_choice']}\n"
