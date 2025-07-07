@@ -68,6 +68,7 @@ async def simulation_step(request: SimulationRequest):
         "Continue the scenario."
     )
     result = ask_openai(prompt)
+    print("LLM raw response:", result)
     # Try to parse the LLM's response as JSON
     import json
     try:
