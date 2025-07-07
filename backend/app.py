@@ -22,6 +22,9 @@ class SimulationRequest(BaseModel):
     history: list  # List of dicts: [{"speaker": "Customer", "text": "...", "user_choice": "..."}]
     user_input: str  # The user's latest choice/response
 
+class RecommendationRequest(BaseModel):
+    skill_gap: str
+
 @app.get("/")
 def root():
     return {"message": "AI Workplace Learning API is running."}
@@ -44,10 +47,10 @@ def generate_simulation():
     result = ask_openai(SIMULATION_PROMPT)
     return {"simulation": result}
 
-@app.get("/recommendation")
-def generate_recommendation():
-    """Generate learning analysis and recommendations."""
-    result = ask_openai(RECOMMENDATION_PROMPT)
+@app.post("/recommendation")
+def generate_recommendation(request: RecommendationRequest):
+    prompt = RECOMMENDATION_PROMPT.replace("{skill_gap}", request.skill_gap)
+    result = ask_openai(prompt)
     return {"recommendation": result}
 
 @app.post("/simulation-step")

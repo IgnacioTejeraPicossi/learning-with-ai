@@ -13,19 +13,10 @@ MICROLESSON_PROMPT = (
 )
 
 SIMULATION_PROMPT = (
-    "You are simulating a customer service scenario between an employee and a frustrated customer. "
-    "Given the conversation so far, generate the next customer message, 2-3 possible employee responses, "
-    "and feedback for each. Respond in this JSON format:\n"
-    "{\n"
-    "  \"customerText\": \"...\",\n"
-    "  \"choices\": [\n"
-    "    {\"text\": \"...\", \"feedback\": \"...\"},\n"
-    "    {\"text\": \"...\", \"feedback\": \"...\"}\n"
-    "  ]\n"
-    "}\n"
+    "Create a simulated conversation between an employee and a frustrated customer who did not receive a service on time. "
+    "Include AI-driven response options and provide feedback on each decision."
 )
 
 RECOMMENDATION_PROMPT = (
-    "Use the following fictional conversation: 'Hi team, let's talk about how we can improve communication in our projects…'. "
-    "Identify learning needs, suggest interventions, and recommend relevant modules from the learning platform."
+    "You are an AI learning advisor. Given a user with a skill gap in '{skill_gap}', suggest 3 relevant new learning modules and explain why they are suitable."
 ) 

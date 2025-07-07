@@ -6,7 +6,7 @@ export async function fetchConcepts() {
 }
 
 export async function fetchMicroLesson(topic) {
-  const res = await fetch("http://127.0.0.1:8000/micro-lesson", {
+  const res = await fetch(`${API_BASE}/micro-lesson`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ topic }),
@@ -19,8 +19,12 @@ export async function fetchSimulation() {
   return res.json();
 }
 
-export async function fetchRecommendation() {
-  const res = await fetch(`${API_BASE}/recommendation`);
+export async function fetchRecommendation(skill_gap) {
+  const res = await fetch(`${API_BASE}/recommendation`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ skill_gap }),
+  });
   return res.json();
 }
 
