@@ -156,7 +156,7 @@ README.md
 - Add user input for other endpoints
 - Add authentication/user profiles
 - Deploy to the cloud (Vercel, Google Cloud Run, etc.)
-- Connect to a real OpenAI key for live AI responses
+- Connect to a real OpenAI key for live AI responses (done!)
 
 ---
 
