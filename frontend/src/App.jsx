@@ -5,6 +5,7 @@ import MicroLesson from "./MicroLesson";
 import Recommendation from "./Recommendation";
 import Simulator from "./Simulator";
 import Dashboard from "./Dashboard";
+import WebSearch from "./WebSearch";
 
 function App() {
   return (
@@ -25,6 +26,9 @@ function App() {
         </section>
         <section>
           <Simulator />
+        </section>
+        <section style={{ marginBottom: 32 }}>
+          <WebSearch />
         </section>
       </div>
     </div>

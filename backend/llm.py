@@ -24,3 +24,12 @@ def ask_openai(prompt, model="gpt-4", max_tokens=512):
     except Exception as e:
         # If the key is invalid or any error occurs, return a mock response
         return f"[MOCKED RESPONSE - Error: {str(e)}] This would be the AI's answer to: {prompt[:60]}..." 
+
+def web_search_query(query):
+    response = openai.chat.completions.create(
+        model="gpt-4-1106-preview",  # or "gpt-4.1" if available
+        messages=[{"role": "user", "content": query}],
+        tools=[{"type": "web_search"}],  # or "web_search_preview" if that's the correct type
+        tool_choice="auto"
+    )
+    return response.choices[0].message.content 

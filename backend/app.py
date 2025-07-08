@@ -3,7 +3,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from backend.prompts import CONCEPT_PROMPT, MICROLESSON_PROMPT, SIMULATION_PROMPT, RECOMMENDATION_PROMPT
-from backend.llm import ask_openai
+from backend.llm import ask_openai, web_search_query
 from typing import List
 
 app = FastAPI()
@@ -90,3 +90,12 @@ async def simulation_step(request: SimulationRequest):
         # If parsing fails, return the raw result for debugging
         parsed = {"customerText": "Sorry, could not parse AI response.", "choices": []}
     return parsed 
+
+@app.post("/web-search")
+async def web_search(request: Request):
+    data = await request.json()
+    query = data.get("query")
+    if not query:
+        return {"error": "No query provided"}
+    result = web_search_query(query)
+    return {"result": result} 
