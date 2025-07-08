@@ -77,7 +77,9 @@ This project is a full-stack demo for the Nordic Software AI Hackathon. It featu
   - **Scenario Simulator** (`Simulator.jsx`)
 - Tooltips/hints on all main options and inputs for user guidance
 - Responsive, modern design with color-coded buttons
-- Displays API results in a styled, readable format
+- **Per-section Clear buttons** for Concepts, Micro-lesson, and Recommendation to reset results and inputs
+- Robust progress tracking and personalized dashboard
+- Displays API results in a styled, readable format with proper text wrapping
 - Ready for further expansion (user input for other endpoints, authentication, etc.)
 
 ---
@@ -146,7 +148,9 @@ README.md
 ## Usage
 - Click any button to call the backend API and display the result.
 - For "Micro-Lesson", enter a topic and click the button for a custom lesson.
+- Use the **Clear** button in each section to reset the input and result for that feature.
 - Hover over any button or input for a helpful tooltip/hint.
+- Progress is tracked and shown in the dashboard at the top.
 - If no valid OpenAI key is set, you will see a mocked response.
 
 ---
