@@ -13,6 +13,11 @@ function Recommendation() {
     setLoading(false);
   };
 
+  const handleClear = () => {
+    setSkillGap("");
+    setRecommendation(null);
+  };
+
   return (
     <div style={{ background: "#f8fafc", borderRadius: 8, padding: 20, boxShadow: "0 1px 6px #0001" }}>
       <h2 style={{ marginTop: 0 }}>Recommendation</h2>
@@ -31,6 +36,25 @@ function Recommendation() {
         title="Enter a skill gap (e.g., 'team leadership') to get tailored recommendations."
       />
       <button
+        onClick={handleClear}
+        disabled={loading && !skillGap && !recommendation}
+        style={{
+          marginRight: 8,
+          background: "#fff",
+          color: "#333",
+          border: "1px solid #bbb",
+          borderRadius: 6,
+          padding: "8px 18px",
+          fontWeight: 600,
+          fontSize: 16,
+          cursor: loading || (!skillGap && !recommendation) ? "not-allowed" : "pointer",
+          boxShadow: "0 1px 4px #0001"
+        }}
+        title="Clear the skill gap and recommendation result."
+      >
+        Clear
+      </button>
+      <button
         onClick={handleGetRecommendation}
         disabled={loading || !skillGap}
         style={{
@@ -48,7 +72,7 @@ function Recommendation() {
       >
         {loading ? "Loading..." : "Get Recommendation"}
       </button>
-      {recommendation && <pre style={{ marginTop: 16, background: "#eef3fa", borderRadius: 6, padding: 12 }}>{recommendation}</pre>}
+      {recommendation && <pre style={{ marginTop: 16, background: "#eef3fa", borderRadius: 6, padding: 12, whiteSpace: "pre-wrap", wordBreak: "break-word" }}>{recommendation}</pre>}
     </div>
   );
 }

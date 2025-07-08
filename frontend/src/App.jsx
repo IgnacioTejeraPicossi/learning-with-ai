@@ -4,6 +4,7 @@ import Concepts from "./Concepts";
 import MicroLesson from "./MicroLesson";
 import Recommendation from "./Recommendation";
 import Simulator from "./Simulator";
+import Dashboard from "./Dashboard";
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
         <h1>AI Workplace Learning Chat UI</h1>
       </header>
       <div style={{ maxWidth: 700, margin: "2rem auto", background: "#fff", borderRadius: 12, boxShadow: "0 2px 12px #0001", padding: 32 }}>
+        <Dashboard />
         <section style={{ marginBottom: 32 }}>
           <Concepts />
         </section>

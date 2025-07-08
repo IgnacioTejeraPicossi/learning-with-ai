@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { Tooltip } from "@mui/material";
 import { fetchSimulationStep } from "./api";
+import { updateProgress } from "./Dashboard";
 
 function Simulator() {
   const [history, setHistory] = useState([]); // [{customerText, userChoice, feedback}]
@@ -46,6 +47,16 @@ function Simulator() {
       setShowFeedback(false);
       setSelectedChoice(null);
       setLoading(false);
+      // If simulation is complete (no more choices), update progress
+      if (!res.choices || res.choices.length === 0) {
+        const progress = JSON.parse(localStorage.getItem("ai_learning_progress"));
+        // Count "good" feedback (case-insensitive, includes several positive words)
+        const isGood = /(good|excellent|well done|great|correct)/i.test(lastTurn.feedback || "");
+        updateProgress({
+          simulationsCompleted: (progress.simulationsCompleted || 0) + 1,
+          simulationScore: (progress.simulationScore || 0) + (isGood ? 1 : 0)
+        });
+      }
     });
   };
 
@@ -100,6 +111,7 @@ function Simulator() {
 
   if (loading || !current) return <div style={{ marginTop: 24 }}>Loading simulation...</div>;
   if (!current.choices || current.choices.length === 0) {
+    // Simulation complete: update progress if not already done (handled in handleNext)
     return (
       <div style={{ marginTop: 24, background: "#f8fafc", borderRadius: 8, padding: 20, boxShadow: "0 1px 6px #0001" }}>
         <b style={{ fontSize: 20 }}>Simulation complete!</b>

@@ -38,6 +38,7 @@ class SimulationStepRequest(BaseModel):
 def root():
     return {"message": "AI Workplace Learning API is running."}
 
+
 @app.get("/concepts")
 def generate_concepts():
     """Generate AI-based workplace learning concepts."""

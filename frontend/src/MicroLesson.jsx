@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { fetchMicroLesson } from "./api";
+import { updateProgress } from "./Dashboard";
 
 function MicroLesson() {
   const [topic, setTopic] = useState("");
@@ -11,6 +12,14 @@ function MicroLesson() {
     const data = await fetchMicroLesson(topic);
     setLesson(data.lesson);
     setLoading(false);
+    // Update progress: increment lessonsCompleted
+    const progress = JSON.parse(localStorage.getItem("ai_learning_progress"));
+    updateProgress({ lessonsCompleted: (progress.lessonsCompleted || 0) + 1 });
+  };
+
+  const handleClear = () => {
+    setTopic("");
+    setLesson(null);
   };
 
   return (
@@ -31,6 +40,25 @@ function MicroLesson() {
         title="Enter a topic (e.g., 'agile sprint planning') to get a custom micro-lesson."
       />
       <button
+        onClick={handleClear}
+        disabled={loading && !topic && !lesson}
+        style={{
+          marginRight: 8,
+          background: "#fff",
+          color: "#333",
+          border: "1px solid #bbb",
+          borderRadius: 6,
+          padding: "8px 18px",
+          fontWeight: 600,
+          fontSize: 16,
+          cursor: loading || (!topic && !lesson) ? "not-allowed" : "pointer",
+          boxShadow: "0 1px 4px #0001"
+        }}
+        title="Clear the micro-lesson topic and result."
+      >
+        Clear
+      </button>
+      <button
         onClick={handleGetMicroLesson}
         disabled={loading || !topic}
         style={{
@@ -48,7 +76,7 @@ function MicroLesson() {
       >
         {loading ? "Loading..." : "Get Micro-lesson"}
       </button>
-      {lesson && <pre style={{ marginTop: 16, background: "#eef3fa", borderRadius: 6, padding: 12 }}>{lesson}</pre>}
+      {lesson && <pre style={{ marginTop: 16, background: "#eef3fa", borderRadius: 6, padding: 12, whiteSpace: "pre-wrap", wordBreak: "break-word" }}>{lesson}</pre>}
     </div>
   );
 }
