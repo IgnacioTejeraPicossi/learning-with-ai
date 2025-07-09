@@ -5,6 +5,8 @@ from pydantic import BaseModel
 from backend.prompts import CONCEPT_PROMPT, MICROLESSON_PROMPT, SIMULATION_PROMPT, RECOMMENDATION_PROMPT
 from backend.llm import ask_openai, web_search_query
 from typing import List
+from fastapi.staticfiles import StaticFiles
+import os
 
 app = FastAPI()
 
@@ -15,6 +17,19 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+import os
+from fastapi.staticfiles import StaticFiles
+
+static_dir = os.path.join(os.path.dirname(__file__), "static")
+app.mount("/static", StaticFiles(directory=static_dir), name="static")
+
+from fastapi.responses import FileResponse
+
+@app.get("/favicon.ico")
+async def favicon():
+    favicon_path = os.path.join("static", "favicon.ico")
+    return FileResponse(favicon_path)
 
 class MicroLessonRequest(BaseModel):
     topic: str
@@ -46,10 +61,11 @@ def generate_concepts():
     return {"concepts": result}
 
 @app.post("/micro-lesson")
-async def generate_micro_lesson(request: MicroLessonRequest):
-    prompt = MICROLESSON_PROMPT.replace("{topic}", request.topic)
-    result = ask_openai(prompt)
-    return {"micro_lesson": result}
+async def micro_lesson(request: Request):
+    data = await request.json()
+    topic = data.get("topic", "default topic")
+    lesson_text = generate_micro_lesson(topic)  # however you generate it
+    return {"lesson": lesson_text}
 
 @app.get("/simulation")
 def generate_simulation():
