@@ -93,6 +93,28 @@ This project is a full-stack demo for the Nordic Software AI Hackathon. It featu
 
 ---
 
+## Note: Two Backend Servers
+
+This project uses **two backend servers**:
+
+- **Python FastAPI backend** (main API):
+  - Handles concepts, micro-lesson, recommendation, simulation, etc.
+  - Run with:
+    ```bash
+    uvicorn backend.app:app --reload
+    ```
+- **Node.js Express backend** (web search):
+  - Handles `/web-search` endpoint using OpenAI’s web search tool (if available)
+  - Run with:
+    ```bash
+    cd websearch-backend
+    node index.js
+    ```
+
+Your React frontend will call both as needed. This is a common pattern for hackathons and microservice architectures.
+
+---
+
 ## Web Search Functionality: Tool Support and Fallback
 
 The Web Search feature uses a separate Node.js backend to call OpenAI's GPT-4.1 model with the web search tool. **This tool is only available to some OpenAI users/organizations.**
