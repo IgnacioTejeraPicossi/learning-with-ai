@@ -230,3 +230,48 @@ README.md
 ---
 
 **Built for the Nordic Software AI Hackathon 2025** 
+
+---
+
+## Automatic Tests
+
+This project includes both unit/integration tests and end-to-end (E2E) tests for quality assurance.
+
+### Frontend
+- **Unit & Integration Tests:**
+  - Written with **Jest** and **React Testing Library** (default with Create React App)
+  - Test individual components and their interactions
+  - To run:
+    ```bash
+    cd frontend
+    npm test
+    ```
+- **End-to-End (E2E) Tests:**
+  - Written with **Cypress**
+  - Test full user flows (UI + backend)
+  - Test files are in `frontend/cypress/e2e/`
+  - To run interactively:
+    ```bash
+    cd frontend
+    npx cypress open
+    ```
+  - To run headless:
+    ```bash
+    npx cypress run
+    ```
+
+### Backend
+- **Unit & Integration Tests:**
+  - Written with **pytest** and **httpx**
+  - Test API endpoints and backend logic
+  - Test files are in `backend/tests/`
+  - To run:
+    ```bash
+    cd backend
+    pytest
+    ```
+
+---
+
+**See the `cypress/e2e/` folder and `src/__tests__/` for sample tests.**
+If you add new features, please add or update tests to keep the project robust! 
