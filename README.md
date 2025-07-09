@@ -9,6 +9,7 @@ flowchart TD
     Recommendation[Recommendation.jsx]
     Simulator[Simulator.jsx]
     API[api.js]
+    WebSearch[WebSearch.jsx]
   end
   subgraph Backend
     AppPy[app.py]
@@ -25,6 +26,7 @@ flowchart TD
   App --> MicroLesson
   App --> Recommendation
   App --> Simulator
+  App --> WebSearch
   App -->|Calls API functions| API
   Simulator -->|Scenario UI| App
   API -->|HTTP requests| AppPy
@@ -65,6 +67,7 @@ This project is a full-stack demo for the Nordic Software AI Hackathon. It featu
   - Micro-Lesson generation (with dynamic user input)
   - Scenario Simulation
   - AI Recommendation/Analysis
+  - **Web Search (GPT-4.1 + tools)** for up-to-date answers
 - Dynamic prompt handling with user input (e.g., custom micro-lesson topics)
 - Mocked AI responses if OpenAI API key is missing or invalid
 - CORS enabled for frontend-backend communication
@@ -75,12 +78,31 @@ This project is a full-stack demo for the Nordic Software AI Hackathon. It featu
   - **Micro-lesson** (`MicroLesson.jsx`)
   - **Recommendation** (`Recommendation.jsx`)
   - **Scenario Simulator** (`Simulator.jsx`)
+  - **Web Search** (`WebSearch.jsx`)
 - Tooltips/hints on all main options and inputs for user guidance
 - Responsive, modern design with color-coded buttons
 - **Per-section Clear buttons** for Concepts, Micro-lesson, and Recommendation to reset results and inputs
 - Robust progress tracking and personalized dashboard
 - Displays API results in a styled, readable format with proper text wrapping
 - Ready for further expansion (user input for other endpoints, authentication, etc.)
+
+---
+
+## OpenAI API vs. Web Search Tool Integration
+
+This app supports both standard OpenAI LLM calls and the new GPT-4.1 web search tool. Each endpoint uses the appropriate method:
+
+| Endpoint           | Uses Web Search Tool? | Uses Standard LLM? |
+|--------------------|----------------------|--------------------|
+| `/concepts`        | ❌                   | ✅                 |
+| `/micro-lesson`    | ❌                   | ✅                 |
+| `/recommendation`  | ❌                   | ✅                 |
+| `/simulation`      | ❌                   | ✅                 |
+| `/web-search`      | ✅                   | ✅ (with tool)     |
+
+- **Standard endpoints** (concepts, micro-lesson, recommendation, simulation) use the regular OpenAI API for fast, context-aware answers.
+- **Web Search endpoint** uses GPT-4.1 with the web search tool for up-to-date, internet-powered answers.
+- Both approaches work independently and do not interfere with each other.
 
 ---
 
