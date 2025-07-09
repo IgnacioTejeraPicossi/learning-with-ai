@@ -7,7 +7,7 @@ function WebSearch() {
 
   const handleSearch = async () => {
     setLoading(true);
-    const res = await fetch("http://localhost:8000/web-search", {
+    const res = await fetch("http://localhost:8080/web-search", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ query }),
