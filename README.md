@@ -16,6 +16,7 @@ flowchart TD
     LLM[llm.py]
     Prompts[prompts.py]
     VectorStore[vector_store.py]
+    WebSearchNode[websearch-backend/index.js]
   end
   OpenAI(OpenAI API)
   DB[(Database?)]
@@ -28,8 +29,10 @@ flowchart TD
   App --> Simulator
   App --> WebSearch
   App -->|Calls API functions| API
+  App -->|Calls web search API| WebSearchNode
   Simulator -->|Scenario UI| App
   API -->|HTTP requests| AppPy
+  WebSearchNode -->|HTTP requests| OpenAI
 
   %% Backend flow
   AppPy -->|Uses prompts| Prompts
@@ -44,6 +47,8 @@ flowchart TD
   AppPy -- JSON response --> API
   API -- Data --> App
   App -- Shows result --> User
+  WebSearchNode -- Data --> App
+  OpenAI -- AI response --> WebSearchNode
 
   %% Optional database connection
   VectorStore -.->|Planned| DB
@@ -61,13 +66,13 @@ This project is a full-stack demo for the Nordic Software AI Hackathon. It featu
 
 ## Features
 
-### Backend (FastAPI)
+### Backend (FastAPI + Node.js)
 - Modular API endpoints for:
   - AI Concepts generation
   - Micro-Lesson generation (with dynamic user input)
   - Scenario Simulation
   - AI Recommendation/Analysis
-  - **Web Search (GPT-4.1 + tools)** for up-to-date answers
+  - **Web Search (GPT-4.1 + tools, Node.js backend)** for up-to-date answers
 - Dynamic prompt handling with user input (e.g., custom micro-lesson topics)
 - Mocked AI responses if OpenAI API key is missing or invalid
 - CORS enabled for frontend-backend communication
@@ -88,20 +93,24 @@ This project is a full-stack demo for the Nordic Software AI Hackathon. It featu
 
 ---
 
-## OpenAI API vs. Web Search Tool Integration
+## Web Search Functionality: Tool Support and Fallback
 
-This app supports both standard OpenAI LLM calls and the new GPT-4.1 web search tool. Each endpoint uses the appropriate method:
+The Web Search feature uses a separate Node.js backend to call OpenAI's GPT-4.1 model with the web search tool. **This tool is only available to some OpenAI users/organizations.**
 
-| Endpoint           | Uses Web Search Tool? | Uses Standard LLM? |
-|--------------------|----------------------|--------------------|
-| `/concepts`        | ❌                   | ✅                 |
-| `/micro-lesson`    | ❌                   | ✅                 |
-| `/recommendation`  | ❌                   | ✅                 |
-| `/simulation`      | ❌                   | ✅                 |
-| `/web-search`      | ✅                   | ✅ (with tool)     |
+- If your OpenAI account supports the web search tool (`web_search_preview`), you will get live, up-to-date answers from the internet.
+- If not, the backend will **automatically fall back to a standard LLM response** (no web search, but still a high-quality answer).
+- The user experience is seamless: you always get an answer, and no error is shown if web search is not available.
+
+### Summary Table: Web Search Tool Support
+
+| Tool Parameter         | Supported? | Fallback Behavior                |
+|-----------------------|------------|----------------------------------|
+| `web_search`          | ❌         | Falls back to standard LLM       |
+| `web_search_preview`  | ❓ (beta)   | Falls back to standard LLM       |
+| (no tools)            | ✅         | Standard LLM always works        |
 
 - **Standard endpoints** (concepts, micro-lesson, recommendation, simulation) use the regular OpenAI API for fast, context-aware answers.
-- **Web Search endpoint** uses GPT-4.1 with the web search tool for up-to-date, internet-powered answers.
+- **Web Search endpoint** uses GPT-4.1 with the web search tool if available, otherwise falls back to standard LLM.
 - Both approaches work independently and do not interfere with each other.
 
 ---
