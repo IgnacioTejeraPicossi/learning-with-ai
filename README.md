@@ -93,6 +93,18 @@ This project is a full-stack demo for the Nordic Software AI Hackathon. It featu
 
 ---
 
+## 4. Summary Table
+
+| Endpoint         | Uses Web Search Tool? | Uses Standard LLM? |
+|------------------|:--------------------:|:------------------:|
+| `/concepts`      | ❌                   | ✅                 |
+| `/micro-lesson`  | ❌                   | ✅                 |
+| `/recommendation`| ❌                   | ✅                 |
+| `/simulation`    | ❌                   | ✅                 |
+| `/web-search`    | ✅                   | ✅ (with tool)     |
+
+---
+
 ## Note: Two Backend Servers
 
 This project uses **two backend servers**:
