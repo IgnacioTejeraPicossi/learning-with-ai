@@ -122,3 +122,11 @@ async def web_search(request: Request):
         return {"error": "No query provided"}
     result = web_search_query(query)
     return {"result": result} 
+
+@app.get("/lessons")
+async def get_lessons():
+    lessons = []
+    async for lesson in lessons_collection.find():
+        lesson["_id"] = str(lesson["_id"])  # Convert ObjectId to string for JSON
+        lessons.append(lesson)
+    return {"lessons": lessons} 

@@ -6,6 +6,7 @@ import Recommendation from "./Recommendation";
 import Simulator from "./Simulator";
 import Dashboard from "./Dashboard";
 import WebSearch from "./WebSearch";
+import LessonList from "./LessonList";
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
         <section style={{ marginBottom: 32 }}>
           <WebSearch />
         </section>
+        <LessonList />
       </div>
     </div>
   );

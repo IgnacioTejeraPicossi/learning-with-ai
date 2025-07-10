@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import LessonList from "./LessonList";
 
 const PROGRESS_KEY = "ai_learning_progress";
 
@@ -39,18 +40,27 @@ function Dashboard() {
   }, []);
 
   return (
-    <div style={{ background: "#e3f2fd", borderRadius: 10, padding: 24, marginBottom: 32, boxShadow: "0 1px 6px #0001" }}>
-      <h2 style={{ marginTop: 0 }}>Your Progress</h2>
-      <div style={{ display: "flex", gap: 32, flexWrap: "wrap", marginBottom: 12 }}>
-        <div><b>Lessons completed:</b> {progress.lessonsCompleted}</div>
-        <div><b>Simulations completed:</b> {progress.simulationsCompleted}</div>
-        <div><b>Simulation score:</b> {progress.simulationScore}</div>
-        <div><b>Last activity:</b> {formatDate(progress.lastActivity)}</div>
+    <>
+      <div style={{
+        background: "#e3f2fd",
+        borderRadius: 10,
+        padding: 24,
+        marginBottom: 32,
+        boxShadow: "0 1px 4px #eee"
+      }}>
+        <h2 style={{ marginTop: 0 }}>Your Progress</h2>
+        <div style={{ display: "flex", gap: 32, flexWrap: "wrap", marginBottom: 12 }}>
+          <div><b>Lessons completed:</b> {progress.lessonsCompleted}</div>
+          <div><b>Simulations completed:</b> {progress.simulationsCompleted}</div>
+          <div><b>Simulation score:</b> {progress.simulationScore}</div>
+          <div><b>Last activity:</b> {formatDate(progress.lastActivity)}</div>
+        </div>
+        <div style={{ fontWeight: 500, color: "#1976d2" }}>
+          Recommended next step: {getRecommendation(progress)}
+        </div>
       </div>
-      <div style={{ fontWeight: 500, color: "#1976d2" }}>
-        Recommended next step: {getRecommendation(progress)}
-      </div>
-    </div>
+      
+    </>
   );
 }
 
