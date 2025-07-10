@@ -1,5 +1,5 @@
 # FastAPI app skeleton for AI Workplace Learning
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Body, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from backend.prompts import CONCEPT_PROMPT, MICROLESSON_PROMPT, SIMULATION_PROMPT, RECOMMENDATION_PROMPT
@@ -8,6 +8,7 @@ from typing import List
 from fastapi.staticfiles import StaticFiles
 import os
 from backend.db import lessons_collection
+from bson import ObjectId
 
 app = FastAPI()
 
@@ -130,3 +131,20 @@ async def get_lessons():
         lesson["_id"] = str(lesson["_id"])  # Convert ObjectId to string for JSON
         lessons.append(lesson)
     return {"lessons": lessons} 
+
+@app.delete("/lessons/{lesson_id}")
+async def delete_lesson(lesson_id: str):
+    result = await lessons_collection.delete_one({"_id": ObjectId(lesson_id)})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Lesson not found")
+    return {"success": True}
+
+@app.put("/lessons/{lesson_id}")
+async def update_lesson(lesson_id: str, data: dict = Body(...)):
+    result = await lessons_collection.update_one(
+        {"_id": ObjectId(lesson_id)},
+        {"$set": {"topic": data.get("topic"), "lesson": data.get("lesson")}}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Lesson not found")
+    return {"success": True} 
