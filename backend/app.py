@@ -7,6 +7,7 @@ from backend.llm import ask_openai, web_search_query
 from typing import List
 from fastapi.staticfiles import StaticFiles
 import os
+from backend.db import lessons_collection
 
 app = FastAPI()
 
@@ -68,7 +69,9 @@ def generate_micro_lesson(topic: str) -> str:
 async def micro_lesson(request: Request):
     data = await request.json()
     topic = data.get("topic", "default topic")
-    lesson_text = generate_micro_lesson(topic)  # however you generate it
+    lesson_text = generate_micro_lesson(topic)
+    # Save to MongoDB
+    await lessons_collection.insert_one({"topic": topic, "lesson": lesson_text})
     return {"lesson": lesson_text}
 
 @app.get("/simulation")
