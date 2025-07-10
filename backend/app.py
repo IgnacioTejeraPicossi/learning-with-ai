@@ -2,7 +2,7 @@
 from fastapi import FastAPI, Request, Body, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from backend.prompts import CONCEPT_PROMPT, MICROLESSON_PROMPT, SIMULATION_PROMPT, RECOMMENDATION_PROMPT
+from backend.prompts import CONCEPT_PROMPT, MICROLESSON_PROMPT, SIMULATION_PROMPT, RECOMMENDATION_PROMPT, PROMPTS
 from backend.llm import ask_openai, web_search_query
 from typing import List
 from fastapi.staticfiles import StaticFiles
@@ -148,3 +148,9 @@ async def update_lesson(lesson_id: str, data: dict = Body(...)):
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Lesson not found")
     return {"success": True} 
+
+@app.post("/career-coach")
+async def career_coach():
+    prompt = PROMPTS["career_coach"]
+    result = ask_openai(prompt)
+    return {"response": result} 

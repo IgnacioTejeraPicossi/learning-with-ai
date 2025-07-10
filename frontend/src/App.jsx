@@ -7,6 +7,7 @@ import Simulator from "./Simulator";
 import Dashboard from "./Dashboard";
 import WebSearch from "./WebSearch";
 import LessonList from "./LessonList";
+import CareerCoach from "./CareerCoach";
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
           <WebSearch />
         </section>
         <LessonList />
+        <CareerCoach />
       </div>
     </div>
   );

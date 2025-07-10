@@ -36,3 +36,10 @@ export async function fetchSimulationStep(history, user_input) {
   });
   return res.json();
 }
+
+export async function postCareerCoach() {
+  const res = await fetch(`${API_BASE}/career-coach`, {
+    method: "POST"
+  });
+  return res.json();
+}
