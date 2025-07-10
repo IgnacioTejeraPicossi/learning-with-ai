@@ -250,6 +250,7 @@ README.md
 - Add authentication/user profiles
 - Deploy to the cloud (Vercel, Google Cloud Run, etc.)
 - Connect to a real OpenAI key for live AI responses (done!)
+- Connect to a Database(MongoDB) and save data to later session (done!)
 
 ---
 
