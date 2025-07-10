@@ -61,8 +61,8 @@ def generate_concepts():
     return {"concepts": result}
 
 def generate_micro_lesson(topic: str) -> str:
-    # Replace this with your real logic
-    return f"This is a micro-lesson about: {topic}"
+    prompt = f"Write a concise, practical micro-lesson for the following workplace topic: {topic}"
+    return ask_openai(prompt)
 
 @app.post("/micro-lesson")
 async def micro_lesson(request: Request):
