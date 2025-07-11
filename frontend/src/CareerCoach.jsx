@@ -26,6 +26,11 @@ export default function CareerCoach() {
     setLoading(false);
   };
 
+  const handleClear = () => {
+    setMessages([]);
+    setInput('');
+  };
+
   return (
     <div>
       <h3>AI Career Coach</h3>
@@ -43,17 +48,22 @@ export default function CareerCoach() {
               </div>
             ))}
           </div>
-          <input
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && sendMessage()}
-            placeholder="Type your answer..."
-            style={{ width: 300, marginRight: 8 }}
-            disabled={loading}
-          />
-          <button onClick={sendMessage} disabled={loading || !input.trim()}>
-            Send
-          </button>
+          <div>
+            <input
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && sendMessage()}
+              placeholder="Type your answer..."
+              style={{ width: 300, marginRight: 8 }}
+              disabled={loading}
+            />
+            <button onClick={sendMessage} disabled={loading || !input.trim()}>
+              Send
+            </button>
+            <button onClick={handleClear} disabled={loading} style={{ marginLeft: 8 }}>
+              End Session
+            </button>
+          </div>
         </>
       )}
     </div>
