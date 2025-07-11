@@ -12,6 +12,7 @@ flowchart TD
     WebSearch[WebSearch.jsx]
     LessonList[LessonList.jsx]
     CareerCoach[CareerCoach.jsx]
+    SkillsForecast[SkillsForecast.jsx]
   end
   subgraph Backend
     AppPy[app.py]
@@ -34,6 +35,7 @@ flowchart TD
   App -->|Calls web search API| WebSearchNode
   App --> LessonList
   App --> CareerCoach
+  App --> SkillsForecast
   Simulator -->|Scenario UI| App
   API -->|HTTP requests| AppPy
   WebSearchNode -->|HTTP requests| OpenAI
@@ -44,6 +46,7 @@ flowchart TD
   AppPy -->|Vector search| VectorStore
   AppPy -->|Saves lessons| DB
   AppPy -->|Career coach| LLM
+  AppPy -->|Skills forecast| LLM
   LLM -->|Sends prompt, gets response| OpenAI
   VectorStore -->|Future: Embeddings| DB
 
@@ -79,6 +82,7 @@ This project is a full-stack demo for the Nordic Software AI Hackathon. It featu
   - **Web Search (GPT-4.1 + tools, Node.js backend)** for up-to-date answers
   - **Saved Micro-lessons**: All generated micro-lessons are stored in a MongoDB database for later review, with endpoints for listing, editing, and deleting lessons
   - **AI Career Coach**: An intelligent mentor that guides users through soft skills, leadership scenarios, and career goals via a `/career-coach` endpoint. Supports multi-turn conversations by accepting and responding to conversation history.
+  - **Dynamic Skills Forecasting**: Predicts future skill needs based on user learning history and transcript keywords via a `/skills-forecast` endpoint.
 - Dynamic prompt handling with user input (e.g., custom micro-lesson topics)
 - Mocked AI responses if OpenAI API key is missing or invalid
 - CORS enabled for frontend-backend communication
@@ -102,6 +106,9 @@ This project is a full-stack demo for the Nordic Software AI Hackathon. It featu
     - **Multi-turn chat interface**: Continue the conversation by sending and receiving messages in a chat-like UI
     - **End Session** button to reset the conversation and start over
     - (Future: add user context and progress tracking)
+  - **Skills Forecasting** (`SkillsForecast.jsx`):
+    - Enter your learning history and transcript keywords
+    - Get AI-powered predictions for the next skills you should develop, with explanations
 - Tooltips/hints on all main options and inputs for user guidance
 - Responsive, modern design with color-coded buttons
 - **Per-section Clear buttons** for Concepts, Micro-lesson, and Recommendation to reset results and inputs
@@ -146,6 +153,26 @@ The **AI Career Coach** is an intelligent mentor module that guides users throug
 - Click "Start Coaching" to begin a session
 - Type your answers and click **Send** to continue the conversation
 - Click **End Session** to reset and start over
+
+---
+
+## Dynamic Skills Forecasting
+
+The **Dynamic Skills Forecasting** module analyzes your learning history and transcript keywords to predict which skills you should develop next. This helps you stay ahead in your career by proactively identifying emerging skill needs.
+
+- **How it works:**
+  - The backend exposes a `/skills-forecast` endpoint powered by a dedicated prompt and the LLM.
+  - The frontend provides a `SkillsForecast.jsx` component where you can enter your learning history and transcript keywords.
+  - The AI suggests three future skills to develop, with reasons for each suggestion.
+- **Planned enhancements:**
+  - Automatically extract history and keywords from user activity and meeting transcripts
+  - Save and track forecasts over time
+  - Visualize skill trends
+
+**How to use:**
+- Scroll to the "Skills Forecasting" section in the app
+- Enter your recent learning history and transcript keywords (or use the defaults)
+- Click **Get Forecast** to receive personalized skill suggestions
 
 ---
 
@@ -229,6 +256,7 @@ The Web Search feature uses a separate Node.js backend to call OpenAI's GPT-4.1 
     Simulator.jsx
     api.js
     CareerCoach.jsx
+    SkillsForecast.jsx
   package.json
 /deployment/
   Dockerfile
