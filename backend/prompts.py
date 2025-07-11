@@ -44,6 +44,18 @@ Example user context:
 Begin by greeting the user and asking them to choose a growth area: Leadership, Communication, or Conflict Management.
 """
 
+skills_forecast_prompt = """
+You are a skill forecasting assistant.
+Given the following user activity and communication patterns, predict which skills the user should develop next.
+
+Example input:
+- Lessons completed: Agile Planning, Communication Basics
+- Transcript keywords: negotiation, hybrid work, stakeholder
+
+List 3 suggested future skills with reasons.
+"""
+
 PROMPTS = {
     "career_coach": career_coach_prompt,
+    "skills_forecast": skills_forecast_prompt,
 } 

@@ -8,6 +8,7 @@ import Dashboard from "./Dashboard";
 import WebSearch from "./WebSearch";
 import LessonList from "./LessonList";
 import CareerCoach from "./CareerCoach";
+import SkillsForecast from "./SkillsForecast";
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
         </section>
         <LessonList />
         <CareerCoach />
+        <SkillsForecast />
       </div>
     </div>
   );

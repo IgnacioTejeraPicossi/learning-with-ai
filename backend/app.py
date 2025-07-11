@@ -160,3 +160,13 @@ async def career_coach(request: Request):
         messages = history
     result = ask_openai(messages=messages)
     return {"response": result} 
+
+@app.post("/skills-forecast")
+async def skills_forecast(request: Request):
+    data = await request.json()
+    history = data.get("history", "")
+    keywords = data.get("keywords", "")
+    context = f"User history:\n{history}\n\nTranscript keywords:\n{keywords}\n\n"
+    prompt = PROMPTS["skills_forecast"] + "\n" + context
+    result = ask_openai(prompt)
+    return {"forecast": result} 
