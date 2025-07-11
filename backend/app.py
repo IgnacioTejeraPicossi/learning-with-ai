@@ -150,7 +150,13 @@ async def update_lesson(lesson_id: str, data: dict = Body(...)):
     return {"success": True} 
 
 @app.post("/career-coach")
-async def career_coach():
-    prompt = PROMPTS["career_coach"]
-    result = ask_openai(prompt)
+async def career_coach(request: Request):
+    data = await request.json()
+    history = data.get("history", [])
+    # If no history, start with the system prompt
+    if not history:
+        messages = [{"role": "system", "content": PROMPTS["career_coach"]}]
+    else:
+        messages = history
+    result = ask_openai(messages=messages)
     return {"response": result} 

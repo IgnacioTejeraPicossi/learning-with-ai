@@ -37,9 +37,11 @@ export async function fetchSimulationStep(history, user_input) {
   return res.json();
 }
 
-export async function postCareerCoach() {
-  const res = await fetch(`${API_BASE}/career-coach`, {
-    method: "POST"
+export async function postCareerCoach(body) {
+  const res = await fetch("http://127.0.0.1:8000/career-coach", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
   });
   return res.json();
 }
