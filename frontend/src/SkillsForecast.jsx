@@ -4,8 +4,6 @@ import { postSkillsForecast } from './api';
 export default function SkillsForecast() {
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
-
-  // Optionally, make these controlled inputs for user customization
   const [history, setHistory] = useState("Agile Planning, Communication Basics");
   const [keywords, setKeywords] = useState("negotiation, hybrid work, stakeholder");
 
@@ -15,6 +13,10 @@ export default function SkillsForecast() {
     const resp = await postSkillsForecast(input);
     setResult(resp.forecast);
     setLoading(false);
+  };
+
+  const handleClear = () => {
+    setResult("");
   };
 
   return (
@@ -40,8 +42,11 @@ export default function SkillsForecast() {
           />
         </label>
       </div>
-      <button onClick={handleForecast} disabled={loading} style={{ marginTop: 8 }}>
+      <button onClick={handleForecast} disabled={loading} style={{ marginTop: 8, marginRight: 8 }}>
         {loading ? "Forecasting..." : "Get Forecast"}
+      </button>
+      <button onClick={handleClear} disabled={loading} style={{ marginTop: 8 }}>
+        Clear
       </button>
       <pre style={{ whiteSpace: "pre-wrap", marginTop: 12 }}>{result}</pre>
     </div>
