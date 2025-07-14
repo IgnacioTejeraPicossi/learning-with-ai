@@ -341,7 +341,7 @@ README.md
 ## Next Steps
 - Make the Scenario Simulator interactive (done!)
 - Add user input for other endpoints
-- Add authentication/user profiles
+- Add authentication/user profiles (done!)
 - Deploy to the cloud (Vercel, Google Cloud Run, etc.)
 - Connect to a real OpenAI key for live AI responses (done!)
 - Connect to a Database(MongoDB) and save data to later session (done!)
