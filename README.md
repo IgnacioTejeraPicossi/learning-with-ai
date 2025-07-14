@@ -88,7 +88,7 @@ This project is a full-stack demo for the Nordic Software AI Hackathon. It featu
 - CORS enabled for frontend-backend communication
 - **MongoDB integration** for persistent storage of micro-lessons
 
-### Frontend (React)
+### Frontend (React + Shoelace)
 - Modular, professional UI with each feature in its own card:
   - **Concepts** (`Concepts.jsx`)
   - **Micro-lesson** (`MicroLesson.jsx`)
@@ -109,12 +109,31 @@ This project is a full-stack demo for the Nordic Software AI Hackathon. It featu
   - **Skills Forecasting** (`SkillsForecast.jsx`):
     - Enter your learning history and transcript keywords
     - Get AI-powered predictions for the next skills you should develop, with explanations
+- **Shoelace-based UI:**
+  - Uses [Shoelace](https://shoelace.style/) Web Components for cards, buttons, and layout in all main features (Career Coach, Skills Forecasting, Saved Micro-lessons)
+  - Consistent, modern design with accessible, themeable components
+  - Easy to extend with more Shoelace elements (dialogs, alerts, etc.)
 - Tooltips/hints on all main options and inputs for user guidance
 - Responsive, modern design with color-coded buttons
 - **Per-section Clear buttons** for Concepts, Micro-lesson, and Recommendation to reset results and inputs
 - Robust progress tracking and personalized dashboard
 - Displays API results in a styled, readable format with proper text wrapping
 - Ready for further expansion (user input for other endpoints, authentication, etc.)
+
+---
+
+## UI Styling: Shoelace Web Components
+
+The app uses [Shoelace](https://shoelace.style/) for a modern, accessible, and consistent UI. Shoelace provides:
+- **Cards** (`<sl-card>`) for feature panels
+- **Buttons** (`<sl-button>`) for all actions (primary, secondary, danger, etc.)
+- **Utility classes and layout** for spacing and alignment
+- **Theme support** for easy customization
+
+**How to customize or extend:**
+- Add more Shoelace components (dialogs, alerts, inputs) as needed
+- Change themes or use Shoelace’s utility classes for layout tweaks
+- See [Shoelace documentation](https://shoelace.style/components/overview/) for more options
 
 ---
 
