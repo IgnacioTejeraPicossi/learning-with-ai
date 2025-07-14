@@ -1,5 +1,19 @@
 import React, { useEffect, useState } from "react";
 
+function fetchLessons(setLessons, setLoading, setError) {
+  setLoading(true);
+  fetch("http://localhost:8000/lessons")
+    .then(res => res.json())
+    .then(data => {
+      setLessons(data.lessons);
+      setLoading(false);
+    })
+    .catch(err => {
+      setError(err.message);
+      setLoading(false);
+    });
+}
+
 function LessonList() {
   const [lessons, setLessons] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -10,46 +24,30 @@ function LessonList() {
   const [editContent, setEditContent] = useState({});
 
   useEffect(() => {
-    fetchLessons();
+    fetchLessons(setLessons, setLoading, setError);
   }, []);
 
-  function fetchLessons() {
-    setLoading(true);
-    fetch("http://localhost:8000/lessons")
-      .then(res => res.json())
-      .then(data => {
-        setLessons(data.lessons);
-        setLoading(false);
-      })
-      .catch(err => {
-        setError(err.message);
-        setLoading(false);
-      });
-  }
-
-  function handleDelete(id) {
+  const handleExpandToggle = id => setExpanded({ ...expanded, [id]: !expanded[id] });
+  const handleDelete = id => {
     if (!window.confirm("Delete this lesson?")) return;
     fetch(`http://localhost:8000/lessons/${id}`, { method: "DELETE" })
       .then(res => {
         if (!res.ok) throw new Error("Delete failed");
-        fetchLessons();
+        fetchLessons(setLessons, setLoading, setError);
       })
       .catch(err => alert(err.message));
-  }
-
-  function handleEdit(id, topic, lesson) {
+  };
+  const handleEdit = (id, topic, lesson) => {
     setEditing({ ...editing, [id]: true });
     setEditContent({ ...editContent, [id]: { topic, lesson } });
-  }
-
-  function handleEditChange(id, field, value) {
+  };
+  const handleEditChange = (id, field, value) => {
     setEditContent({
       ...editContent,
       [id]: { ...editContent[id], [field]: value }
     });
-  }
-
-  function handleEditSave(id) {
+  };
+  const handleEditSave = id => {
     const { topic, lesson } = editContent[id];
     fetch(`http://localhost:8000/lessons/${id}`, {
       method: "PUT",
@@ -59,14 +57,11 @@ function LessonList() {
       .then(res => {
         if (!res.ok) throw new Error("Update failed");
         setEditing({ ...editing, [id]: false });
-        fetchLessons();
+        fetchLessons(setLessons, setLoading, setError);
       })
       .catch(err => alert(err.message));
-  }
-
-  function handleExpandToggle(id) {
-    setExpanded({ ...expanded, [id]: !expanded[id] });
-  }
+  };
+  const handleClear = () => setFilter("");
 
   const filteredLessons = lessons.filter(lesson =>
     lesson.topic.toLowerCase().includes(filter.toLowerCase())
@@ -76,15 +71,18 @@ function LessonList() {
   if (error) return <div style={{ color: "red" }}>Error: {error}</div>;
 
   return (
-    <div style={{ marginTop: "2rem" }}>
-      <h2>Saved Micro-lessons</h2>
-      <input
-        type="text"
-        placeholder="Filter by topic..."
-        value={filter}
-        onChange={e => setFilter(e.target.value)}
-        style={{ marginBottom: 16, padding: 4, width: "60%" }}
-      />
+    <sl-card style={{ margin: "32px 0", padding: "24px", maxWidth: 800 }}>
+      <h2 style={{ marginTop: 0 }}>Saved Micro-lessons</h2>
+      <div style={{ marginBottom: 16 }}>
+        <input
+          type="text"
+          placeholder="Filter by topic..."
+          value={filter}
+          onChange={e => setFilter(e.target.value)}
+          style={{ width: 300, marginRight: 8 }}
+        />
+        <sl-button variant="default" onClick={handleClear}>Clear</sl-button>
+      </div>
       {filteredLessons.length === 0 ? (
         <div>No lessons found.</div>
       ) : (
@@ -100,7 +98,7 @@ function LessonList() {
                 boxShadow: "0 1px 4px #eee"
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
                 <strong>Topic:</strong>
                 {editing[lesson._id] ? (
                   <input
@@ -113,38 +111,25 @@ function LessonList() {
                 ) : (
                   <span>{lesson.topic}</span>
                 )}
-                <button onClick={() => handleExpandToggle(lesson._id)}>
+                <sl-button size="small" variant="default" onClick={() => handleExpandToggle(lesson._id)}>
                   {expanded[lesson._id] ? "Compress" : "Expand"}
-                </button>
-                <button onClick={() => handleDelete(lesson._id)}>Delete</button>
+                </sl-button>
+                <sl-button size="small" variant="danger" onClick={() => handleDelete(lesson._id)}>
+                  Delete
+                </sl-button>
                 {editing[lesson._id] ? (
                   <>
-                    <button
-                      onClick={() => handleEditSave(lesson._id)}
-                      style={{ color: "green" }}
-                    >
+                    <sl-button size="small" variant="primary" onClick={() => handleEditSave(lesson._id)}>
                       Save
-                    </button>
-                    <button
-                      onClick={() =>
-                        setEditing({ ...editing, [lesson._id]: false })
-                      }
-                    >
+                    </sl-button>
+                    <sl-button size="small" variant="default" onClick={() => setEditing({ ...editing, [lesson._id]: false })}>
                       Cancel
-                    </button>
+                    </sl-button>
                   </>
                 ) : (
-                  <button
-                    onClick={() =>
-                      handleEdit(
-                        lesson._id,
-                        lesson.topic,
-                        lesson.lesson
-                      )
-                    }
-                  >
+                  <sl-button size="small" variant="primary" onClick={() => handleEdit(lesson._id, lesson.topic, lesson.lesson)}>
                     Edit
-                  </button>
+                  </sl-button>
                 )}
               </div>
               {expanded[lesson._id] && (
@@ -181,7 +166,7 @@ function LessonList() {
           ))}
         </ul>
       )}
-    </div>
+    </sl-card>
   );
 }
 
