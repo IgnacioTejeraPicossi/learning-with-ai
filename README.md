@@ -13,6 +13,7 @@ flowchart TD
     LessonList[LessonList.jsx]
     CareerCoach[CareerCoach.jsx]
     SkillsForecast[SkillsForecast.jsx]
+    Auth[Auth.jsx]
   end
   subgraph Backend
     AppPy[app.py]
@@ -36,6 +37,7 @@ flowchart TD
   App --> LessonList
   App --> CareerCoach
   App --> SkillsForecast
+  App --> Auth
   Simulator -->|Scenario UI| App
   API -->|HTTP requests| AppPy
   WebSearchNode -->|HTTP requests| OpenAI
@@ -89,6 +91,7 @@ This project is a full-stack demo for the Nordic Software AI Hackathon. It featu
 - **MongoDB integration** for persistent storage of micro-lessons
 
 ### Frontend (React + Shoelace)
+- **Google Sign-In via Firebase Authentication** for secure, personalized access
 - Modular, professional UI with each feature in its own card:
   - **Concepts** (`Concepts.jsx`)
   - **Micro-lesson** (`MicroLesson.jsx`)
@@ -119,6 +122,16 @@ This project is a full-stack demo for the Nordic Software AI Hackathon. It featu
 - Robust progress tracking and personalized dashboard
 - Displays API results in a styled, readable format with proper text wrapping
 - Ready for further expansion (user input for other endpoints, authentication, etc.)
+
+---
+
+## Authentication: Google Sign-In with Firebase
+
+The app supports secure, personalized access using **Google Sign-In via Firebase Authentication**.
+- Users can sign in with their Google account to access all features.
+- User data (saved lessons, forecasts, etc.) can be linked to their Google account for a personalized experience.
+- Sign-in and sign-out are handled with Shoelace-styled buttons for a seamless UI.
+- (Future: user-specific dashboards, data protection, and backend endpoint security)
 
 ---
 
@@ -276,6 +289,7 @@ The Web Search feature uses a separate Node.js backend to call OpenAI's GPT-4.1 
     api.js
     CareerCoach.jsx
     SkillsForecast.jsx
+    Auth.jsx
   package.json
 /deployment/
   Dockerfile
