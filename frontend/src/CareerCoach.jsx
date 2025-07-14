@@ -6,7 +6,6 @@ export default function CareerCoach() {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Start the conversation
   const startCoach = async () => {
     setLoading(true);
     const resp = await postCareerCoach({ history: [] });
@@ -14,7 +13,6 @@ export default function CareerCoach() {
     setLoading(false);
   };
 
-  // Continue the conversation
   const sendMessage = async () => {
     if (!input.trim()) return;
     const newMessages = [...messages, { role: 'user', content: input }];
@@ -32,12 +30,12 @@ export default function CareerCoach() {
   };
 
   return (
-    <div>
-      <h3>AI Career Coach</h3>
+    <sl-card style={{ margin: "32px 0", padding: "24px", maxWidth: 600 }}>
+      <h2 style={{ marginTop: 0 }}>AI Career Coach</h2>
       {messages.length === 0 ? (
-        <button onClick={startCoach} disabled={loading}>
+        <sl-button variant="primary" onClick={startCoach} style={{ marginRight: 8 }} loading={loading ? true : undefined}>
           {loading ? "Coaching..." : "Start Coaching"}
-        </button>
+        </sl-button>
       ) : (
         <>
           <div style={{ marginBottom: 12 }}>
@@ -48,24 +46,24 @@ export default function CareerCoach() {
               </div>
             ))}
           </div>
-          <div>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
             <input
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && sendMessage()}
               placeholder="Type your answer..."
-              style={{ width: 300, marginRight: 8 }}
+              style={{ width: 300 }}
               disabled={loading}
             />
-            <button onClick={sendMessage} disabled={loading || !input.trim()}>
+            <sl-button variant="primary" onClick={sendMessage} disabled={loading || !input.trim()} style={{ marginRight: 8 }}>
               Send
-            </button>
-            <button onClick={handleClear} disabled={loading} style={{ marginLeft: 8 }}>
+            </sl-button>
+            <sl-button variant="default" onClick={handleClear} disabled={loading}>
               End Session
-            </button>
+            </sl-button>
           </div>
         </>
       )}
-    </div>
+    </sl-card>
   );
 }

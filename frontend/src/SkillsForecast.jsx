@@ -20,9 +20,9 @@ export default function SkillsForecast() {
   };
 
   return (
-    <div>
-      <h3>Skills Forecasting</h3>
-      <div>
+    <sl-card style={{ margin: "32px 0", padding: "24px", maxWidth: 600 }}>
+      <h2 style={{ marginTop: 0 }}>Skills Forecasting</h2>
+      <div style={{ marginBottom: 12 }}>
         <label>
           Learning history:
           <input
@@ -32,7 +32,7 @@ export default function SkillsForecast() {
           />
         </label>
       </div>
-      <div>
+      <div style={{ marginBottom: 16 }}>
         <label>
           Transcript keywords:
           <input
@@ -42,13 +42,15 @@ export default function SkillsForecast() {
           />
         </label>
       </div>
-      <button onClick={handleForecast} disabled={loading} style={{ marginTop: 8, marginRight: 8 }}>
-        {loading ? "Forecasting..." : "Get Forecast"}
-      </button>
-      <button onClick={handleClear} disabled={loading} style={{ marginTop: 8 }}>
-        Clear
-      </button>
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 12 }}>
+        <sl-button variant="primary" onClick={handleForecast} disabled={loading}>
+          {loading ? "Forecasting..." : "Get Forecast"}
+        </sl-button>
+        <sl-button variant="default" onClick={handleClear} disabled={loading}>
+          Clear
+        </sl-button>
+      </div>
       <pre style={{ whiteSpace: "pre-wrap", marginTop: 12 }}>{result}</pre>
-    </div>
+    </sl-card>
   );
 }
