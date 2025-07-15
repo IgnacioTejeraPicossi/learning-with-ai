@@ -1,5 +1,5 @@
 # FastAPI app skeleton for AI Workplace Learning
-from fastapi import FastAPI, Request, Body, HTTPException
+from fastapi import FastAPI, Request, Body, HTTPException, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from backend.prompts import CONCEPT_PROMPT, MICROLESSON_PROMPT, SIMULATION_PROMPT, RECOMMENDATION_PROMPT, PROMPTS
@@ -9,6 +9,13 @@ from fastapi.staticfiles import StaticFiles
 import os
 from backend.db import lessons_collection
 from bson import ObjectId
+
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import auth as firebase_auth
+
+cred = credentials.Certificate("serviceAccountKey.json")  # Path from root
+firebase_admin.initialize_app(cred)
 
 app = FastAPI()
 
@@ -32,6 +39,17 @@ from fastapi.responses import FileResponse
 async def favicon():
     favicon_path = os.path.join("static", "favicon.ico")
     return FileResponse(favicon_path)
+
+async def verify_token(request: Request):
+    auth_header = request.headers.get("Authorization")
+    if not auth_header or not auth_header.startswith("Bearer "):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing or invalid auth header")
+    id_token = auth_header.split(" ")[1]
+    try:
+        decoded_token = firebase_auth.verify_id_token(id_token)
+        return decoded_token
+    except Exception:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
 class MicroLessonRequest(BaseModel):
     topic: str
@@ -57,7 +75,7 @@ def root():
 
 
 @app.get("/concepts")
-def generate_concepts():
+async def generate_concepts(user=Depends(verify_token)):
     """Generate AI-based workplace learning concepts."""
     result = ask_openai(CONCEPT_PROMPT)
     return {"concepts": result}
@@ -67,7 +85,7 @@ def generate_micro_lesson(topic: str) -> str:
     return ask_openai(prompt)
 
 @app.post("/micro-lesson")
-async def micro_lesson(request: Request):
+async def micro_lesson(request: Request, user=Depends(verify_token)):
     data = await request.json()
     topic = data.get("topic", "default topic")
     lesson_text = generate_micro_lesson(topic)
@@ -76,19 +94,19 @@ async def micro_lesson(request: Request):
     return {"lesson": lesson_text}
 
 @app.get("/simulation")
-def generate_simulation():
+async def generate_simulation(user=Depends(verify_token)):
     """Generate a customer conversation simulation."""
     result = ask_openai(SIMULATION_PROMPT)
     return {"simulation": result}
 
 @app.post("/recommendation")
-def generate_recommendation(request: RecommendationRequest):
+async def generate_recommendation(request: RecommendationRequest, user=Depends(verify_token)):
     prompt = RECOMMENDATION_PROMPT.replace("{skill_gap}", request.skill_gap)
     result = ask_openai(prompt)
     return {"recommendation": result}
 
 @app.post("/simulation-step")
-async def simulation_step(request: SimulationRequest):
+async def simulation_step(request: SimulationRequest, user=Depends(verify_token)):
     # Build conversation history as text
     history_text = ""
     for turn in request.history:
@@ -125,7 +143,7 @@ async def web_search(request: Request):
     return {"result": result} 
 
 @app.get("/lessons")
-async def get_lessons():
+async def get_lessons(user=Depends(verify_token)):
     lessons = []
     async for lesson in lessons_collection.find():
         lesson["_id"] = str(lesson["_id"])  # Convert ObjectId to string for JSON
@@ -133,14 +151,14 @@ async def get_lessons():
     return {"lessons": lessons} 
 
 @app.delete("/lessons/{lesson_id}")
-async def delete_lesson(lesson_id: str):
+async def delete_lesson(lesson_id: str, user=Depends(verify_token)):
     result = await lessons_collection.delete_one({"_id": ObjectId(lesson_id)})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Lesson not found")
     return {"success": True}
 
 @app.put("/lessons/{lesson_id}")
-async def update_lesson(lesson_id: str, data: dict = Body(...)):
+async def update_lesson(lesson_id: str, data: dict = Body(...), user=Depends(verify_token)):
     result = await lessons_collection.update_one(
         {"_id": ObjectId(lesson_id)},
         {"$set": {"topic": data.get("topic"), "lesson": data.get("lesson")}}
@@ -150,7 +168,7 @@ async def update_lesson(lesson_id: str, data: dict = Body(...)):
     return {"success": True} 
 
 @app.post("/career-coach")
-async def career_coach(request: Request):
+async def career_coach(request: Request, user=Depends(verify_token)):
     data = await request.json()
     history = data.get("history", [])
     # If no history, start with the system prompt
@@ -162,7 +180,7 @@ async def career_coach(request: Request):
     return {"response": result} 
 
 @app.post("/skills-forecast")
-async def skills_forecast(request: Request):
+async def skills_forecast(request: Request, user=Depends(verify_token)):
     data = await request.json()
     history = data.get("history", "")
     keywords = data.get("keywords", "")
