@@ -7,7 +7,8 @@ from backend.llm import ask_openai, web_search_query
 from typing import List
 from fastapi.staticfiles import StaticFiles
 import os
-from backend.db import lessons_collection
+import datetime
+from backend.db import lessons_collection, career_coach_sessions, skills_forecasts
 from bson import ObjectId
 
 import firebase_admin
@@ -89,8 +90,14 @@ async def micro_lesson(request: Request, user=Depends(verify_token)):
     data = await request.json()
     topic = data.get("topic", "default topic")
     lesson_text = generate_micro_lesson(topic)
-    # Save to MongoDB
-    await lessons_collection.insert_one({"topic": topic, "lesson": lesson_text})
+    # Save to MongoDB with user ID
+    await lessons_collection.insert_one({
+        "topic": topic, 
+        "lesson": lesson_text,
+        "user_id": user["uid"],  # Add user ID
+        "user_email": user.get("email", ""),  # Optional: store email for reference
+        "created_at": datetime.datetime.utcnow()  # Add timestamp
+    })
     return {"lesson": lesson_text}
 
 @app.get("/simulation")
@@ -145,22 +152,31 @@ async def web_search(request: Request):
 @app.get("/lessons")
 async def get_lessons(user=Depends(verify_token)):
     lessons = []
-    async for lesson in lessons_collection.find():
+    # Only get lessons for the authenticated user
+    async for lesson in lessons_collection.find({"user_id": user["uid"]}):
         lesson["_id"] = str(lesson["_id"])  # Convert ObjectId to string for JSON
         lessons.append(lesson)
     return {"lessons": lessons} 
 
 @app.delete("/lessons/{lesson_id}")
 async def delete_lesson(lesson_id: str, user=Depends(verify_token)):
-    result = await lessons_collection.delete_one({"_id": ObjectId(lesson_id)})
+    # Only delete lessons owned by the authenticated user
+    result = await lessons_collection.delete_one({
+        "_id": ObjectId(lesson_id),
+        "user_id": user["uid"]  # Ensure user owns this lesson
+    })
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Lesson not found")
     return {"success": True}
 
 @app.put("/lessons/{lesson_id}")
 async def update_lesson(lesson_id: str, data: dict = Body(...), user=Depends(verify_token)):
+    # Only update lessons owned by the authenticated user
     result = await lessons_collection.update_one(
-        {"_id": ObjectId(lesson_id)},
+        {
+            "_id": ObjectId(lesson_id),
+            "user_id": user["uid"]  # Ensure user owns this lesson
+        },
         {"$set": {"topic": data.get("topic"), "lesson": data.get("lesson")}}
     )
     if result.matched_count == 0:
@@ -177,6 +193,19 @@ async def career_coach(request: Request, user=Depends(verify_token)):
     else:
         messages = history
     result = ask_openai(messages=messages)
+    
+    # Optionally save the session for the user
+    try:
+        await career_coach_sessions.insert_one({
+            "user_id": user["uid"],
+            "user_email": user.get("email", ""),
+            "history": history,
+            "response": result,
+            "created_at": datetime.datetime.utcnow()
+        })
+    except Exception as e:
+        print(f"Failed to save career coach session: {e}")
+    
     return {"response": result} 
 
 @app.post("/skills-forecast")
@@ -187,4 +216,36 @@ async def skills_forecast(request: Request, user=Depends(verify_token)):
     context = f"User history:\n{history}\n\nTranscript keywords:\n{keywords}\n\n"
     prompt = PROMPTS["skills_forecast"] + "\n" + context
     result = ask_openai(prompt)
-    return {"forecast": result} 
+    
+    # Optionally save the forecast for the user
+    try:
+        await skills_forecasts.insert_one({
+            "user_id": user["uid"],
+            "user_email": user.get("email", ""),
+            "history": history,
+            "keywords": keywords,
+            "forecast": result,
+            "created_at": datetime.datetime.utcnow()
+        })
+    except Exception as e:
+        print(f"Failed to save skills forecast: {e}")
+    
+    return {"forecast": result}
+
+@app.get("/user/career-sessions")
+async def get_career_sessions(user=Depends(verify_token)):
+    """Get user's career coach sessions."""
+    sessions = []
+    async for session in career_coach_sessions.find({"user_id": user["uid"]}).sort("created_at", -1):
+        session["_id"] = str(session["_id"])
+        sessions.append(session)
+    return {"sessions": sessions}
+
+@app.get("/user/skills-forecasts")
+async def get_skills_forecasts(user=Depends(verify_token)):
+    """Get user's skills forecasts."""
+    forecasts = []
+    async for forecast in skills_forecasts.find({"user_id": user["uid"]}).sort("created_at", -1):
+        forecast["_id"] = str(forecast["_id"])
+        forecasts.append(forecast)
+    return {"forecasts": forecasts} 

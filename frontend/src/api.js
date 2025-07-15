@@ -98,3 +98,13 @@ export async function webSearch(query) {
   });
   return res.json();
 }
+
+export async function fetchCareerSessions() {
+  const res = await fetchWithAuth(`${API_BASE}/user/career-sessions`);
+  return res.json();
+}
+
+export async function fetchSkillsForecasts() {
+  const res = await fetchWithAuth(`${API_BASE}/user/skills-forecasts`);
+  return res.json();
+}
