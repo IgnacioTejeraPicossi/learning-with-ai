@@ -130,6 +130,18 @@ This project is a full-stack demo for the Nordic Software AI Hackathon. It featu
 
 ---
 
+## Prompt Evolution: Improving with prompts.chat
+
+To ensure our AI responses are always high quality and up-to-date with the latest best practices, this project leverages the [prompts.chat](https://prompts.chat) directory and its open-source community. 
+
+- We regularly review and incorporate new prompt patterns and techniques from [prompts.chat](https://prompts.chat) and its [GitHub repository](https://github.com/f/awesome-chatgpt-prompts).
+- This allows our application to continuously evolve, using the most effective prompt engineering strategies for better, more consistent AI results.
+- In the future, we plan to automate prompt updates and allow user/admin feedback to help select and refine the best prompts for each feature.
+
+**Learn more or contribute your own prompts at [prompts.chat](https://prompts.chat)!**
+
+---
+
 ## Authentication: Google Sign-In with Firebase
 
 The app supports secure, personalized access using **Google Sign-In via Firebase Authentication**.
