@@ -1,12 +1,26 @@
+import { auth } from './firebase';
+
+export async function fetchWithAuth(url, options = {}) {
+  const user = auth.currentUser;
+  if (user) {
+    const token = await user.getIdToken();
+    options.headers = {
+      ...options.headers,
+      Authorization: `Bearer ${token}`,
+    };
+  }
+  return fetch(url, options);
+}
+
 const API_BASE = "http://127.0.0.1:8000";
 
 export async function fetchConcepts() {
-  const res = await fetch(`${API_BASE}/concepts`);
+  const res = await fetchWithAuth(`${API_BASE}/concepts`);
   return res.json();
 }
 
 export async function fetchMicroLesson(topic) {
-  const res = await fetch(`${API_BASE}/micro-lesson`, {
+  const res = await fetchWithAuth("http://localhost:8000/micro-lesson", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ topic }),
@@ -15,12 +29,12 @@ export async function fetchMicroLesson(topic) {
 }
 
 export async function fetchSimulation() {
-  const res = await fetch(`${API_BASE}/simulation`);
+  const res = await fetchWithAuth(`${API_BASE}/simulation`);
   return res.json();
 }
 
 export async function fetchRecommendation(skill_gap) {
-  const res = await fetch(`${API_BASE}/recommendation`, {
+  const res = await fetchWithAuth(`${API_BASE}/recommendation`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ skill_gap }),
@@ -29,7 +43,7 @@ export async function fetchRecommendation(skill_gap) {
 }
 
 export async function fetchSimulationStep(history, user_input) {
-  const res = await fetch("http://127.0.0.1:8000/simulation-step", {
+  const res = await fetchWithAuth("http://127.0.0.1:8000/simulation-step", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ history, user_input }),
@@ -38,7 +52,7 @@ export async function fetchSimulationStep(history, user_input) {
 }
 
 export async function postCareerCoach(body) {
-  const res = await fetch("http://127.0.0.1:8000/career-coach", {
+  const res = await fetchWithAuth("http://127.0.0.1:8000/career-coach", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
@@ -47,7 +61,7 @@ export async function postCareerCoach(body) {
 }
 
 export async function postSkillsForecast(input) {
-  const res = await fetch("http://127.0.0.1:8000/skills-forecast", {
+  const res = await fetchWithAuth("http://127.0.0.1:8000/skills-forecast", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(input),
