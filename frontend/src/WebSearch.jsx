@@ -1,20 +1,23 @@
 import React, { useState } from "react";
+import { webSearch } from "./api";
 
 function WebSearch() {
   const [query, setQuery] = useState("");
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleSearch = async () => {
     setLoading(true);
-    const res = await fetch("http://localhost:8080/web-search", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ query }),
-    });
-    const data = await res.json();
-    setResult(data.result);
-    setLoading(false);
+    setError(null);
+    try {
+      const data = await webSearch(query);
+      setResult(data.result);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -44,6 +47,7 @@ function WebSearch() {
       >
         {loading ? "Searching..." : "Search"}
       </button>
+      {error && <div style={{ color: "red", marginTop: 8 }}>Error: {error}</div>}
       {result && <pre style={{ marginTop: 16, background: "#eef3fa", borderRadius: 6, padding: 12, whiteSpace: "pre-wrap", wordBreak: "break-word" }}>{result}</pre>}
     </div>
   );

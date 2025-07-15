@@ -68,3 +68,33 @@ export async function postSkillsForecast(input) {
   });
   return res.json();
 }
+
+export async function fetchLessons() {
+  const res = await fetchWithAuth(`${API_BASE}/lessons`);
+  return res.json();
+}
+
+export async function deleteLesson(id) {
+  const res = await fetchWithAuth(`${API_BASE}/lessons/${id}`, {
+    method: "DELETE"
+  });
+  return res;
+}
+
+export async function updateLesson(id, data) {
+  const res = await fetchWithAuth(`${API_BASE}/lessons/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
+  return res;
+}
+
+export async function webSearch(query) {
+  const res = await fetch("http://localhost:8080/web-search", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ query }),
+  });
+  return res.json();
+}

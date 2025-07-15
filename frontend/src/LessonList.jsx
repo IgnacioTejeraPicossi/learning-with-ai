@@ -1,18 +1,5 @@
 import React, { useEffect, useState } from "react";
-
-function fetchLessons(setLessons, setLoading, setError) {
-  setLoading(true);
-  fetch("http://localhost:8000/lessons")
-    .then(res => res.json())
-    .then(data => {
-      setLessons(data.lessons);
-      setLoading(false);
-    })
-    .catch(err => {
-      setError(err.message);
-      setLoading(false);
-    });
-}
+import { fetchLessons, deleteLesson, updateLesson } from "./api";
 
 function LessonList() {
   const [lessons, setLessons] = useState([]);
@@ -23,44 +10,59 @@ function LessonList() {
   const [editing, setEditing] = useState({});
   const [editContent, setEditContent] = useState({});
 
+  const loadLessons = async () => {
+    setLoading(true);
+    try {
+      const data = await fetchLessons();
+      setLessons(data.lessons || []);
+      setError(null);
+    } catch (err) {
+      setError(err.message);
+      setLessons([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    fetchLessons(setLessons, setLoading, setError);
+    loadLessons();
   }, []);
 
   const handleExpandToggle = id => setExpanded({ ...expanded, [id]: !expanded[id] });
-  const handleDelete = id => {
+  
+  const handleDelete = async (id) => {
     if (!window.confirm("Delete this lesson?")) return;
-    fetch(`http://localhost:8000/lessons/${id}`, { method: "DELETE" })
-      .then(res => {
-        if (!res.ok) throw new Error("Delete failed");
-        fetchLessons(setLessons, setLoading, setError);
-      })
-      .catch(err => alert(err.message));
+    try {
+      await deleteLesson(id);
+      await loadLessons();
+    } catch (err) {
+      alert(err.message);
+    }
   };
+  
   const handleEdit = (id, topic, lesson) => {
     setEditing({ ...editing, [id]: true });
     setEditContent({ ...editContent, [id]: { topic, lesson } });
   };
+  
   const handleEditChange = (id, field, value) => {
     setEditContent({
       ...editContent,
       [id]: { ...editContent[id], [field]: value }
     });
   };
-  const handleEditSave = id => {
+  
+  const handleEditSave = async (id) => {
     const { topic, lesson } = editContent[id];
-    fetch(`http://localhost:8000/lessons/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ topic, lesson })
-    })
-      .then(res => {
-        if (!res.ok) throw new Error("Update failed");
-        setEditing({ ...editing, [id]: false });
-        fetchLessons(setLessons, setLoading, setError);
-      })
-      .catch(err => alert(err.message));
+    try {
+      await updateLesson(id, { topic, lesson });
+      setEditing({ ...editing, [id]: false });
+      await loadLessons();
+    } catch (err) {
+      alert(err.message);
+    }
   };
+  
   const handleClear = () => setFilter("");
 
   const filteredLessons = lessons.filter(lesson =>
