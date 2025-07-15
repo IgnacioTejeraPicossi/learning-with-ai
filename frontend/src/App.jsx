@@ -44,7 +44,7 @@ function App() {
         <section style={{ marginBottom: 32 }}>
           <WebSearch />
         </section>
-        <LessonList />
+        <LessonList user={user} />
         <CareerCoach />
         <SkillsForecast />
       </div>

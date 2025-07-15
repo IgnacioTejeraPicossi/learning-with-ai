@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { fetchLessons, deleteLesson, updateLesson } from "./api";
 
-function LessonList() {
+function LessonList({ user }) {
   const [lessons, setLessons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -25,8 +25,10 @@ function LessonList() {
   };
 
   useEffect(() => {
-    loadLessons();
-  }, []);
+    if (user) {
+      loadLessons();
+    }
+  }, [user]);
 
   const handleExpandToggle = id => setExpanded({ ...expanded, [id]: !expanded[id] });
   
