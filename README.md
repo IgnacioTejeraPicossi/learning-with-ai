@@ -21,7 +21,8 @@ flowchart TD
     Prompts[prompts.py]
     VectorStore[vector_store.py]
     WebSearchNode[websearch-backend/index.js]
-    DB[(Database)]
+    DB[(MongoDB)]
+    Firebase[(Firebase Auth)]
   end
   OpenAI(OpenAI API)
 
@@ -39,16 +40,17 @@ flowchart TD
   App --> SkillsForecast
   App --> Auth
   Simulator -->|Scenario UI| App
-  API -->|HTTP requests| AppPy
+  API -->|HTTP requests with Firebase token| AppPy
   WebSearchNode -->|HTTP requests| OpenAI
 
   %% Backend flow
   AppPy -->|Uses prompts| Prompts
   AppPy -->|Calls LLM| LLM
   AppPy -->|Vector search| VectorStore
-  AppPy -->|Saves lessons| DB
+  AppPy -->|Saves user-specific data| DB
   AppPy -->|Career coach| LLM
   AppPy -->|Skills forecast| LLM
+  AppPy -->|Verifies Firebase token| Firebase
   LLM -->|Sends prompt, gets response| OpenAI
   VectorStore -->|Future: Embeddings| DB
 
@@ -60,7 +62,7 @@ flowchart TD
   App -- Shows result --> User
   WebSearchNode -- Data --> App
   OpenAI -- AI response --> WebSearchNode
-  DB -- Saved lessons --> AppPy
+  DB -- User-specific data --> AppPy
 
   %% Styling
   classDef backend fill:#e3f2fd,stroke:#1976d2,stroke-width:2px;
@@ -85,10 +87,12 @@ This project is a full-stack demo for the Nordic Software AI Hackathon. It featu
   - **Saved Micro-lessons**: All generated micro-lessons are stored in a MongoDB database for later review, with endpoints for listing, editing, and deleting lessons
   - **AI Career Coach**: An intelligent mentor that guides users through soft skills, leadership scenarios, and career goals via a `/career-coach` endpoint. Supports multi-turn conversations by accepting and responding to conversation history.
   - **Dynamic Skills Forecasting**: Predicts future skill needs based on user learning history and transcript keywords via a `/skills-forecast` endpoint.
+- **Firebase Authentication**: Secure user authentication with Google Sign-In
+- **User-Specific Data**: All data (lessons, career sessions, forecasts) is saved per user
 - Dynamic prompt handling with user input (e.g., custom micro-lesson topics)
 - Mocked AI responses if OpenAI API key is missing or invalid
 - CORS enabled for frontend-backend communication
-- **MongoDB integration** for persistent storage of micro-lessons
+- **MongoDB integration** for persistent storage of user-specific data
 
 ### Frontend (React + Shoelace)
 - **Google Sign-In via Firebase Authentication** for secure, personalized access
@@ -108,10 +112,11 @@ This project is a full-stack demo for the Nordic Software AI Hackathon. It featu
     - Start a conversation with an AI mentor for career guidance, goal setting, and soft skills development
     - **Multi-turn chat interface**: Continue the conversation by sending and receiving messages in a chat-like UI
     - **End Session** button to reset the conversation and start over
-    - (Future: add user context and progress tracking)
+    - Sessions are automatically saved per user
   - **Skills Forecasting** (`SkillsForecast.jsx`):
     - Enter your learning history and transcript keywords
     - Get AI-powered predictions for the next skills you should develop, with explanations
+    - Forecasts are saved per user for future reference
 - **Shoelace-based UI:**
   - Uses [Shoelace](https://shoelace.style/) Web Components for cards, buttons, and layout in all main features (Career Coach, Skills Forecasting, Saved Micro-lessons)
   - Consistent, modern design with accessible, themeable components
@@ -129,9 +134,76 @@ This project is a full-stack demo for the Nordic Software AI Hackathon. It featu
 
 The app supports secure, personalized access using **Google Sign-In via Firebase Authentication**.
 - Users can sign in with their Google account to access all features.
-- User data (saved lessons, forecasts, etc.) can be linked to their Google account for a personalized experience.
+- **User-specific data**: All saved lessons, career coach sessions, and skills forecasts are linked to the user's Google account.
+- **Privacy and security**: Users can only access and modify their own data.
 - Sign-in and sign-out are handled with Shoelace-styled buttons for a seamless UI.
-- (Future: user-specific dashboards, data protection, and backend endpoint security)
+- **Backend protection**: All API endpoints require valid Firebase authentication tokens.
+
+---
+
+## Database Architecture: Two Databases for Different Purposes
+
+This project uses **two separate databases** for different purposes:
+
+### 1. **Firebase Authentication Database**
+- **Purpose**: User identity and authentication
+- **Stores**: User credentials, email, UID, profile information
+- **What you get**: Secure way to know "who is this user?"
+- **Access**: Managed by Firebase (no direct database access needed)
+
+### 2. **MongoDB (Application Database)**
+- **Purpose**: Store your app's business data
+- **Stores**: 
+  - Micro-lessons with user associations
+  - Career coach sessions per user
+  - Skills forecasts per user
+  - User progress and activity
+- **What you get**: Your app's data with user associations
+- **Collections**:
+  - `lessons`: User-specific micro-lessons
+  - `career_coach_sessions`: User's career coaching history
+  - `skills_forecasts`: User's skills predictions
+  - `users`: (Future) Additional user profile data
+
+### **Why Use Both?**
+
+- **Separation of Concerns**: Authentication vs. business data
+- **Firebase Auth is NOT a Database**: It only handles user identity, not app data
+- **Scalability**: Each database optimized for its specific purpose
+- **Security**: User data is properly isolated and protected
+
+### **Data Structure Example:**
+```json
+// MongoDB lesson document
+{
+  "_id": "ObjectId(...)",
+  "topic": "Agile sprint planning",
+  "lesson": "Lesson content...",
+  "user_id": "firebase_uid_here",
+  "user_email": "user@example.com",
+  "created_at": "2024-01-15T10:30:00Z"
+}
+```
+
+---
+
+## User-Specific Features
+
+### **Personalized Data Storage**
+- **Micro-lessons**: Each user sees only their own saved lessons
+- **Career coach sessions**: Conversations are saved per user
+- **Skills forecasts**: Predictions are stored per user
+- **Security**: Users can only access and modify their own data
+
+### **New User-Specific Endpoints**
+- `GET /user/career-sessions`: Retrieve user's career coaching history
+- `GET /user/skills-forecasts`: Retrieve user's skills predictions
+- All existing endpoints now filter by user ID
+
+### **Frontend Integration**
+- All API calls include Firebase authentication tokens
+- User-specific data is automatically loaded
+- Seamless personalization without additional user setup
 
 ---
 
@@ -145,21 +217,23 @@ The app uses [Shoelace](https://shoelace.style/) for a modern, accessible, and c
 
 **How to customize or extend:**
 - Add more Shoelace components (dialogs, alerts, inputs) as needed
-- Change themes or use Shoelace’s utility classes for layout tweaks
+- Change themes or use Shoelace's utility classes for layout tweaks
 - See [Shoelace documentation](https://shoelace.style/components/overview/) for more options
 
 ---
 
 ## Saved Micro-lessons
 
-All micro-lessons generated by the user are automatically saved to the MongoDB database. You can view your entire history of generated micro-lessons in the **Saved Micro-lessons** section at the bottom of the app. This allows you to revisit, review, and reuse any lesson at any time.
+All micro-lessons generated by the user are automatically saved to the MongoDB database with user-specific associations. You can view your entire history of generated micro-lessons in the **Saved Micro-lessons** section at the bottom of the app. This allows you to revisit, review, and reuse any lesson at any time.
 
 **Features of the Saved Micro-lessons section:**
+- **User-specific**: Only shows lessons created by the logged-in user
 - **Filter:** Instantly filter lessons by topic as you type.
 - **Expand/Compress:** Toggle each lesson to show only the topic or the full lesson content.
 - **Edit:** Edit the topic and content of any lesson inline and save changes to the database.
 - **Delete:** Remove any lesson from your history with a single click.
-- Lessons are stored with their topic and full content.
+- **Secure:** Users can only access and modify their own lessons.
+- Lessons are stored with their topic, full content, user ID, and creation timestamp.
 - The list is always up to date and loads automatically.
 - This feature demonstrates persistent storage, retrieval, and management in a real-world AI learning app.
 
@@ -174,6 +248,7 @@ The **AI Career Coach** is an intelligent mentor module that guides users throug
   - The frontend provides a `CareerCoach.jsx` component with a chat-like interface.
   - Users can start a session, send messages, and receive contextual responses from the AI coach.
   - The conversation can be reset at any time using the **End Session** button.
+  - **User-specific sessions**: All conversations are saved per user for future reference.
 - **Planned enhancements:**
   - Allow users to input their role and learning focus
   - Multi-turn conversations with state/history
@@ -196,6 +271,7 @@ The **Dynamic Skills Forecasting** module analyzes your learning history and tra
   - The backend exposes a `/skills-forecast` endpoint powered by a dedicated prompt and the LLM.
   - The frontend provides a `SkillsForecast.jsx` component where you can enter your learning history and transcript keywords.
   - The AI suggests three future skills to develop, with reasons for each suggestion.
+  - **User-specific forecasts**: All predictions are saved per user for tracking over time.
 - **Planned enhancements:**
   - Automatically extract history and keywords from user activity and meeting transcripts
   - Save and track forecasts over time
@@ -210,13 +286,16 @@ The **Dynamic Skills Forecasting** module analyzes your learning history and tra
 
 ## 4. Summary Table
 
-| Endpoint         | Uses Web Search Tool? | Uses Standard LLM? |
-|------------------|:--------------------:|:------------------:|
-| `/concepts`      | ❌                   | ✅                 |
-| `/micro-lesson`  | ❌                   | ✅                 |
-| `/recommendation`| ❌                   | ✅                 |
-| `/simulation`    | ❌                   | ✅                 |
-| `/web-search`    | ✅                   | ✅ (with tool)     |
+| Endpoint         | Uses Web Search Tool? | Uses Standard LLM? | User-Specific? |
+|------------------|:--------------------:|:------------------:|:--------------:|
+| `/concepts`      | ❌                   | ✅                 | ❌             |
+| `/micro-lesson`  | ❌                   | ✅                 | ✅             |
+| `/recommendation`| ❌                   | ✅                 | ❌             |
+| `/simulation`    | ❌                   | ✅                 | ❌             |
+| `/web-search`    | ✅                   | ✅ (with tool)     | ❌             |
+| `/lessons`       | ❌                   | ❌                 | ✅             |
+| `/career-coach`  | ❌                   | ✅                 | ✅             |
+| `/skills-forecast`| ❌                  | ✅                 | ✅             |
 
 ---
 
@@ -226,12 +305,14 @@ This project uses **two backend servers**:
 
 - **Python FastAPI backend** (main API):
   - Handles concepts, micro-lesson, recommendation, simulation, etc.
+  - **Firebase authentication** for user security
+  - **User-specific data storage** in MongoDB
   - Run with:
     ```bash
     uvicorn backend.app:app --reload
     ```
 - **Node.js Express backend** (web search):
-  - Handles `/web-search` endpoint using OpenAI’s web search tool (if available)
+  - Handles `/web-search` endpoint using OpenAI's web search tool (if available)
   - Run with:
     ```bash
     cd websearch-backend
@@ -248,7 +329,6 @@ The Web Search feature uses a separate Node.js backend to call OpenAI's GPT-4.1 
 
 - If your OpenAI account supports the web search tool (`web_search_preview`), you will get live, up-to-date answers from the internet.
 - If not, the backend will **automatically fall back to a standard LLM response** (no web search, but still a high-quality answer).
-- The user experience is seamless: you always get an answer, and no error is shown if web search is not available.
 
 ### Summary Table: Web Search Tool Support
 
