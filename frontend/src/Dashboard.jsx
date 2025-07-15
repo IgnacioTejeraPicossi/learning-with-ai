@@ -1,19 +1,28 @@
 import React, { useEffect, useState } from "react";
-import LessonList from "./LessonList";
+import { auth } from "./firebase";
+import { fetchLessons } from "./api";
 
-const PROGRESS_KEY = "ai_learning_progress";
+const PROGRESS_KEY_PREFIX = "ai_learning_progress_";
 
-function getInitialProgress() {
-  const stored = localStorage.getItem(PROGRESS_KEY);
+function getProgressKey(userId) {
+  return `${PROGRESS_KEY_PREFIX}${userId}`;
+}
+
+function getInitialProgress(userId) {
+  if (!userId) return getDefaultProgress();
+  
+  const stored = localStorage.getItem(getProgressKey(userId));
   if (stored) return JSON.parse(stored);
-  const initial = {
+  return getDefaultProgress();
+}
+
+function getDefaultProgress() {
+  return {
     lessonsCompleted: 0,
     simulationsCompleted: 0,
     simulationScore: 0,
     lastActivity: null
   };
-  localStorage.setItem(PROGRESS_KEY, JSON.stringify(initial));
-  return initial;
 }
 
 function formatDate(dateStr) {
@@ -29,15 +38,62 @@ function getRecommendation(progress) {
   return "Great job! Keep learning or try a new scenario.";
 }
 
-function Dashboard() {
-  const [progress, setProgress] = useState(getInitialProgress());
+function Dashboard({ user }) {
+  const [progress, setProgress] = useState(getDefaultProgress());
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Listen for progress updates from other components
-    const onStorage = () => setProgress(getInitialProgress());
-    window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
-  }, []);
+    if (!user) {
+      setProgress(getDefaultProgress());
+      setLoading(false);
+      return;
+    }
+
+    // Load user-specific progress
+    const userProgress = getInitialProgress(user.uid);
+    setProgress(userProgress);
+
+    // Fetch actual lessons count from backend
+    const fetchUserData = async () => {
+      try {
+        const lessonsData = await fetchLessons();
+        const actualLessonsCount = lessonsData.lessons?.length || 0;
+        
+        // Update progress with real data
+        const updatedProgress = {
+          ...userProgress,
+          lessonsCompleted: actualLessonsCount,
+          lastActivity: userProgress.lastActivity || new Date().toISOString()
+        };
+        
+        setProgress(updatedProgress);
+        // Save updated progress
+        localStorage.setItem(getProgressKey(user.uid), JSON.stringify(updatedProgress));
+      } catch (error) {
+        console.error("Failed to fetch user data:", error);
+        setProgress(userProgress);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, [user]);
+
+  if (loading) {
+    return (
+      <div style={{
+        background: "#e3f2fd",
+        borderRadius: 10,
+        padding: 24,
+        marginBottom: 32,
+        boxShadow: "0 1px 4px #eee"
+      }}>
+        <h2 style={{ marginTop: 0 }}>Your Progress</h2>
+        <div>Loading your progress...</div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -59,16 +115,19 @@ function Dashboard() {
           Recommended next step: {getRecommendation(progress)}
         </div>
       </div>
-      
     </>
   );
 }
 
 export function updateProgress(updates) {
-  const current = getInitialProgress();
+  const user = auth.currentUser;
+  if (!user) return;
+
+  const current = getInitialProgress(user.uid);
   const merged = { ...current, ...updates };
   merged.lastActivity = new Date().toISOString();
-  localStorage.setItem("ai_learning_progress", JSON.stringify(merged));
+  
+  localStorage.setItem(getProgressKey(user.uid), JSON.stringify(merged));
   // Trigger storage event for other tabs/components
   window.dispatchEvent(new Event("storage"));
 }

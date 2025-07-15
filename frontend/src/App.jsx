@@ -28,7 +28,7 @@ function App() {
       </header>
       <div style={{ maxWidth: 700, margin: "2rem auto", background: "#fff", borderRadius: 12, boxShadow: "0 2px 12px #0001", padding: 32 }}>
         <Auth user={user} setUser={setUser} />
-        <Dashboard />
+        <Dashboard user={user} />
         <section style={{ marginBottom: 32 }}>
           <Concepts />
         </section>

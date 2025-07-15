@@ -9,12 +9,16 @@ function MicroLesson() {
 
   const handleGetMicroLesson = async () => {
     setLoading(true);
-    const data = await fetchMicroLesson(topic);
-    setLesson(data.lesson);
-    setLoading(false);
-    // Update progress: increment lessonsCompleted
-    const progress = JSON.parse(localStorage.getItem("ai_learning_progress"));
-    updateProgress({ lessonsCompleted: (progress.lessonsCompleted || 0) + 1 });
+    try {
+      const data = await fetchMicroLesson(topic);
+      setLesson(data.lesson);
+      // Update progress: increment lessonsCompleted
+      updateProgress({ lessonsCompleted: 1 }); // This will be added to current count
+    } catch (error) {
+      console.error("Failed to generate micro-lesson:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleClear = () => {
