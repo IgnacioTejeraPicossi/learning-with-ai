@@ -152,9 +152,8 @@ async def web_search(request: Request):
 @app.get("/lessons")
 async def get_lessons(user=Depends(verify_token)):
     lessons = []
-    # Only get lessons for the authenticated user
     async for lesson in lessons_collection.find({"user_id": user["uid"]}):
-        lesson["_id"] = str(lesson["_id"])  # Convert ObjectId to string for JSON
+        lesson["_id"] = str(lesson["_id"])
         lessons.append(lesson)
     return {"lessons": lessons} 
 
