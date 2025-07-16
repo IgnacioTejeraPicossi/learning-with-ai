@@ -1,5 +1,27 @@
 import React, { useState } from "react";
-import "@shoelace-style/shoelace/dist/components/icon/icon.js";
+
+// Simple icon component using Unicode symbols
+const Icon = ({ name, size = 20 }) => {
+  const icons = {
+    house: "🏠",
+    lightbulb: "💡", 
+    book: "📚",
+    star: "⭐",
+    "play-circle": "▶️",
+    "user-check": "👤",
+    "bar-chart": "📊",
+    archive: "📦",
+    layers: "📋",
+    "chevron-left": "◀️",
+    "chevron-right": "▶️"
+  };
+
+  return (
+    <span style={{ fontSize: size, display: "inline-block", width: size, textAlign: "center" }}>
+      {icons[name] || "📄"}
+    </span>
+  );
+};
 
 const navItems = [
   { key: "dashboard", label: "Dashboard", icon: "house" },
@@ -7,7 +29,7 @@ const navItems = [
   { key: "micro-lessons", label: "Micro-lessons", icon: "book" },
   { key: "recommendation", label: "Recommendation", icon: "star" },
   { key: "simulations", label: "Simulations", icon: "play-circle" },
-  { key: "coach", label: "AI Career Coach", icon: "person-heart" },
+  { key: "coach", label: "AI Career Coach", icon: "user-check" },
   { key: "skills-forecast", label: "Skills Forecast", icon: "bar-chart" },
   { key: "saved-lessons", label: "Saved Lessons", icon: "archive" },
 ];
@@ -55,10 +77,7 @@ function Sidebar({ selected, onSelect }) {
         }}
         title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
       >
-        <sl-icon 
-          name={isCollapsed ? "chevron-right" : "chevron-left"} 
-          style={{ fontSize: 12 }}
-        ></sl-icon>
+        <Icon name={isCollapsed ? "chevron-right" : "chevron-left"} size={12} />
       </button>
 
       <div style={{ 
@@ -71,9 +90,9 @@ function Sidebar({ selected, onSelect }) {
         overflow: "hidden",
         whiteSpace: "nowrap"
       }}>
-        {!isCollapsed && <sl-icon name="layers" style={{ marginRight: 8 }}></sl-icon>}
+        {!isCollapsed && <Icon name="layers" size={20} style={{ marginRight: 8 }} />}
         {!isCollapsed && "AI Learning"}
-        {isCollapsed && <sl-icon name="layers"></sl-icon>}
+        {isCollapsed && <Icon name="layers" size={20} />}
       </div>
       
       <nav>
@@ -100,7 +119,7 @@ function Sidebar({ selected, onSelect }) {
             }}
             title={isCollapsed ? item.label : ""}
           >
-            <sl-icon name={item.icon} style={{ fontSize: isCollapsed ? 18 : 20 }}></sl-icon>
+            <Icon name={item.icon} size={isCollapsed ? 18 : 20} />
             {!isCollapsed && item.label}
           </button>
         ))}

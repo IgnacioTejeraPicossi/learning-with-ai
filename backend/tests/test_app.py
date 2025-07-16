@@ -7,3 +7,5 @@ def test_concepts():
     response = client.get("/concepts")
     assert response.status_code == 200
     assert "concepts" in response.json()
+
+
