@@ -16,7 +16,9 @@ import Sidebar from './Sidebar';
 
 const sectionComponents = {
   dashboard: Dashboard,
+  "ai-concepts": Concepts,
   "micro-lessons": MicroLesson,
+  recommendation: Recommendation,
   simulations: Simulator,
   coach: CareerCoach,
   "skills-forecast": SkillsForecast,
@@ -45,7 +47,9 @@ function App() {
           <Auth user={user} setUser={setUser} />
           {/* Render the selected section */}
           {section === "dashboard" && <Dashboard user={user} />}
+          {section === "ai-concepts" && <Concepts />}
           {section === "micro-lessons" && <MicroLesson />}
+          {section === "recommendation" && <Recommendation />}
           {section === "simulations" && <Simulator />}
           {section === "coach" && <CareerCoach />}
           {section === "skills-forecast" && <SkillsForecast />}

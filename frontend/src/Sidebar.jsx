@@ -3,9 +3,11 @@ import "@shoelace-style/shoelace/dist/components/icon/icon.js";
 
 const navItems = [
   { key: "dashboard", label: "Dashboard", icon: "house" },
+  { key: "ai-concepts", label: "AI Concepts", icon: "lightbulb" },
   { key: "micro-lessons", label: "Micro-lessons", icon: "book" },
+  { key: "recommendation", label: "Recommendation", icon: "star" },
   { key: "simulations", label: "Simulations", icon: "play-circle" },
-  { key: "coach", label: "Coach", icon: "person-heart" },
+  { key: "coach", label: "AI Career Coach", icon: "person-heart" },
   { key: "skills-forecast", label: "Skills Forecast", icon: "bar-chart" },
   { key: "saved-lessons", label: "Saved Lessons", icon: "archive" },
 ];
