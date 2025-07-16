@@ -1,70 +1,93 @@
-# Getting Started with Create React App
+# AI Workplace Learning Platform – Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This is the React frontend for the AI Workplace Learning Platform. It provides a modern, interactive dashboard for workplace learning, powered by AI and integrated with Firebase Authentication and a FastAPI backend.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## ✨ Features
 
-### `npm start`
+- **Modern Dashboard UI** with sidebar navigation
+- **Progress Cards** for lessons, simulations, and learning streak
+- **Interactive Charts**:
+  - Lessons Completed Over Time (Line Chart)
+  - Lessons by Topic Breakdown (Pie Chart)
+- **Modal Dialogs** for AI outputs (AI Concepts, Micro-lesson, Recommendation)
+- **Consistent Theming** with color-coded buttons and cards
+- **Responsive Design** for desktop and mobile
+- **Firebase Authentication** integration
+- **Secure API calls** with user tokens
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+---
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 📦 Dependencies
 
-### `npm test`
+- [React](https://reactjs.org/)
+- [Recharts](https://recharts.org/) – for charts
+- [react-modal](https://reactcommunity.org/react-modal/) – for modal dialogs
+- [Firebase](https://firebase.google.com/) – for authentication
+- [Shoelace](https://shoelace.style/) – for icons (sidebar)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+---
 
-### `npm run build`
+## 🚀 Getting Started
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+1. **Install dependencies:**
+   ```sh
+   npm install
+   ```
+2. **Start the development server:**
+   ```sh
+   npm start
+   ```
+   The app will be available at [http://localhost:3000](http://localhost:3000)
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+---
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## 🖥️ UI Overview
 
-### `npm run eject`
+- **Sidebar Navigation:**
+  - Quick access to Dashboard, AI Concepts, Micro-lessons, Recommendation, Simulations, Career Coach, Skills Forecast, and Saved Lessons
+- **Dashboard:**
+  - Welcome message and sign out
+  - Progress cards for lessons, simulations, and streak
+  - Recommended next step
+  - **Charts:**
+    - Lessons Completed Over Time (line chart)
+    - Lessons by Topic (pie chart)
+- **AI Features:**
+  - Get AI Concepts, Micro-lessons, and Recommendations
+  - Results shown in beautiful modal dialogs
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+---
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## 🛠️ Customization & Extending
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+- **Add new charts:** Use Recharts and pass processed data as props
+- **Add new sidebar sections:** Edit `Sidebar.jsx` and add new routes/components
+- **Style buttons and cards:** Use inline styles or your favorite CSS-in-JS solution
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+---
 
-## Learn More
+## 🔒 Authentication & API
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- Uses Firebase Authentication for login
+- All API calls include the user’s Firebase ID token for secure backend access
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+---
 
-### Code Splitting
+## 📊 Data Handling
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+- **Lessons** are fetched from the backend and grouped by week and topic for charts
+- **Progress** is tracked and displayed per user
 
-### Analyzing the Bundle Size
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## 🤝 Contributing
 
-### Making a Progressive Web App
+Pull requests and suggestions are welcome! Please open an issue or PR to discuss improvements.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+---
 
-### Advanced Configuration
+## License
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+MIT

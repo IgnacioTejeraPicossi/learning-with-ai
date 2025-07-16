@@ -3,6 +3,7 @@ import { auth } from "./firebase";
 import { fetchLessons } from "./api";
 import ProgressCard from "./ProgressCard";
 import LearningTrendsChart from "./LearningTrendsChart";
+import TopicBreakdownChart from "./TopicBreakdownChart";
 
 const PROGRESS_KEY_PREFIX = "ai_learning_progress_";
 
@@ -55,11 +56,13 @@ function Dashboard({ user }) {
   const [progress, setProgress] = useState(getDefaultProgress());
   const [loading, setLoading] = useState(true);
   const [lessonTrends, setLessonTrends] = useState([]);
+  const [topicBreakdown, setTopicBreakdown] = useState([]);
 
   useEffect(() => {
     if (!user) {
       setProgress(getDefaultProgress());
       setLessonTrends([]);
+      setTopicBreakdown([]);
       setLoading(false);
       return;
     }
@@ -84,7 +87,7 @@ function Dashboard({ user }) {
         setProgress(updatedProgress);
         localStorage.setItem(getProgressKey(user.uid), JSON.stringify(updatedProgress));
 
-        // Group lessons by week
+        // Group lessons by week for line chart
         const weekMap = {};
         lessons.forEach(lesson => {
           if (lesson.created_at) {
@@ -96,10 +99,25 @@ function Dashboard({ user }) {
         const sortedWeeks = Object.keys(weekMap).sort();
         const trends = sortedWeeks.map(week => ({ week, lessons: weekMap[week] }));
         setLessonTrends(trends);
+
+        // Group lessons by topic for pie chart
+        const topicMap = {};
+        lessons.forEach(lesson => {
+          if (lesson.topic) {
+            topicMap[lesson.topic] = (topicMap[lesson.topic] || 0) + 1;
+          }
+        });
+        // Convert to array for pie chart
+        const breakdown = Object.keys(topicMap).map(topic => ({
+          name: topic,
+          value: topicMap[topic]
+        }));
+        setTopicBreakdown(breakdown);
       } catch (error) {
         console.error("Failed to fetch user data:", error);
         setProgress(userProgress);
         setLessonTrends([]);
+        setTopicBreakdown([]);
       } finally {
         setLoading(false);
       }
@@ -190,7 +208,15 @@ function Dashboard({ user }) {
           💡 <strong>Recommended next step:</strong> {getRecommendation(progress)}
         </div>
       </div>
-      <LearningTrendsChart data={lessonTrends} />
+      
+      <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
+        <div style={{ flex: 1, minWidth: 300 }}>
+          <LearningTrendsChart data={lessonTrends} />
+        </div>
+        <div style={{ flex: 1, minWidth: 300 }}>
+          <TopicBreakdownChart data={topicBreakdown} />
+        </div>
+      </div>
     </>
   );
 }
