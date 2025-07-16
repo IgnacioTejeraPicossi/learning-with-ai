@@ -12,6 +12,7 @@ const Icon = ({ name, size = 20 }) => {
     "bar-chart": "📊",
     archive: "📦",
     layers: "📋",
+    globe: "🌐",
     "chevron-left": "◀️",
     "chevron-right": "▶️"
   };
@@ -29,6 +30,7 @@ const navItems = [
   { key: "micro-lessons", label: "Micro-lessons", icon: "book" },
   { key: "recommendation", label: "Recommendation", icon: "star" },
   { key: "simulations", label: "Simulations", icon: "play-circle" },
+  { key: "web-search", label: "Web Search", icon: "globe" },
   { key: "coach", label: "AI Career Coach", icon: "user-check" },
   { key: "skills-forecast", label: "Skills Forecast", icon: "bar-chart" },
   { key: "saved-lessons", label: "Saved Lessons", icon: "archive" },

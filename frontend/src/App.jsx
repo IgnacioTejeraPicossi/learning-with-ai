@@ -20,6 +20,7 @@ const sectionComponents = {
   "micro-lessons": MicroLesson,
   recommendation: Recommendation,
   simulations: Simulator,
+  "web-search": WebSearch,
   coach: CareerCoach,
   "skills-forecast": SkillsForecast,
   "saved-lessons": LessonList,
@@ -45,26 +46,16 @@ function App() {
         </header>
         <div style={{ maxWidth: 900, margin: "2rem auto", background: "#fff", borderRadius: 12, boxShadow: "0 2px 12px #0001", padding: 32 }}>
           <Auth user={user} setUser={setUser} />
-          {/* Render the selected section */}
+          {/* Render the selected section only */}
           {section === "dashboard" && <Dashboard user={user} />}
           {section === "ai-concepts" && <Concepts />}
           {section === "micro-lessons" && <MicroLesson />}
           {section === "recommendation" && <Recommendation />}
           {section === "simulations" && <Simulator />}
+          {section === "web-search" && <WebSearch />}
           {section === "coach" && <CareerCoach />}
           {section === "skills-forecast" && <SkillsForecast />}
           {section === "saved-lessons" && <LessonList user={user} />}
-          {/* Optionally, keep Concepts, Recommendation, WebSearch as dashboard widgets or add to sidebar */}
-          {section === "dashboard" && <>
-            <section style={{ marginBottom: 32 }}><Concepts /></section>
-            <section style={{ marginBottom: 32 }}><MicroLesson /></section>
-            <section style={{ marginBottom: 32 }}><Recommendation /></section>
-            <section><Simulator /></section>
-            <section style={{ marginBottom: 32 }}><WebSearch /></section>
-            <LessonList user={user} />
-            <CareerCoach />
-            <SkillsForecast />
-          </>}
         </div>
       </div>
     </div>
