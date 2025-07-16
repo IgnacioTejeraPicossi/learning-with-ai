@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { auth } from "./firebase";
 import { fetchLessons } from "./api";
+import ProgressCard from "./ProgressCard";
 
 const PROGRESS_KEY_PREFIX = "ai_learning_progress_";
 
@@ -104,15 +105,62 @@ function Dashboard({ user }) {
         marginBottom: 32,
         boxShadow: "0 1px 4px #eee"
       }}>
-        <h2 style={{ marginTop: 0 }}>Your Progress</h2>
-        <div style={{ display: "flex", gap: 32, flexWrap: "wrap", marginBottom: 12 }}>
-          <div><b>Lessons completed:</b> {progress.lessonsCompleted}</div>
-          <div><b>Simulations completed:</b> {progress.simulationsCompleted}</div>
-          <div><b>Simulation score:</b> {progress.simulationScore}</div>
-          <div><b>Last activity:</b> {formatDate(progress.lastActivity)}</div>
+        <h2 style={{ marginTop: 0, marginBottom: 20 }}>Your Progress</h2>
+        
+        <div style={{ 
+          display: "flex", 
+          gap: 16, 
+          flexWrap: "wrap", 
+          marginBottom: 20 
+        }}>
+          <ProgressCard
+            title="Lessons Completed"
+            value={progress.lessonsCompleted}
+            total={10}
+            icon="📚"
+            color="#4CAF50"
+            backgroundColor="#e8f5e8"
+          />
+          
+          <ProgressCard
+            title="Simulations Completed"
+            value={progress.simulationsCompleted}
+            total={5}
+            icon="▶️"
+            color="#2196F3"
+            backgroundColor="#e3f2fd"
+          />
+          
+          <ProgressCard
+            title="Simulation Score"
+            value={progress.simulationScore}
+            total={progress.simulationsCompleted || 1}
+            icon="🎯"
+            color="#FF9800"
+            backgroundColor="#fff3e0"
+            showProgress={progress.simulationsCompleted > 0}
+          />
+          
+          <ProgressCard
+            title="Learning Streak"
+            value={progress.lastActivity ? 1 : 0}
+            total={1}
+            icon="🔥"
+            color="#F44336"
+            backgroundColor="#ffebee"
+            showProgress={false}
+          />
         </div>
-        <div style={{ fontWeight: 500, color: "#1976d2" }}>
-          Recommended next step: {getRecommendation(progress)}
+        
+        <div style={{ 
+          fontWeight: 500, 
+          color: "#1976d2",
+          background: "white",
+          padding: "12px 16px",
+          borderRadius: 8,
+          border: "1px solid #e0e0e0"
+        }}>
+          💡 <strong>Recommended next step:</strong> {getRecommendation(progress)}
         </div>
       </div>
     </>
