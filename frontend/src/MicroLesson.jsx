@@ -45,6 +45,7 @@ function MicroLesson() {
           marginRight: 8,
           boxShadow: "0 1px 4px #0001"
         }}
+        title="Generate a custom AI-powered micro-lesson for your chosen topic."
       >
         Get Micro-lesson
       </button>

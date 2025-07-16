@@ -45,6 +45,7 @@ function Recommendation() {
           marginRight: 8,
           boxShadow: "0 1px 4px #0001"
         }}
+        title="Get a personalized AI-powered learning recommendation for your skill gap."
       >
         Get Recommendation
       </button>
