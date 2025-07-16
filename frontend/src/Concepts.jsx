@@ -21,7 +21,6 @@ function Concepts() {
       <h2 style={{ marginTop: 0 }}>AI Concepts</h2>
       <button
         onClick={handleGetConcepts}
-        disabled={loading}
         style={{
           background: "#1976d2",
           color: "#fff",
@@ -30,13 +29,13 @@ function Concepts() {
           padding: "8px 18px",
           fontWeight: 600,
           fontSize: 16,
-          cursor: loading ? "not-allowed" : "pointer",
-          boxShadow: "0 1px 4px #0001",
-          marginRight: 8
+          cursor: "pointer",
+          marginRight: 8,
+          boxShadow: "0 1px 4px #0001"
         }}
         title="Get 3 innovative AI-powered workplace learning concepts."
       >
-        {loading ? "Loading..." : "Get AI Concepts"}
+        Get AI Concepts
       </button>
       <button
         onClick={handleClear}

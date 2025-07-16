@@ -1,62 +1,38 @@
 import React, { useState } from "react";
 import { fetchRecommendation } from "./api";
+import ModalDialog from "./ModalDialog";
 
 function Recommendation() {
   const [skillGap, setSkillGap] = useState("");
-  const [recommendation, setRecommendation] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [aiOutput, setAiOutput] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleGetRecommendation = async () => {
     setLoading(true);
-    const data = await fetchRecommendation(skillGap);
-    setRecommendation(data.recommendation);
+    setModalOpen(true);
+    try {
+      const result = await fetchRecommendation(skillGap);
+      setAiOutput(result.recommendation || JSON.stringify(result, null, 2));
+    } catch (err) {
+      setAiOutput("Error fetching recommendation.");
+    }
     setLoading(false);
   };
 
-  const handleClear = () => {
-    setSkillGap("");
-    setRecommendation(null);
-  };
-
   return (
-    <div style={{ background: "#f8fafc", borderRadius: 8, padding: 20, boxShadow: "0 1px 6px #0001" }}>
-      <h2 style={{ marginTop: 0 }}>Recommendation</h2>
+    <div>
+      <h2>Recommendation</h2>
       <input
+        type="text"
         value={skillGap}
         onChange={e => setSkillGap(e.target.value)}
         placeholder="Enter skill gap for recommendation"
-        style={{
-          marginRight: 8,
-          padding: 8,
-          borderRadius: 6,
-          border: "1px solid #bbb",
-          fontSize: 15,
-          minWidth: 220
-        }}
-        title="Enter a skill gap (e.g., 'team leadership') to get tailored recommendations."
+        style={{ marginRight: 8 }}
       />
       <button
-        onClick={handleClear}
-        disabled={loading && !skillGap && !recommendation}
-        style={{
-          marginRight: 8,
-          background: "#fff",
-          color: "#333",
-          border: "1px solid #bbb",
-          borderRadius: 6,
-          padding: "8px 18px",
-          fontWeight: 600,
-          fontSize: 16,
-          cursor: loading || (!skillGap && !recommendation) ? "not-allowed" : "pointer",
-          boxShadow: "0 1px 4px #0001"
-        }}
-        title="Clear the skill gap and recommendation result."
-      >
-        Clear
-      </button>
-      <button
         onClick={handleGetRecommendation}
-        disabled={loading || !skillGap}
+        disabled={!skillGap}
         style={{
           background: "#d32f2f",
           color: "#fff",
@@ -65,14 +41,24 @@ function Recommendation() {
           padding: "8px 18px",
           fontWeight: 600,
           fontSize: 16,
-          cursor: loading || !skillGap ? "not-allowed" : "pointer",
+          cursor: !skillGap ? "not-allowed" : "pointer",
+          marginRight: 8,
           boxShadow: "0 1px 4px #0001"
         }}
-        title="Generate learning module recommendations for the entered skill gap."
       >
-        {loading ? "Loading..." : "Get Recommendation"}
+        Get Recommendation
       </button>
-      {recommendation && <pre style={{ marginTop: 16, background: "#eef3fa", borderRadius: 6, padding: 12, whiteSpace: "pre-wrap", wordBreak: "break-word" }}>{recommendation}</pre>}
+      <ModalDialog
+        isOpen={modalOpen}
+        onRequestClose={() => setModalOpen(false)}
+        title="Recommendation"
+      >
+        {loading ? (
+          <div>Loading...</div>
+        ) : (
+          <pre style={{ whiteSpace: "pre-wrap" }}>{aiOutput}</pre>
+        )}
+      </ModalDialog>
     </div>
   );
 }
