@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { auth } from "./firebase";
 import { fetchLessons } from "./api";
 import ProgressCard from "./ProgressCard";
+import LearningTrendsChart from "./LearningTrendsChart";
 
 const PROGRESS_KEY_PREFIX = "ai_learning_progress_";
 
@@ -39,13 +40,26 @@ function getRecommendation(progress) {
   return "Great job! Keep learning or try a new scenario.";
 }
 
+// Helper to get ISO week string (YYYY-Www)
+function getISOWeek(dateStr) {
+  const date = new Date(dateStr);
+  const year = date.getUTCFullYear();
+  // Get week number
+  const firstJan = new Date(Date.UTC(year, 0, 1));
+  const days = Math.floor((date - firstJan) / (24 * 60 * 60 * 1000));
+  const week = Math.ceil((days + firstJan.getUTCDay() + 1) / 7);
+  return `${year}-W${week.toString().padStart(2, '0')}`;
+}
+
 function Dashboard({ user }) {
   const [progress, setProgress] = useState(getDefaultProgress());
   const [loading, setLoading] = useState(true);
+  const [lessonTrends, setLessonTrends] = useState([]);
 
   useEffect(() => {
     if (!user) {
       setProgress(getDefaultProgress());
+      setLessonTrends([]);
       setLoading(false);
       return;
     }
@@ -58,21 +72,34 @@ function Dashboard({ user }) {
     const fetchUserData = async () => {
       try {
         const lessonsData = await fetchLessons();
-        const actualLessonsCount = lessonsData.lessons?.length || 0;
+        const lessons = lessonsData.lessons || lessonsData || [];
+        const actualLessonsCount = lessons.length;
         
         // Update progress with real data
         const updatedProgress = {
           ...userProgress,
           lessonsCompleted: actualLessonsCount,
-          lastActivity: userProgress.lastActivity || new Date().toISOString()
+          lastActivity: userProgress.lastActivity || (lessons[0]?.created_at || new Date().toISOString())
         };
-        
         setProgress(updatedProgress);
-        // Save updated progress
         localStorage.setItem(getProgressKey(user.uid), JSON.stringify(updatedProgress));
+
+        // Group lessons by week
+        const weekMap = {};
+        lessons.forEach(lesson => {
+          if (lesson.created_at) {
+            const week = getISOWeek(lesson.created_at);
+            weekMap[week] = (weekMap[week] || 0) + 1;
+          }
+        });
+        // Convert to array sorted by week
+        const sortedWeeks = Object.keys(weekMap).sort();
+        const trends = sortedWeeks.map(week => ({ week, lessons: weekMap[week] }));
+        setLessonTrends(trends);
       } catch (error) {
         console.error("Failed to fetch user data:", error);
         setProgress(userProgress);
+        setLessonTrends([]);
       } finally {
         setLoading(false);
       }
@@ -163,6 +190,7 @@ function Dashboard({ user }) {
           💡 <strong>Recommended next step:</strong> {getRecommendation(progress)}
         </div>
       </div>
+      <LearningTrendsChart data={lessonTrends} />
     </>
   );
 }
