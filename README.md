@@ -366,27 +366,74 @@ The Web Search feature uses a separate Node.js backend to call OpenAI's GPT-4.1 
 ## Project Structure
 
 ```
-/backend/
-  app.py
-  prompts.py
-  llm.py
-  vector_store.py
-/frontend/
-  src/
-    App.jsx
-    Concepts.jsx
-    MicroLesson.jsx
-    Recommendation.jsx
-    Simulator.jsx
-    api.js
-    CareerCoach.jsx
-    SkillsForecast.jsx
-    Auth.jsx
+AI Learning with AI/
+  backend/
+    app.py
+    db.py
+    llm.py
+    prompts.py
+    vector_store.py
+    static/
+      favicon.ico
+    tests/
+      test_app.py
+  deployment/
+    cloudrun.yaml
+    Dockerfile
+  docs/
+  frontend/
+    cypress/
+      cypress.config.js
+      e2e/
+        app.cy.js
+        appOption.cy.js
+        clearButtons.cy.js
+        savedMicro-lessons.cy.js
+        scenarioSimulator.cy.js
+        webSearch.cy.js
+      fixtures/
+        example.json
+      support/
+        commands.js
+        e2e.js
+    cypress.config.js
+    package.json
+    public/
+      favicon.ico
+      index.html
+      logo192.png
+      logo512.png
+      manifest.json
+      robots.txt
+    README.md
+    src/
+      _tests_/
+        Concepts.test.jsx
+      api.js
+      App.css
+      App.jsx
+      App.test.js
+      Auth.jsx
+      CareerCoach.jsx
+      Concepts.jsx
+      cypress.config.js
+      Dashboard.jsx
+      index.css
+      index.js
+      LessonList.jsx
+      logo.svg
+      MicroLesson.jsx
+      Recommendation.jsx
+      reportWebVitals.js
+      setupTests.js
+      Simulator.jsx
+      SkillsForecast.jsx
+      WebSearch.jsx
   package.json
-/deployment/
-  Dockerfile
-  cloudrun.yaml
-README.md
+  README.md
+  serviceAccountKey.json (ignored, not in repo)
+  websearch-backend/
+    index.js
 ```
 
 ---
