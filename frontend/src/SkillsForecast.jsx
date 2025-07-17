@@ -48,6 +48,7 @@ function SkillsForecast() {
       <button
         onClick={handleGetForecast}
         disabled={loading || !input}
+        title="Generate AI-powered skills forecast based on your current skills and career goals. Get personalized recommendations for skills to develop next and career advancement strategies."
         style={{
           background: colors.buttonPrimary,
           color: "#fff",
@@ -66,6 +67,7 @@ function SkillsForecast() {
       <button
         onClick={handleClear}
         disabled={loading && !input && !forecast}
+        title="Clear the current skills input and forecast results. Start fresh with new skills assessment or career goals."
         style={{
           background: colors.cardBackground,
           color: colors.text,

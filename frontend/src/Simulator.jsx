@@ -46,6 +46,7 @@ function Simulator() {
       <button
         onClick={handleStartSimulation}
         disabled={loading || !scenarioType}
+        title="Launch an interactive scenario simulation. Practice workplace situations, customer interactions, and decision-making skills in a safe environment. Enter a scenario type to begin."
         style={{
           background: colors.buttonPrimary,
           color: "#fff",
@@ -64,6 +65,7 @@ function Simulator() {
       <button
         onClick={handleClear}
         disabled={loading && !scenarioType && !simulation}
+        title="Clear the current simulation and reset all inputs. Start fresh with a new scenario or different parameters."
         style={{
           background: colors.cardBackground,
           color: colors.text,
