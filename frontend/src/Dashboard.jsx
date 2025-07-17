@@ -4,6 +4,7 @@ import { fetchLessons } from "./api";
 import ProgressCard from "./ProgressCard";
 import LearningTrendsChart from "./LearningTrendsChart";
 import TopicBreakdownChart from "./TopicBreakdownChart";
+import { useTheme } from "./ThemeContext";
 
 const PROGRESS_KEY_PREFIX = "ai_learning_progress_";
 
@@ -57,6 +58,7 @@ function Dashboard({ user }) {
   const [loading, setLoading] = useState(true);
   const [lessonTrends, setLessonTrends] = useState([]);
   const [topicBreakdown, setTopicBreakdown] = useState([]);
+  const { colors } = useTheme();
 
   useEffect(() => {
     if (!user) {
@@ -129,13 +131,14 @@ function Dashboard({ user }) {
   if (loading) {
     return (
       <div style={{
-        background: "#e3f2fd",
+        background: colors.primaryLight,
         borderRadius: 10,
         padding: 24,
         marginBottom: 32,
-        boxShadow: "0 1px 4px #eee"
+        boxShadow: colors.shadow,
+        color: colors.text
       }}>
-        <h2 style={{ marginTop: 0 }}>Your Progress</h2>
+        <h2 style={{ marginTop: 0, color: colors.text }}>Your Progress</h2>
         <div>Loading your progress...</div>
       </div>
     );
@@ -144,13 +147,14 @@ function Dashboard({ user }) {
   return (
     <>
       <div style={{
-        background: "#e3f2fd",
+        background: colors.primaryLight,
         borderRadius: 10,
         padding: 24,
         marginBottom: 32,
-        boxShadow: "0 1px 4px #eee"
+        boxShadow: colors.shadow,
+        color: colors.text
       }}>
-        <h2 style={{ marginTop: 0, marginBottom: 20 }}>Your Progress</h2>
+        <h2 style={{ marginTop: 0, marginBottom: 20, color: colors.text }}>Your Progress</h2>
         
         <div style={{ 
           display: "flex", 
@@ -199,11 +203,11 @@ function Dashboard({ user }) {
         
         <div style={{ 
           fontWeight: 500, 
-          color: "#1976d2",
-          background: "white",
+          color: colors.primary,
+          background: colors.cardBackground,
           padding: "12px 16px",
           borderRadius: 8,
-          border: "1px solid #e0e0e0"
+          border: `1px solid ${colors.border}`
         }}>
           💡 <strong>Recommended next step:</strong> {getRecommendation(progress)}
         </div>

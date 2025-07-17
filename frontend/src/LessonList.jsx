@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { fetchLessons, deleteLesson, updateLesson } from "./api";
+import { useTheme } from "./ThemeContext";
 
 function LessonList({ user }) {
   const [lessons, setLessons] = useState([]);
@@ -9,6 +10,7 @@ function LessonList({ user }) {
   const [expanded, setExpanded] = useState({});
   const [editing, setEditing] = useState({});
   const [editContent, setEditContent] = useState({});
+  const { colors } = useTheme();
 
   const loadLessons = async () => {
     setLoading(true);
@@ -75,17 +77,32 @@ function LessonList({ user }) {
   if (error) return <div style={{ color: "red" }}>Error: {error}</div>;
 
   return (
-    <sl-card style={{ margin: "32px 0", padding: "24px", maxWidth: 800 }}>
-      <h2 style={{ marginTop: 0 }}>Saved Micro-lessons</h2>
+    <div style={{ margin: "32px 0", padding: "24px", maxWidth: 800, background: colors.cardBackground, borderRadius: 12, boxShadow: colors.shadow, color: colors.text }}>
+      <h2 style={{ marginTop: 0, color: colors.text }}>Saved Micro-lessons</h2>
       <div style={{ marginBottom: 16 }}>
         <input
           type="text"
           placeholder="Filter by topic..."
           value={filter}
           onChange={e => setFilter(e.target.value)}
-          style={{ width: 300, marginRight: 8 }}
+          style={{ width: 300, marginRight: 8, background: colors.cardBackground, color: colors.text, border: `1px solid ${colors.border}`, borderRadius: 6, padding: 8 }}
         />
-        <sl-button variant="default" onClick={handleClear}>Clear</sl-button>
+        <button
+          onClick={handleClear}
+          style={{
+            background: colors.cardBackground,
+            color: colors.text,
+            border: `1px solid ${colors.border}`,
+            borderRadius: 6,
+            padding: "8px 18px",
+            fontWeight: 600,
+            fontSize: 16,
+            cursor: "pointer",
+            boxShadow: "0 1px 4px #0001"
+          }}
+        >
+          Clear
+        </button>
       </div>
       {filteredLessons.length === 0 ? (
         <div>No lessons found.</div>
@@ -96,10 +113,11 @@ function LessonList({ user }) {
               key={lesson._id}
               style={{
                 marginBottom: "1.5rem",
-                background: "#f6fafd",
+                background: colors.primaryLight,
                 borderRadius: "8px",
                 padding: "1rem",
-                boxShadow: "0 1px 4px #eee"
+                boxShadow: colors.shadow,
+                color: colors.text
               }}
             >
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
@@ -110,30 +128,90 @@ function LessonList({ user }) {
                     onChange={e =>
                       handleEditChange(lesson._id, "topic", e.target.value)
                     }
-                    style={{ flex: 1 }}
+                    style={{ flex: 1, background: colors.cardBackground, color: colors.text, border: `1px solid ${colors.border}`, borderRadius: 6, padding: 6 }}
                   />
                 ) : (
                   <span>{lesson.topic}</span>
                 )}
-                <sl-button size="small" variant="default" onClick={() => handleExpandToggle(lesson._id)}>
+                <button
+                  onClick={() => handleExpandToggle(lesson._id)}
+                  style={{
+                    background: colors.cardBackground,
+                    color: colors.text,
+                    border: `1px solid ${colors.border}`,
+                    borderRadius: 6,
+                    padding: "4px 12px",
+                    fontWeight: 600,
+                    fontSize: 14,
+                    cursor: "pointer"
+                  }}
+                >
                   {expanded[lesson._id] ? "Compress" : "Expand"}
-                </sl-button>
-                <sl-button size="small" variant="danger" onClick={() => handleDelete(lesson._id)}>
+                </button>
+                <button
+                  onClick={() => handleDelete(lesson._id)}
+                  style={{
+                    background: "#d32f2f",
+                    color: "#fff",
+                    border: 0,
+                    borderRadius: 6,
+                    padding: "4px 12px",
+                    fontWeight: 600,
+                    fontSize: 14,
+                    cursor: "pointer"
+                  }}
+                >
                   Delete
-                </sl-button>
+                </button>
                 {editing[lesson._id] ? (
                   <>
-                    <sl-button size="small" variant="primary" onClick={() => handleEditSave(lesson._id)}>
+                    <button
+                      onClick={() => handleEditSave(lesson._id)}
+                      style={{
+                        background: colors.buttonPrimary,
+                        color: "#fff",
+                        border: 0,
+                        borderRadius: 6,
+                        padding: "4px 12px",
+                        fontWeight: 600,
+                        fontSize: 14,
+                        cursor: "pointer"
+                      }}
+                    >
                       Save
-                    </sl-button>
-                    <sl-button size="small" variant="default" onClick={() => setEditing({ ...editing, [lesson._id]: false })}>
+                    </button>
+                    <button
+                      onClick={() => setEditing({ ...editing, [lesson._id]: false })}
+                      style={{
+                        background: colors.cardBackground,
+                        color: colors.text,
+                        border: `1px solid ${colors.border}`,
+                        borderRadius: 6,
+                        padding: "4px 12px",
+                        fontWeight: 600,
+                        fontSize: 14,
+                        cursor: "pointer"
+                      }}
+                    >
                       Cancel
-                    </sl-button>
+                    </button>
                   </>
                 ) : (
-                  <sl-button size="small" variant="primary" onClick={() => handleEdit(lesson._id, lesson.topic, lesson.lesson)}>
+                  <button
+                    onClick={() => handleEdit(lesson._id, lesson.topic, lesson.lesson)}
+                    style={{
+                      background: colors.buttonPrimary,
+                      color: "#fff",
+                      border: 0,
+                      borderRadius: 6,
+                      padding: "4px 12px",
+                      fontWeight: 600,
+                      fontSize: 14,
+                      cursor: "pointer"
+                    }}
+                  >
                     Edit
-                  </sl-button>
+                  </button>
                 )}
               </div>
               {expanded[lesson._id] && (
@@ -148,17 +226,23 @@ function LessonList({ user }) {
                       style={{
                         width: "100%",
                         marginTop: 8,
-                        fontFamily: "monospace"
+                        fontFamily: "monospace",
+                        background: colors.cardBackground,
+                        color: colors.text,
+                        border: `1px solid ${colors.border}`,
+                        borderRadius: 6,
+                        padding: 8
                       }}
                     />
                   ) : (
                     <pre
                       style={{
                         whiteSpace: "pre-wrap",
-                        background: "#eef6fa",
+                        background: colors.cardBackground,
                         padding: "0.5rem",
                         borderRadius: "4px",
-                        marginTop: "0.5rem"
+                        marginTop: "0.5rem",
+                        color: colors.text
                       }}
                     >
                       {lesson.lesson}
@@ -170,7 +254,7 @@ function LessonList({ user }) {
           ))}
         </ul>
       )}
-    </sl-card>
+    </div>
   );
 }
 
