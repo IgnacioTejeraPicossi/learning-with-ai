@@ -4,11 +4,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from backend.prompts import CONCEPT_PROMPT, MICROLESSON_PROMPT, SIMULATION_PROMPT, RECOMMENDATION_PROMPT, PROMPTS
 from backend.llm import ask_openai, web_search_query
-from typing import List
+from typing import List, Optional
 from fastapi.staticfiles import StaticFiles
 import os
 import datetime
-from backend.db import lessons_collection, career_coach_sessions, skills_forecasts
+from backend.db import lessons_collection, career_coach_sessions, skills_forecasts, teams_collection, team_members_collection, team_analytics_collection
 from bson import ObjectId
 
 import firebase_admin
@@ -69,6 +69,33 @@ class Turn(BaseModel):
 class SimulationStepRequest(BaseModel):
     history: List[Turn]
     # ... other fields
+
+# Team Management Models
+class TeamMember(BaseModel):
+    name: str
+    role: str
+    email: str
+    skills: List[str]
+    performance_score: Optional[float] = None
+
+class TeamCreateRequest(BaseModel):
+    name: str
+    description: str
+    members: List[TeamMember]
+
+class TeamUpdateRequest(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+
+class TeamMemberUpdateRequest(BaseModel):
+    name: Optional[str] = None
+    role: Optional[str] = None
+    skills: Optional[List[str]] = None
+    performance_score: Optional[float] = None
+
+class TeamAnalyticsRequest(BaseModel):
+    team_id: str
+    metrics: List[str]  # e.g., ["collaboration", "productivity", "communication"]
 
 @app.get("/")
 def root():
@@ -247,4 +274,289 @@ async def get_skills_forecasts(user=Depends(verify_token)):
     async for forecast in skills_forecasts.find({"user_id": user["uid"]}).sort("created_at", -1):
         forecast["_id"] = str(forecast["_id"])
         forecasts.append(forecast)
-    return {"forecasts": forecasts} 
+    return {"forecasts": forecasts}
+
+# Team Management Endpoints
+@app.post("/teams")
+async def create_team(request: TeamCreateRequest, user=Depends(verify_token)):
+    """Create a new team."""
+    team_data = {
+        "name": request.name,
+        "description": request.description,
+        "created_by": user["uid"],
+        "created_by_email": user.get("email", ""),
+        "created_at": datetime.datetime.utcnow(),
+        "updated_at": datetime.datetime.utcnow()
+    }
+    
+    # Insert team
+    team_result = await teams_collection.insert_one(team_data)
+    team_id = str(team_result.inserted_id)
+    
+    # Insert team members
+    member_docs = []
+    for member in request.members:
+        member_doc = {
+            "team_id": team_id,
+            "name": member.name,
+            "role": member.role,
+            "email": member.email,
+            "skills": member.skills,
+            "performance_score": member.performance_score,
+            "created_at": datetime.datetime.utcnow()
+        }
+        member_docs.append(member_doc)
+    
+    if member_docs:
+        await team_members_collection.insert_many(member_docs)
+    
+    return {"team_id": team_id, "message": "Team created successfully"}
+
+@app.get("/teams")
+async def get_teams(user=Depends(verify_token)):
+    """Get all teams created by the user."""
+    teams = []
+    async for team in teams_collection.find({"created_by": user["uid"]}):
+        team["_id"] = str(team["_id"])
+        # Get member count for each team
+        member_count = await team_members_collection.count_documents({"team_id": team["_id"]})
+        team["member_count"] = member_count
+        teams.append(team)
+    return {"teams": teams}
+
+@app.get("/teams/{team_id}")
+async def get_team(team_id: str, user=Depends(verify_token)):
+    """Get specific team details with members."""
+    # Verify team ownership
+    team = await teams_collection.find_one({
+        "_id": ObjectId(team_id),
+        "created_by": user["uid"]
+    })
+    
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found")
+    
+    team["_id"] = str(team["_id"])
+    
+    # Get team members
+    members = []
+    async for member in team_members_collection.find({"team_id": team_id}):
+        member["_id"] = str(member["_id"])
+        members.append(member)
+    
+    team["members"] = members
+    return {"team": team}
+
+@app.put("/teams/{team_id}")
+async def update_team(team_id: str, request: TeamUpdateRequest, user=Depends(verify_token)):
+    """Update team details."""
+    # Verify team ownership
+    team = await teams_collection.find_one({
+        "_id": ObjectId(team_id),
+        "created_by": user["uid"]
+    })
+    
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found")
+    
+    # Prepare update data
+    update_data = {"updated_at": datetime.datetime.utcnow()}
+    if request.name is not None:
+        update_data["name"] = request.name
+    if request.description is not None:
+        update_data["description"] = request.description
+    
+    await teams_collection.update_one(
+        {"_id": ObjectId(team_id)},
+        {"$set": update_data}
+    )
+    
+    return {"message": "Team updated successfully"}
+
+@app.delete("/teams/{team_id}")
+async def delete_team(team_id: str, user=Depends(verify_token)):
+    """Delete a team and all its members."""
+    # Verify team ownership
+    team = await teams_collection.find_one({
+        "_id": ObjectId(team_id),
+        "created_by": user["uid"]
+    })
+    
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found")
+    
+    # Delete team members first
+    await team_members_collection.delete_many({"team_id": team_id})
+    
+    # Delete team
+    await teams_collection.delete_one({"_id": ObjectId(team_id)})
+    
+    return {"message": "Team deleted successfully"}
+
+@app.post("/teams/{team_id}/members")
+async def add_team_member(team_id: str, member: TeamMember, user=Depends(verify_token)):
+    """Add a new member to a team."""
+    # Verify team ownership
+    team = await teams_collection.find_one({
+        "_id": ObjectId(team_id),
+        "created_by": user["uid"]
+    })
+    
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found")
+    
+    member_doc = {
+        "team_id": team_id,
+        "name": member.name,
+        "role": member.role,
+        "email": member.email,
+        "skills": member.skills,
+        "performance_score": member.performance_score,
+        "created_at": datetime.datetime.utcnow()
+    }
+    
+    result = await team_members_collection.insert_one(member_doc)
+    member_doc["_id"] = str(result.inserted_id)
+    
+    return {"member": member_doc, "message": "Member added successfully"}
+
+@app.put("/teams/{team_id}/members/{member_id}")
+async def update_team_member(
+    team_id: str, 
+    member_id: str, 
+    request: TeamMemberUpdateRequest, 
+    user=Depends(verify_token)
+):
+    """Update a team member's details."""
+    # Verify team ownership
+    team = await teams_collection.find_one({
+        "_id": ObjectId(team_id),
+        "created_by": user["uid"]
+    })
+    
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found")
+    
+    # Prepare update data
+    update_data = {}
+    if request.name is not None:
+        update_data["name"] = request.name
+    if request.role is not None:
+        update_data["role"] = request.role
+    if request.skills is not None:
+        update_data["skills"] = request.skills
+    if request.performance_score is not None:
+        update_data["performance_score"] = request.performance_score
+    
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No fields to update")
+    
+    result = await team_members_collection.update_one(
+        {"_id": ObjectId(member_id), "team_id": team_id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Member not found")
+    
+    return {"message": "Member updated successfully"}
+
+@app.delete("/teams/{team_id}/members/{member_id}")
+async def remove_team_member(team_id: str, member_id: str, user=Depends(verify_token)):
+    """Remove a member from a team."""
+    # Verify team ownership
+    team = await teams_collection.find_one({
+        "_id": ObjectId(team_id),
+        "created_by": user["uid"]
+    })
+    
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found")
+    
+    result = await team_members_collection.delete_one({
+        "_id": ObjectId(member_id),
+        "team_id": team_id
+    })
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Member not found")
+    
+    return {"message": "Member removed successfully"}
+
+@app.post("/teams/{team_id}/analytics")
+async def generate_team_analytics(team_id: str, request: TeamAnalyticsRequest, user=Depends(verify_token)):
+    """Generate AI-powered team analytics."""
+    # Verify team ownership
+    team = await teams_collection.find_one({
+        "_id": ObjectId(team_id),
+        "created_by": user["uid"]
+    })
+    
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found")
+    
+    # Get team members
+    members = []
+    async for member in team_members_collection.find({"team_id": team_id}):
+        members.append(member)
+    
+    # Prepare data for AI analysis
+    team_data = {
+        "team_name": team["name"],
+        "team_description": team["description"],
+        "members": members,
+        "metrics": request.metrics
+    }
+    
+    # Generate AI analysis
+    analysis_prompt = f"""
+    Analyze the following team data and provide insights on the requested metrics:
+    
+    Team: {team_data['team_name']}
+    Description: {team_data['team_description']}
+    
+    Team Members:
+    {chr(10).join([f"- {m['name']} ({m['role']}): Skills: {', '.join(m['skills'])}" for m in members])}
+    
+    Requested Metrics: {', '.join(request.metrics)}
+    
+    Please provide:
+    1. Overall team assessment
+    2. Individual member analysis
+    3. Recommendations for improvement
+    4. Collaboration insights
+    """
+    
+    analysis_result = ask_openai(analysis_prompt)
+    
+    # Save analytics
+    analytics_doc = {
+        "team_id": team_id,
+        "user_id": user["uid"],
+        "metrics": request.metrics,
+        "analysis": analysis_result,
+        "created_at": datetime.datetime.utcnow()
+    }
+    
+    await team_analytics_collection.insert_one(analytics_doc)
+    
+    return {"analysis": analysis_result}
+
+@app.get("/teams/{team_id}/analytics")
+async def get_team_analytics(team_id: str, user=Depends(verify_token)):
+    """Get historical analytics for a team."""
+    # Verify team ownership
+    team = await teams_collection.find_one({
+        "_id": ObjectId(team_id),
+        "created_by": user["uid"]
+    })
+    
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found")
+    
+    analytics = []
+    async for analysis in team_analytics_collection.find({"team_id": team_id}).sort("created_at", -1):
+        analysis["_id"] = str(analysis["_id"])
+        analytics.append(analysis)
+    
+    return {"analytics": analytics} 

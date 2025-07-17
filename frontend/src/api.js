@@ -14,6 +14,24 @@ export async function fetchWithAuth(url, options = {}) {
 
 const API_BASE = "http://127.0.0.1:8000";
 
+// Generic API call function
+export async function apiCall(endpoint, method = "GET", data = null) {
+  const url = endpoint.startsWith('http') ? endpoint : `${API_BASE}${endpoint}`;
+  const options = {
+    method,
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
+  
+  if (data && (method === "POST" || method === "PUT" || method === "PATCH")) {
+    options.body = JSON.stringify(data);
+  }
+  
+  const response = await fetchWithAuth(url, options);
+  return response.json();
+}
+
 export async function fetchConcepts() {
   const res = await fetchWithAuth(`${API_BASE}/concepts`);
   return res.json();
@@ -107,4 +125,48 @@ export async function fetchCareerSessions() {
 export async function fetchSkillsForecasts() {
   const res = await fetchWithAuth(`${API_BASE}/user/skills-forecasts`);
   return res.json();
+}
+
+// Team Management API Functions
+export async function createTeam(teamData) {
+  return apiCall("/teams", "POST", teamData);
+}
+
+export async function getTeams() {
+  return apiCall("/teams", "GET");
+}
+
+export async function getTeam(teamId) {
+  return apiCall(`/teams/${teamId}`, "GET");
+}
+
+export async function updateTeam(teamId, teamData) {
+  return apiCall(`/teams/${teamId}`, "PUT", teamData);
+}
+
+export async function deleteTeam(teamId) {
+  return apiCall(`/teams/${teamId}`, "DELETE");
+}
+
+export async function addTeamMember(teamId, memberData) {
+  return apiCall(`/teams/${teamId}/members`, "POST", memberData);
+}
+
+export async function updateTeamMember(teamId, memberId, memberData) {
+  return apiCall(`/teams/${teamId}/members/${memberId}`, "PUT", memberData);
+}
+
+export async function removeTeamMember(teamId, memberId) {
+  return apiCall(`/teams/${teamId}/members/${memberId}`, "DELETE");
+}
+
+export async function generateTeamAnalytics(teamId, metrics) {
+  return apiCall(`/teams/${teamId}/analytics`, "POST", {
+    team_id: teamId,
+    metrics
+  });
+}
+
+export async function getTeamAnalytics(teamId) {
+  return apiCall(`/teams/${teamId}/analytics`, "GET");
 }

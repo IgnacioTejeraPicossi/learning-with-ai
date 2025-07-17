@@ -9,6 +9,7 @@ import WebSearch from "./WebSearch";
 import LessonList from "./LessonList";
 import CareerCoach from "./CareerCoach";
 import SkillsForecast from "./SkillsForecast";
+import TeamDynamics from "./TeamDynamics";
 import { auth } from './firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import Auth from './Auth';
@@ -22,6 +23,7 @@ const sectionComponents = {
   recommendation: Recommendation,
   simulations: Simulator,
   "web-search": WebSearch,
+  "team-dynamics": TeamDynamics,
   coach: CareerCoach,
   "skills-forecast": SkillsForecast,
   "saved-lessons": LessonList,
@@ -96,6 +98,7 @@ function AppContent() {
           {section === "recommendation" && <Recommendation />}
           {section === "simulations" && <Simulator />}
           {section === "web-search" && <WebSearch />}
+          {section === "team-dynamics" && <TeamDynamics />}
           {section === "coach" && <CareerCoach />}
           {section === "skills-forecast" && <SkillsForecast />}
           {section === "saved-lessons" && <LessonList user={user} />}

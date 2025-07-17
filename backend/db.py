@@ -8,3 +8,8 @@ users_collection = database.get_collection("users")  # Example collection
 lessons_collection = database.get_collection("lessons")
 career_coach_sessions = database.get_collection("career_coach_sessions")
 skills_forecasts = database.get_collection("skills_forecasts")
+
+# Team Management Collections
+teams_collection = database.get_collection("teams")
+team_members_collection = database.get_collection("team_members")
+team_analytics_collection = database.get_collection("team_analytics")
