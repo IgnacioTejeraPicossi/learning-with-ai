@@ -1,28 +1,33 @@
 import React, { useState } from "react";
 import { fetchConcepts } from "./api";
+import ModalDialog from "./ModalDialog";
+import { useTheme } from "./ThemeContext";
 
 function Concepts() {
-  const [concepts, setConcepts] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [aiOutput, setAiOutput] = useState("");
   const [loading, setLoading] = useState(false);
+  const { colors } = useTheme();
 
   const handleGetConcepts = async () => {
     setLoading(true);
-    const data = await fetchConcepts();
-    setConcepts(data.concepts);
+    setModalOpen(true);
+    try {
+      const result = await fetchConcepts();
+      setAiOutput(result.concepts || JSON.stringify(result, null, 2));
+    } catch (err) {
+      setAiOutput("Error fetching AI concepts.");
+    }
     setLoading(false);
   };
 
-  const handleClear = () => {
-    setConcepts(null);
-  };
-
   return (
-    <div style={{ background: "#f8fafc", borderRadius: 8, padding: 20, boxShadow: "0 1px 6px #0001" }}>
-      <h2 style={{ marginTop: 0 }}>AI Concepts</h2>
+    <div style={{ color: colors.text }}>
+      <h2 style={{ color: colors.text }}>AI Concepts</h2>
       <button
         onClick={handleGetConcepts}
         style={{
-          background: "#1976d2",
+          background: colors.buttonPrimary,
           color: "#fff",
           border: 0,
           borderRadius: 6,
@@ -38,24 +43,32 @@ function Concepts() {
         Get AI Concepts
       </button>
       <button
-        onClick={handleClear}
-        disabled={loading || !concepts}
+        onClick={() => setAiOutput("")}
         style={{
-          background: "#fff",
-          color: "#333",
-          border: "1px solid #bbb",
+          background: colors.cardBackground,
+          color: colors.text,
+          border: `1px solid ${colors.border}`,
           borderRadius: 6,
           padding: "8px 18px",
           fontWeight: 600,
           fontSize: 16,
-          cursor: loading || !concepts ? "not-allowed" : "pointer",
+          cursor: "pointer",
           boxShadow: "0 1px 4px #0001"
         }}
-        title="Clear the AI concepts result."
       >
         Clear
       </button>
-      {concepts && <pre style={{ marginTop: 16, background: "#eef3fa", borderRadius: 6, padding: 12, whiteSpace: "pre-wrap", wordBreak: "break-word" }}>{concepts}</pre>}
+      <ModalDialog
+        isOpen={modalOpen}
+        onRequestClose={() => setModalOpen(false)}
+        title="AI Concepts"
+      >
+        {loading ? (
+          <div>Loading...</div>
+        ) : (
+          <pre style={{ whiteSpace: "pre-wrap", color: colors.text }}>{aiOutput}</pre>
+        )}
+      </ModalDialog>
     </div>
   );
 }

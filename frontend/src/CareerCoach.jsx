@@ -1,69 +1,100 @@
-import React, { useState } from 'react';
-import { postCareerCoach } from './api';
+import React, { useState } from "react";
+import { postCareerCoach } from "./api";
+import { useTheme } from "./ThemeContext";
 
-export default function CareerCoach() {
-  const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState('');
+function CareerCoach() {
+  const [question, setQuestion] = useState("");
+  const [response, setResponse] = useState(null);
   const [loading, setLoading] = useState(false);
+  const { colors } = useTheme();
 
-  const startCoach = async () => {
+  const handleAskCoach = async () => {
     setLoading(true);
-    const resp = await postCareerCoach({ history: [] });
-    setMessages([{ role: 'assistant', content: resp.response }]);
-    setLoading(false);
-  };
-
-  const sendMessage = async () => {
-    if (!input.trim()) return;
-    const newMessages = [...messages, { role: 'user', content: input }];
-    setMessages(newMessages);
-    setInput('');
-    setLoading(true);
-    const resp = await postCareerCoach({ history: newMessages });
-    setMessages([...newMessages, { role: 'assistant', content: resp.response }]);
+    try {
+      const data = await postCareerCoach({ question });
+      setResponse(data.response || JSON.stringify(data, null, 2));
+    } catch (error) {
+      console.error("Failed to get career advice:", error);
+      setResponse("Error getting career advice.");
+    }
     setLoading(false);
   };
 
   const handleClear = () => {
-    setMessages([]);
-    setInput('');
+    setQuestion("");
+    setResponse(null);
   };
 
   return (
-    <sl-card style={{ margin: "32px 0", padding: "24px", maxWidth: 600 }}>
-      <h2 style={{ marginTop: 0 }}>AI Career Coach</h2>
-      {messages.length === 0 ? (
-        <sl-button variant="primary" onClick={startCoach} style={{ marginRight: 8 }} loading={loading ? true : undefined}>
-          {loading ? "Coaching..." : "Start Coaching"}
-        </sl-button>
-      ) : (
-        <>
-          <div style={{ marginBottom: 12 }}>
-            {messages.map((msg, i) => (
-              <div key={i} style={{ margin: '8px 0', fontWeight: msg.role === 'assistant' ? 'bold' : 'normal' }}>
-                {msg.role === 'assistant' ? 'Coach: ' : 'You: '}
-                <span style={{ fontWeight: 'normal', whiteSpace: 'pre-wrap' }}>{msg.content}</span>
-              </div>
-            ))}
-          </div>
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <input
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && sendMessage()}
-              placeholder="Type your answer..."
-              style={{ width: 300 }}
-              disabled={loading}
-            />
-            <sl-button variant="primary" onClick={sendMessage} disabled={loading || !input.trim()} style={{ marginRight: 8 }}>
-              Send
-            </sl-button>
-            <sl-button variant="default" onClick={handleClear} disabled={loading}>
-              End Session
-            </sl-button>
-          </div>
-        </>
+    <div style={{ color: colors.text }}>
+      <h2 style={{ color: colors.text }}>AI Career Coach</h2>
+      <textarea
+        value={question}
+        onChange={e => setQuestion(e.target.value)}
+        placeholder="Ask your career coach anything..."
+        style={{ 
+          width: "100%",
+          minHeight: 100,
+          marginBottom: 16,
+          padding: "12px",
+          borderRadius: 6,
+          border: `1px solid ${colors.border}`,
+          background: colors.cardBackground,
+          color: colors.text,
+          fontSize: 16,
+          resize: "vertical"
+        }}
+      />
+      <button
+        onClick={handleAskCoach}
+        disabled={loading || !question}
+        style={{
+          background: colors.buttonPrimary,
+          color: "#fff",
+          border: 0,
+          borderRadius: 6,
+          padding: "8px 18px",
+          fontWeight: 600,
+          fontSize: 16,
+          cursor: loading || !question ? "not-allowed" : "pointer",
+          marginRight: 8,
+          boxShadow: "0 1px 4px #0001"
+        }}
+      >
+        {loading ? "Asking..." : "Ask Coach"}
+      </button>
+      <button
+        onClick={handleClear}
+        disabled={loading && !question && !response}
+        style={{
+          background: colors.cardBackground,
+          color: colors.text,
+          border: `1px solid ${colors.border}`,
+          borderRadius: 6,
+          padding: "8px 18px",
+          fontWeight: 600,
+          fontSize: 16,
+          cursor: loading && !question && !response ? "not-allowed" : "pointer",
+          boxShadow: "0 1px 4px #0001"
+        }}
+      >
+        Clear
+      </button>
+      {response && (
+        <pre style={{ 
+          marginTop: 16, 
+          background: colors.primaryLight, 
+          borderRadius: 6, 
+          padding: 12, 
+          whiteSpace: "pre-wrap", 
+          wordBreak: "break-word",
+          color: colors.text
+        }}>
+          {response}
+        </pre>
       )}
-    </sl-card>
+    </div>
   );
 }
+
+export default CareerCoach;

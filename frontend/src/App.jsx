@@ -13,6 +13,7 @@ import { auth } from './firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import Auth from './Auth';
 import Sidebar from './Sidebar';
+import { ThemeProvider, useTheme } from './ThemeContext';
 
 const sectionComponents = {
   dashboard: Dashboard,
@@ -26,9 +27,10 @@ const sectionComponents = {
   "saved-lessons": LessonList,
 };
 
-function App() {
+function AppContent() {
   const [user, setUser] = useState(null);
   const [section, setSection] = useState("dashboard");
+  const { isDark, toggleTheme, colors } = useTheme();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, setUser);
@@ -38,13 +40,54 @@ function App() {
   const SectionComponent = sectionComponents[section] || Dashboard;
 
   return (
-    <div style={{ fontFamily: "sans-serif", background: "#f5f6fa", minHeight: "100vh", padding: 0, display: "flex" }}>
+    <div style={{ 
+      fontFamily: "sans-serif", 
+      background: colors.background, 
+      minHeight: "100vh", 
+      padding: 0, 
+      display: "flex",
+      color: colors.text
+    }}>
       <Sidebar selected={section} onSelect={setSection} />
       <div style={{ flex: 1, minWidth: 0 }}>
-        <header style={{ background: "#2236a8", color: "#fff", padding: "2rem 0", textAlign: "center" }}>
-          <h1>AI Workplace Learning Chat UI</h1>
+        <header style={{ 
+          background: colors.primary, 
+          color: "#fff", 
+          padding: "1rem 2rem", 
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center"
+        }}>
+          <h1 style={{ margin: 0 }}>AI Workplace Learning Chat UI</h1>
+          <button
+            onClick={toggleTheme}
+            style={{
+              background: "transparent",
+              border: "1px solid rgba(255,255,255,0.3)",
+              color: "#fff",
+              borderRadius: "50%",
+              width: 40,
+              height: 40,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              fontSize: 18,
+              transition: "all 0.2s"
+            }}
+            title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            {isDark ? "☀️" : "🌙"}
+          </button>
         </header>
-        <div style={{ maxWidth: 900, margin: "2rem auto", background: "#fff", borderRadius: 12, boxShadow: "0 2px 12px #0001", padding: 32 }}>
+        <div style={{ 
+          maxWidth: 900, 
+          margin: "2rem auto", 
+          background: colors.cardBackground, 
+          borderRadius: 12, 
+          boxShadow: colors.shadow, 
+          padding: 32 
+        }}>
           <Auth user={user} setUser={setUser} />
           {/* Render the selected section only */}
           {section === "dashboard" && <Dashboard user={user} />}
@@ -59,6 +102,14 @@ function App() {
         </div>
       </div>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
   );
 }
 

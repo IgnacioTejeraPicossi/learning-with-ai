@@ -1,56 +1,100 @@
-import React, { useState } from 'react';
-import { postSkillsForecast } from './api';
+import React, { useState } from "react";
+import { postSkillsForecast } from "./api";
+import { useTheme } from "./ThemeContext";
 
-export default function SkillsForecast() {
-  const [result, setResult] = useState("");
+function SkillsForecast() {
+  const [input, setInput] = useState("");
+  const [forecast, setForecast] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [history, setHistory] = useState("Agile Planning, Communication Basics");
-  const [keywords, setKeywords] = useState("negotiation, hybrid work, stakeholder");
+  const { colors } = useTheme();
 
-  const handleForecast = async () => {
+  const handleGetForecast = async () => {
     setLoading(true);
-    const input = { history, keywords };
-    const resp = await postSkillsForecast(input);
-    setResult(resp.forecast);
+    try {
+      const data = await postSkillsForecast({ input });
+      setForecast(data.forecast || JSON.stringify(data, null, 2));
+    } catch (error) {
+      console.error("Failed to get skills forecast:", error);
+      setForecast("Error getting skills forecast.");
+    }
     setLoading(false);
   };
 
   const handleClear = () => {
-    setResult("");
+    setInput("");
+    setForecast(null);
   };
 
   return (
-    <sl-card style={{ margin: "32px 0", padding: "24px", maxWidth: 600 }}>
-      <h2 style={{ marginTop: 0 }}>Skills Forecasting</h2>
-      <div style={{ marginBottom: 12 }}>
-        <label>
-          Learning history:
-          <input
-            value={history}
-            onChange={e => setHistory(e.target.value)}
-            style={{ marginLeft: 8, width: 300 }}
-          />
-        </label>
-      </div>
-      <div style={{ marginBottom: 16 }}>
-        <label>
-          Transcript keywords:
-          <input
-            value={keywords}
-            onChange={e => setKeywords(e.target.value)}
-            style={{ marginLeft: 8, width: 300 }}
-          />
-        </label>
-      </div>
-      <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 12 }}>
-        <sl-button variant="primary" onClick={handleForecast} disabled={loading}>
-          {loading ? "Forecasting..." : "Get Forecast"}
-        </sl-button>
-        <sl-button variant="default" onClick={handleClear} disabled={loading}>
-          Clear
-        </sl-button>
-      </div>
-      <pre style={{ whiteSpace: "pre-wrap", marginTop: 12 }}>{result}</pre>
-    </sl-card>
+    <div style={{ color: colors.text }}>
+      <h2 style={{ color: colors.text }}>Skills Forecast</h2>
+      <textarea
+        value={input}
+        onChange={e => setInput(e.target.value)}
+        placeholder="Describe your current skills and career goals..."
+        style={{ 
+          width: "100%",
+          minHeight: 100,
+          marginBottom: 16,
+          padding: "12px",
+          borderRadius: 6,
+          border: `1px solid ${colors.border}`,
+          background: colors.cardBackground,
+          color: colors.text,
+          fontSize: 16,
+          resize: "vertical"
+        }}
+      />
+      <button
+        onClick={handleGetForecast}
+        disabled={loading || !input}
+        style={{
+          background: colors.buttonPrimary,
+          color: "#fff",
+          border: 0,
+          borderRadius: 6,
+          padding: "8px 18px",
+          fontWeight: 600,
+          fontSize: 16,
+          cursor: loading || !input ? "not-allowed" : "pointer",
+          marginRight: 8,
+          boxShadow: "0 1px 4px #0001"
+        }}
+      >
+        {loading ? "Forecasting..." : "Get Forecast"}
+      </button>
+      <button
+        onClick={handleClear}
+        disabled={loading && !input && !forecast}
+        style={{
+          background: colors.cardBackground,
+          color: colors.text,
+          border: `1px solid ${colors.border}`,
+          borderRadius: 6,
+          padding: "8px 18px",
+          fontWeight: 600,
+          fontSize: 16,
+          cursor: loading && !input && !forecast ? "not-allowed" : "pointer",
+          boxShadow: "0 1px 4px #0001"
+        }}
+      >
+        Clear
+      </button>
+      {forecast && (
+        <pre style={{ 
+          marginTop: 16, 
+          background: colors.primaryLight, 
+          borderRadius: 6, 
+          padding: 12, 
+          whiteSpace: "pre-wrap", 
+          wordBreak: "break-word",
+          color: colors.text
+        }}>
+          {forecast}
+        </pre>
+      )}
+    </div>
   );
 }
+
+export default SkillsForecast;

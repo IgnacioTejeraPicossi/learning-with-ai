@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTheme } from "./ThemeContext";
 
 // Simple icon component using Unicode symbols
 const Icon = ({ name, size = 20 }) => {
@@ -38,6 +39,7 @@ const navItems = [
 
 function Sidebar({ selected, onSelect }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const { colors } = useTheme();
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
@@ -46,11 +48,11 @@ function Sidebar({ selected, onSelect }) {
   return (
     <aside style={{
       width: isCollapsed ? 60 : 220,
-      background: "#f8fafc",
-      borderRight: "1px solid #e5e7eb",
+      background: colors.sidebarBackground,
+      borderRight: `1px solid ${colors.border}`,
       minHeight: "100vh",
       padding: "24px 0 0 0",
-      boxShadow: "2px 0 8px #0001",
+      boxShadow: colors.shadow,
       display: "flex",
       flexDirection: "column",
       gap: 8,
@@ -64,7 +66,7 @@ function Sidebar({ selected, onSelect }) {
           position: "absolute",
           top: 16,
           right: isCollapsed ? 8 : -12,
-          background: "#2236a8",
+          background: colors.primary,
           color: "white",
           border: "none",
           borderRadius: "50%",
@@ -87,14 +89,14 @@ function Sidebar({ selected, onSelect }) {
         fontSize: isCollapsed ? 16 : 22, 
         textAlign: "center", 
         marginBottom: 32, 
-        color: "#2236a8",
+        color: colors.primary,
         padding: "0 8px",
         overflow: "hidden",
         whiteSpace: "nowrap"
       }}>
         {!isCollapsed && <Icon name="layers" size={20} style={{ marginRight: 8 }} />}
         {!isCollapsed && "AI Learning"}
-        {isCollapsed && <Icon name="layers" size={20} />}
+        {isCollapsed && <Icon name="layers"></Icon>}
       </div>
       
       <nav>
@@ -107,8 +109,8 @@ function Sidebar({ selected, onSelect }) {
               alignItems: "center",
               gap: isCollapsed ? 0 : 12,
               width: "100%",
-              background: selected === item.key ? "#e0e7ff" : "transparent",
-              color: selected === item.key ? "#2236a8" : "#2e2e2e",
+              background: selected === item.key ? colors.primaryLight : "transparent",
+              color: selected === item.key ? colors.primary : colors.text,
               border: "none",
               borderRadius: 8,
               padding: isCollapsed ? "12px 0" : "12px 24px",
