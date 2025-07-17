@@ -175,6 +175,9 @@ This project uses **two separate databases** for different purposes:
   - `lessons`: User-specific micro-lessons
   - `career_coach_sessions`: User's career coaching history
   - `skills_forecasts`: User's skills predictions
+  - `teams`: User-created teams with metadata
+  - `team_members`: Team member details and roles
+  - `team_analytics`: AI-generated team analysis and insights
   - `users`: (Future) Additional user profile data
 
 ### **Why Use Both?**
@@ -296,6 +299,66 @@ The **Dynamic Skills Forecasting** module analyzes your learning history and tra
 
 ---
 
+## Team Dynamics Analyzer
+
+The **Team Dynamics Analyzer** is a comprehensive team management and analytics module that helps users create teams, manage members, and generate AI-powered insights for team collaboration and performance.
+
+### **Core Features:**
+
+#### **Team Creation & Management**
+- **Create Teams**: Set up teams with name, description, and detailed member information
+- **Member Management**: Add team members with roles, skills, and performance metrics
+- **Team Analytics**: Generate AI-powered analysis of team dynamics, collaboration patterns, and performance insights
+- **User-Specific Teams**: All teams are created and managed by authenticated users
+
+#### **AI-Powered Analytics**
+- **Collaboration Analysis**: AI analyzes team member interactions and collaboration patterns
+- **Productivity Insights**: Identify team productivity trends and bottlenecks
+- **Communication Assessment**: Evaluate team communication effectiveness
+- **Leadership Development**: Provide insights on leadership opportunities and skill gaps
+- **Personalized Recommendations**: Get AI-generated suggestions for team improvement
+
+#### **Backend API Endpoints**
+- `POST /teams` - Create a new team with members
+- `GET /teams` - Get all teams for the authenticated user
+- `GET /teams/{team_id}` - Get specific team details with members
+- `PUT /teams/{team_id}` - Update team details
+- `DELETE /teams/{team_id}` - Delete a team and all its members
+- `POST /teams/{team_id}/members` - Add a new member to a team
+- `PUT /teams/{team_id}/members/{member_id}` - Update a team member's details
+- `DELETE /teams/{team_id}/members/{member_id}` - Remove a member from a team
+- `POST /teams/{team_id}/analytics` - Generate AI-powered team analytics
+- `GET /teams/{team_id}/analytics` - Get historical analytics for a team
+
+#### **Database Collections**
+- `teams` - Stores team information (name, description, creator, timestamps)
+- `team_members` - Stores team member details (name, role, email, skills, performance)
+- `team_analytics` - Stores AI-generated team analysis and insights
+
+#### **Frontend Features**
+- **Interactive Team Creation**: Form-based team setup with member management
+- **Real-time Analytics**: Generate and view AI-powered team insights
+- **Member Management**: Add, edit, and remove team members with detailed information
+- **Tooltips**: Helpful information on hover for all major features
+- **Theme Support**: Consistent styling with light/dark theme compatibility
+
+#### **How to use:**
+- Navigate to the "Team Dynamics" section in the sidebar
+- Click **"Create New Team"** to set up a new team with members
+- Add team members with their roles, skills, and contact information
+- Click **"Generate Analytics"** on any team to get AI-powered insights
+- View detailed analysis covering collaboration, productivity, communication, and leadership
+- Use **"Start Team Simulation"** for interactive team scenarios (planned feature)
+- Access **"View Team Analytics"** for historical performance tracking
+
+#### **AI Analytics Features**
+- **Overall Team Assessment**: Comprehensive evaluation of team dynamics
+- **Individual Member Analysis**: Detailed insights on each team member's contributions
+- **Recommendations for Improvement**: AI-generated suggestions for team enhancement
+- **Collaboration Insights**: Analysis of team interaction patterns and effectiveness
+
+---
+
 ## 4. Summary Table
 
 | Endpoint         | Uses Web Search Tool? | Uses Standard LLM? | User-Specific? |
@@ -308,6 +371,8 @@ The **Dynamic Skills Forecasting** module analyzes your learning history and tra
 | `/lessons`       | ❌                   | ❌                 | ✅             |
 | `/career-coach`  | ❌                   | ✅                 | ✅             |
 | `/skills-forecast`| ❌                  | ✅                 | ✅             |
+| `/teams`         | ❌                   | ✅                 | ✅             |
+| `/teams/{id}/analytics` | ❌        | ✅                 | ✅             |
 
 ---
 
