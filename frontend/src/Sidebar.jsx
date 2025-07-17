@@ -120,10 +120,29 @@ function Sidebar({ selected, onSelect }) {
               fontSize: isCollapsed ? 14 : 16,
               cursor: "pointer",
               marginBottom: 4,
-              transition: "background 0.2s",
-              justifyContent: isCollapsed ? "center" : "flex-start"
+              transition: "all 0.2s ease",
+              justifyContent: isCollapsed ? "center" : "flex-start",
+              ":hover": {
+                background: selected === item.key ? colors.primaryLight : colors.primaryLight,
+                color: colors.primary,
+                transform: "translateX(4px)"
+              }
             }}
             title={isCollapsed ? item.label : ""}
+            onMouseEnter={(e) => {
+              if (selected !== item.key) {
+                e.target.style.background = colors.primaryLight;
+                e.target.style.color = colors.primary;
+                e.target.style.transform = "translateX(4px)";
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (selected !== item.key) {
+                e.target.style.background = "transparent";
+                e.target.style.color = colors.text;
+                e.target.style.transform = "translateX(0px)";
+              }
+            }}
           >
             <Icon name={item.icon} size={isCollapsed ? 18 : 20} />
             {!isCollapsed && item.label}
