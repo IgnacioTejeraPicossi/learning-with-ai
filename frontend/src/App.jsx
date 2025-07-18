@@ -11,6 +11,7 @@ import CareerCoach from "./CareerCoach";
 import SkillsForecast from "./SkillsForecast";
 import TeamDynamics from "./TeamDynamics";
 import Certifications from "./Certifications";
+import GlobalSearch from "./GlobalSearch";
 import { auth } from './firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import Auth from './Auth';
@@ -20,12 +21,30 @@ import { ThemeProvider, useTheme } from './ThemeContext';
 function AppContent() {
   const [user, setUser] = useState(null);
   const [section, setSection] = useState("dashboard");
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { isDark, toggleTheme, colors } = useTheme();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, setUser);
     return () => unsubscribe();
   }, []);
+
+  // Handle keyboard shortcut for search
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsSearchOpen(true);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  const handleSearchNavigate = (sectionId) => {
+    setSection(sectionId);
+  };
 
   return (
     <div style={{ 
@@ -47,26 +66,51 @@ function AppContent() {
           alignItems: "center"
         }}>
           <h1 style={{ margin: 0 }}>AI Workplace Learning Chat UI</h1>
-          <button
-            onClick={toggleTheme}
-            style={{
-              background: "transparent",
-              border: "1px solid rgba(255,255,255,0.3)",
-              color: "#fff",
-              borderRadius: "50%",
-              width: 40,
-              height: 40,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-              fontSize: 18,
-              transition: "all 0.2s"
-            }}
-            title={isDark ? "Switch to light mode" : "Switch to dark mode"}
-          >
-            {isDark ? "☀️" : "🌙"}
-          </button>
+          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+            {/* Search Button */}
+            <button
+              onClick={() => setIsSearchOpen(true)}
+              style={{
+                background: "transparent",
+                border: "1px solid rgba(255,255,255,0.3)",
+                color: "#fff",
+                borderRadius: "50%",
+                width: 40,
+                height: 40,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                fontSize: 16,
+                transition: "all 0.2s",
+                marginRight: 8
+              }}
+              title="Search all sections (Ctrl+K)"
+            >
+              🔍
+            </button>
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              style={{
+                background: "transparent",
+                border: "1px solid rgba(255,255,255,0.3)",
+                color: "#fff",
+                borderRadius: "50%",
+                width: 40,
+                height: 40,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                fontSize: 18,
+                transition: "all 0.2s"
+              }}
+              title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+            >
+              {isDark ? "☀️" : "🌙"}
+            </button>
+          </div>
         </header>
         <div style={{ 
           maxWidth: 900, 
@@ -91,6 +135,13 @@ function AppContent() {
           {section === "saved-lessons" && <LessonList user={user} />}
         </div>
       </div>
+      
+      {/* Global Search Modal */}
+      <GlobalSearch
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+        onNavigate={handleSearchNavigate}
+      />
     </div>
   );
 }
