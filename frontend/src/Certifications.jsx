@@ -117,13 +117,14 @@ function Certifications() {
         borderBottom: `1px solid ${colors.border}`
       }}>
         {[
-          { key: "recommend", label: "Get Recommendations", icon: "🎯" },
-          { key: "study-plan", label: "Study Plan", icon: "📚" },
-          { key: "simulation", label: "Practice Test", icon: "🧪" }
+          { key: "recommend", label: "Get Recommendations", icon: "🎯", title: "Get AI-powered certification suggestions based on your role, skills, and goals." },
+          { key: "study-plan", label: "Study Plan", icon: "📚", title: "Generate a personalized weekly study plan for your selected certification." },
+          { key: "simulation", label: "Practice Test", icon: "🧪", title: "Practice with realistic certification interview questions and scenarios." }
         ].map(tab => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
+            title={tab.title}
             style={{
               background: activeTab === tab.key ? colors.primary : "transparent",
               color: activeTab === tab.key ? "#fff" : colors.text,
