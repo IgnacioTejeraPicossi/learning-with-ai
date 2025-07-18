@@ -359,6 +359,65 @@ The **Team Dynamics Analyzer** is a comprehensive team management and analytics 
 
 ---
 
+## Certification Path Recommendation (AI-powered)
+
+The **Certification Path Recommendation** module helps users discover, plan, and practice for professional certifications using AI. It is designed for IT professionals and knowledge workers who want to boost their career prospects with official certificates.
+
+### **Core Features:**
+
+#### **AI-Powered Certification Suggestions**
+- Users input their role, skills, experience level, and career goals
+- GPT-4 recommends 3-5 relevant certifications (e.g., AWS, Azure, Google Cloud, Scrum Master, etc.)
+- Explains why each certification fits the user’s profile, expected time commitment, cost, and ROI
+
+#### **Personalized Study Plan Generator**
+- Users select a certification and get a week-by-week study plan
+- Plan adapts to user’s available study time and target completion date
+- Includes recommended resources, practice exercises, and milestones
+
+#### **Practice Test/Simulation**
+- Users can simulate a certification interview or exam
+- AI generates realistic questions, expected answers, and feedback
+
+#### **Certifications Dashboard**
+- Progress bar toward selected certificate
+- Suggested resources and links
+- “Why this matters” AI-generated explanations
+- All recommendations, study plans, and simulations are saved per user
+
+#### **Backend API Endpoints**
+- `POST /certifications/recommend` — Get AI-powered certification recommendations
+- `POST /certifications/study-plan` — Generate a personalized study plan
+- `POST /certifications/simulate` — Practice certification interview/exam
+- `GET /certifications/user-recommendations` — Get user’s certification history
+
+#### **Database Collections**
+- `certifications` — Stores user certification recommendations
+- `study_plans` — Stores user study plans
+- `certification_simulations` — Stores user practice test results
+
+#### **Frontend Features**
+- **Certifications.jsx**: Tabbed UI for Recommendations, Study Plan, and Practice Test
+- **Skill tag input** for easy skill management
+- **Tooltips** on all major actions and tabs
+- **Theme support** for light/dark mode
+- **Progress tracking** and history for each user
+
+#### **How to use:**
+- Go to the “Certifications” section in the sidebar (🏆)
+- Enter your role, skills, and goals to get recommendations
+- Generate a study plan for your chosen certification
+- Practice with realistic AI-generated questions
+- Track your progress and revisit your history anytime
+
+#### **AI Prompts Used**
+- Certification Recommendation
+- Study Plan Generator
+- Certification Interview Simulation
+- Career Coach + Certification Planning
+
+---
+
 ## 4. Summary Table
 
 | Endpoint         | Uses Web Search Tool? | Uses Standard LLM? | User-Specific? |
