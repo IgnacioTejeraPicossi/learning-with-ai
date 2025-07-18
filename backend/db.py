@@ -13,3 +13,8 @@ skills_forecasts = database.get_collection("skills_forecasts")
 teams_collection = database.get_collection("teams")
 team_members_collection = database.get_collection("team_members")
 team_analytics_collection = database.get_collection("team_analytics")
+
+# Certification Collections
+certifications_collection = database.get_collection("certifications")
+study_plans_collection = database.get_collection("study_plans")
+certification_simulations_collection = database.get_collection("certification_simulations")

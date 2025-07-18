@@ -15,6 +15,7 @@ const Icon = ({ name, size = 20 }) => {
     layers: "📋",
     globe: "🌐",
     team: "👥",
+    award: "🏆",
     "chevron-left": "◀️",
     "chevron-right": "▶️"
   };
@@ -34,6 +35,7 @@ const navItems = [
   { key: "simulations", label: "Simulations", icon: "play-circle" },
   { key: "web-search", label: "Web Search", icon: "globe" },
   { key: "team-dynamics", label: "Team Dynamics", icon: "team" },
+  { key: "certifications", label: "Certifications", icon: "award" },
   { key: "coach", label: "AI Career Coach", icon: "user-check" },
   { key: "skills-forecast", label: "Skills Forecast", icon: "bar-chart" },
   { key: "saved-lessons", label: "Saved Lessons", icon: "archive" },

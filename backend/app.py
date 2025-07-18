@@ -2,7 +2,7 @@
 from fastapi import FastAPI, Request, Body, HTTPException, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from backend.prompts import CONCEPT_PROMPT, MICROLESSON_PROMPT, SIMULATION_PROMPT, RECOMMENDATION_PROMPT, PROMPTS
+from backend.prompts import CONCEPT_PROMPT, MICROLESSON_PROMPT, SIMULATION_PROMPT, RECOMMENDATION_PROMPT, PROMPTS, CERTIFICATION_RECOMMENDATION_PROMPT, CERTIFICATION_STUDY_PLAN_PROMPT, CERTIFICATION_SIMULATION_PROMPT, CERTIFICATION_CAREER_COACH_PROMPT
 from backend.llm import ask_openai, web_search_query
 from typing import List, Optional
 from fastapi.staticfiles import StaticFiles
@@ -96,6 +96,23 @@ class TeamMemberUpdateRequest(BaseModel):
 class TeamAnalyticsRequest(BaseModel):
     team_id: str
     metrics: List[str]  # e.g., ["collaboration", "productivity", "communication"]
+
+# Certification Models
+class CertificationProfile(BaseModel):
+    role: str
+    skills: List[str]
+    goals: str
+    experience_level: str
+
+class CertificationStudyPlan(BaseModel):
+    certification_name: str
+    current_skills: List[str]
+    study_time: int  # hours per week
+    target_date: str
+
+class CertificationSimulation(BaseModel):
+    certification_name: str
+    user_responses: List[str] = []
 
 @app.get("/")
 def root():
@@ -559,4 +576,104 @@ async def get_team_analytics(team_id: str, user=Depends(verify_token)):
         analysis["_id"] = str(analysis["_id"])
         analytics.append(analysis)
     
-    return {"analytics": analytics} 
+    return {"analytics": analytics}
+
+# Certification Endpoints
+@app.post("/certifications/recommend")
+async def recommend_certifications(request: CertificationProfile, user=Depends(verify_token)):
+    """Generate AI-powered certification recommendations based on user profile."""
+    prompt = CERTIFICATION_RECOMMENDATION_PROMPT.format(
+        role=request.role,
+        skills=", ".join(request.skills),
+        goals=request.goals,
+        experience_level=request.experience_level
+    )
+    
+    result = ask_openai(prompt)
+    
+    # Save recommendation for user
+    try:
+        await certifications_collection.insert_one({
+            "user_id": user["uid"],
+            "user_email": user.get("email", ""),
+            "profile": request.dict(),
+            "recommendation": result,
+            "created_at": datetime.datetime.utcnow()
+        })
+    except Exception as e:
+        print(f"Failed to save certification recommendation: {e}")
+    
+    return {"recommendation": result}
+
+@app.post("/certifications/study-plan")
+async def generate_study_plan(request: CertificationStudyPlan, user=Depends(verify_token)):
+    """Generate a personalized study plan for a specific certification."""
+    prompt = CERTIFICATION_STUDY_PLAN_PROMPT.format(
+        certification_name=request.certification_name,
+        current_skills=", ".join(request.current_skills),
+        study_time=request.study_time,
+        target_date=request.target_date
+    )
+    
+    result = ask_openai(prompt)
+    
+    # Save study plan for user
+    try:
+        await study_plans_collection.insert_one({
+            "user_id": user["uid"],
+            "user_email": user.get("email", ""),
+            "certification_name": request.certification_name,
+            "study_plan": result,
+            "created_at": datetime.datetime.utcnow()
+        })
+    except Exception as e:
+        print(f"Failed to save study plan: {e}")
+    
+    return {"study_plan": result}
+
+@app.post("/certifications/simulate")
+async def certification_simulation(request: CertificationSimulation, user=Depends(verify_token)):
+    """Generate certification interview simulation."""
+    prompt = CERTIFICATION_SIMULATION_PROMPT.format(
+        certification_name=request.certification_name
+    )
+    
+    result = ask_openai(prompt)
+    
+    # Save simulation for user
+    try:
+        await certification_simulations_collection.insert_one({
+            "user_id": user["uid"],
+            "user_email": user.get("email", ""),
+            "certification_name": request.certification_name,
+            "simulation": result,
+            "created_at": datetime.datetime.utcnow()
+        })
+    except Exception as e:
+        print(f"Failed to save certification simulation: {e}")
+    
+    return {"simulation": result}
+
+@app.get("/certifications/user-recommendations")
+async def get_user_certifications(user=Depends(verify_token)):
+    """Get user's certification recommendations and study plans."""
+    recommendations = []
+    async for rec in certifications_collection.find({"user_id": user["uid"]}).sort("created_at", -1):
+        rec["_id"] = str(rec["_id"])
+        recommendations.append(rec)
+    
+    study_plans = []
+    async for plan in study_plans_collection.find({"user_id": user["uid"]}).sort("created_at", -1):
+        plan["_id"] = str(plan["_id"])
+        study_plans.append(plan)
+    
+    simulations = []
+    async for sim in certification_simulations_collection.find({"user_id": user["uid"]}).sort("created_at", -1):
+        sim["_id"] = str(sim["_id"])
+        simulations.append(sim)
+    
+    return {
+        "recommendations": recommendations,
+        "study_plans": study_plans,
+        "simulations": simulations
+    } 

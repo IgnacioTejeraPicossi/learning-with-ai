@@ -170,3 +170,20 @@ export async function generateTeamAnalytics(teamId, metrics) {
 export async function getTeamAnalytics(teamId) {
   return apiCall(`/teams/${teamId}/analytics`, "GET");
 }
+
+// Certification API Functions
+export async function recommendCertifications(profile) {
+  return apiCall("/certifications/recommend", "POST", profile);
+}
+
+export async function generateStudyPlan(studyPlan) {
+  return apiCall("/certifications/study-plan", "POST", studyPlan);
+}
+
+export async function startCertificationSimulation(simulation) {
+  return apiCall("/certifications/simulate", "POST", simulation);
+}
+
+export async function getUserCertifications() {
+  return apiCall("/certifications/user-recommendations", "GET");
+}

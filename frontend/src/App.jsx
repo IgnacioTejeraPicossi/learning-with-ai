@@ -10,6 +10,7 @@ import LessonList from "./LessonList";
 import CareerCoach from "./CareerCoach";
 import SkillsForecast from "./SkillsForecast";
 import TeamDynamics from "./TeamDynamics";
+import Certifications from "./Certifications";
 import { auth } from './firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import Auth from './Auth';
@@ -84,6 +85,7 @@ function AppContent() {
           {section === "simulations" && <Simulator />}
           {section === "web-search" && <WebSearch />}
           {section === "team-dynamics" && <TeamDynamics />}
+          {section === "certifications" && <Certifications />}
           {section === "coach" && <CareerCoach />}
           {section === "skills-forecast" && <SkillsForecast />}
           {section === "saved-lessons" && <LessonList user={user} />}

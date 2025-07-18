@@ -58,6 +58,80 @@ Act as a workforce analytics expert specializing in future skills prediction. Gi
 - Format your response as a numbered list.
 """
 
+# Certification Module Prompts
+CERTIFICATION_RECOMMENDATION_PROMPT = """
+You are an expert certification advisor for IT professionals. Based on the user's role, skills, and career goals, recommend relevant certifications that will enhance their marketability and career growth.
+
+User Profile:
+- Role: {role}
+- Current Skills: {skills}
+- Career Goals: {goals}
+- Experience Level: {experience_level}
+
+Please provide:
+1. 3-5 most relevant certifications with brief explanations
+2. Why each certification fits their profile
+3. Expected time commitment and difficulty level
+4. Estimated cost and ROI
+5. Next steps to get started
+
+Format your response in a clear, structured way that's easy to read.
+"""
+
+CERTIFICATION_STUDY_PLAN_PROMPT = """
+You are an expert certification trainer. Create a personalized study plan for the {certification_name} certification.
+
+User Profile:
+- Current Skills: {current_skills}
+- Available Study Time: {study_time} hours per week
+- Target Completion Date: {target_date}
+
+Please create a detailed study plan including:
+1. Weekly breakdown with specific topics
+2. Recommended resources and materials
+3. Practice exercises and mock exams
+4. Milestones and checkpoints
+5. Tips for exam preparation
+
+Make the plan realistic and achievable based on their available time.
+"""
+
+CERTIFICATION_SIMULATION_PROMPT = """
+You are conducting a certification interview simulation for {certification_name}. 
+
+Create a realistic interview scenario that tests the candidate's knowledge in key areas:
+- Technical concepts
+- Real-world scenarios
+- Problem-solving approaches
+- Best practices
+
+Provide:
+1. 3-5 challenging interview questions
+2. Expected answers and explanations
+3. Follow-up questions based on responses
+4. Tips for improvement
+
+Make this feel like a real certification interview.
+"""
+
+CERTIFICATION_CAREER_COACH_PROMPT = """
+You are an AI career coach helping a professional plan their certification journey.
+
+User Context:
+- Current Role: {role}
+- Career Goals: {goals}
+- Skills: {skills}
+
+Guide them through:
+1. Why certifications matter for their career path
+2. Which certifications align with their goals
+3. How to balance work and certification study
+4. Long-term career planning with certifications
+5. ROI and market value of different certifications
+
+Provide motivational and practical advice.
+"""
+
 PROMPTS = {
     "career_coach": career_coach_prompt,
     "skills_forecast": skills_forecast_prompt,
