@@ -28,6 +28,29 @@ function Certifications() {
     { value: "advanced", label: "Advanced (5+ years)" }
   ];
 
+  useEffect(() => {
+    // Auto-fill profile from latest recommendation
+    async function fetchLatestProfile() {
+      try {
+        const res = await apiCall("/certifications/user-recommendations", "GET");
+        if (res && res.recommendations && res.recommendations.length > 0) {
+          const last = res.recommendations[0];
+          if (last.profile) {
+            setProfile({
+              role: last.profile.role || "",
+              skills: last.profile.skills || [],
+              goals: last.profile.goals || "",
+              experience_level: last.profile.experience_level || "beginner"
+            });
+          }
+        }
+      } catch (e) {
+        // Ignore errors
+      }
+    }
+    fetchLatestProfile();
+  }, []);
+
   const handleGetRecommendations = async () => {
     if (!profile.role || !profile.goals) return;
     
