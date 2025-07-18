@@ -13,6 +13,7 @@ flowchart TD
     LessonList[LessonList.jsx]
     CareerCoach[CareerCoach.jsx]
     SkillsForecast[SkillsForecast.jsx]
+    GlobalSearch[GlobalSearch.jsx]
     Auth[Auth.jsx]
   end
   subgraph Backend
@@ -38,6 +39,7 @@ flowchart TD
   App --> LessonList
   App --> CareerCoach
   App --> SkillsForecast
+  App --> GlobalSearch
   App --> Auth
   Simulator -->|Scenario UI| App
   API -->|HTTP requests with Firebase token| AppPy
@@ -96,6 +98,14 @@ This project is a full-stack demo for the Nordic Software AI Hackathon. It featu
 
 ### Frontend (React + Shoelace)
 - **Google Sign-In via Firebase Authentication** for secure, personalized access
+- **Global Search Functionality** (`GlobalSearch.jsx`):
+  - **🔍 Search Button**: Located in the header next to the theme toggle
+  - **⌨️ Keyboard Shortcuts**: Press `Ctrl+K` (or `Cmd+K` on Mac) to open search
+  - **📱 Modal Interface**: Clean, modern search overlay with real-time filtering
+  - **🎯 Comprehensive Coverage**: Search across all 11 sections (Dashboard, AI Concepts, Micro-lessons, etc.)
+  - **⚡ Smart Search**: Searches titles, descriptions, and keywords for instant results
+  - **🎨 Theme Aware**: Adapts to light/dark mode automatically
+  - **⌨️ Keyboard Navigation**: Use arrow keys to navigate results, Enter to select, Escape to close
 - Modular, professional UI with each feature in its own card:
   - **Concepts** (`Concepts.jsx`)
   - **Micro-lesson** (`MicroLesson.jsx`)
@@ -359,6 +369,69 @@ The **Team Dynamics Analyzer** is a comprehensive team management and analytics 
 
 ---
 
+## Global Search Functionality
+
+The **Global Search** feature provides instant access to all sections and features of the application through a powerful search interface. This modern, intuitive search system allows users to quickly navigate to any part of the application.
+
+### **Core Features:**
+
+#### **🔍 Search Interface**
+- **Search Button**: Located in the header next to the theme toggle
+- **Modal Overlay**: Clean, modern search interface that appears over the current page
+- **Real-time Search**: Instant results as you type
+- **Theme Aware**: Automatically adapts to light/dark mode
+
+#### **⌨️ Keyboard Shortcuts**
+- **Open Search**: Press `Ctrl+K` (Windows/Linux) or `Cmd+K` (Mac)
+- **Navigate Results**: Use arrow keys (↑↓) to move through results
+- **Select Result**: Press `Enter` to navigate to the selected section
+- **Close Search**: Press `Escape` to close the search modal
+
+#### **🎯 Comprehensive Coverage**
+The search covers all 11 sections of the application:
+- **Dashboard** - View learning progress and overview
+- **AI Concepts** - Explore innovative AI learning concepts
+- **Micro-lessons** - Create and manage bite-sized learning lessons
+- **Recommendation** - Get personalized learning recommendations
+- **Simulations** - Practice with interactive workplace scenarios
+- **Web Search** - Search the web for up-to-date information
+- **Team Dynamics** - Analyze and improve team collaboration
+- **Certifications** - Get certification recommendations and study plans
+- **AI Career Coach** - Get career guidance and professional advice
+- **Skills Forecast** - Predict future skills and career trends
+- **Saved Lessons** - View and manage your saved micro-lessons
+
+#### **⚡ Smart Search Algorithm**
+- **Title Search**: Matches section names exactly
+- **Description Search**: Searches through feature descriptions
+- **Keyword Search**: Includes relevant keywords for each section
+- **Fuzzy Matching**: Finds results even with partial matches
+- **Instant Results**: No loading delays or waiting
+
+#### **🎨 User Experience**
+- **Visual Feedback**: Selected items are highlighted
+- **Icons**: Each result shows the section's icon for easy recognition
+- **Descriptions**: Clear descriptions help users understand what each section does
+- **Responsive Design**: Works perfectly on all screen sizes
+- **Accessibility**: Full keyboard navigation and screen reader support
+
+#### **How to Use:**
+1. **Click the 🔍 button** in the header, or
+2. **Press Ctrl+K** (or Cmd+K on Mac) to open search
+3. **Type to search** - e.g., "certification", "coach", "skills", "team"
+4. **Use arrow keys** to navigate through results
+5. **Press Enter** or click to navigate to the selected section
+6. **Press Escape** to close the search
+
+#### **Technical Implementation**
+- **Component**: `GlobalSearch.jsx` - React component with modal interface
+- **Integration**: Seamlessly integrated into `App.jsx` with header button
+- **State Management**: Uses React hooks for search state and navigation
+- **Styling**: Theme-aware styling that matches the application design
+- **Performance**: Optimized for fast search with minimal re-renders
+
+---
+
 ## Certification Path Recommendation (AI-powered)
 
 The **Certification Path Recommendation** module helps users discover, plan, and practice for professional certifications using AI. It is designed for IT professionals and knowledge workers who want to boost their career prospects with official certificates.
@@ -420,18 +493,19 @@ The **Certification Path Recommendation** module helps users discover, plan, and
 
 ## 4. Summary Table
 
-| Endpoint         | Uses Web Search Tool? | Uses Standard LLM? | User-Specific? |
-|------------------|:--------------------:|:------------------:|:--------------:|
-| `/concepts`      | ❌                   | ✅                 | ❌             |
-| `/micro-lesson`  | ❌                   | ✅                 | ✅             |
-| `/recommendation`| ❌                   | ✅                 | ❌             |
-| `/simulation`    | ❌                   | ✅                 | ❌             |
-| `/web-search`    | ✅                   | ✅ (with tool)     | ❌             |
-| `/lessons`       | ❌                   | ❌                 | ✅             |
-| `/career-coach`  | ❌                   | ✅                 | ✅             |
-| `/skills-forecast`| ❌                  | ✅                 | ✅             |
-| `/teams`         | ❌                   | ✅                 | ✅             |
-| `/teams/{id}/analytics` | ❌        | ✅                 | ✅             |
+| Feature/Endpoint    | Uses Web Search Tool? | Uses Standard LLM? | User-Specific? | Type |
+|-------------------|:--------------------:|:------------------:|:--------------:|:----:|
+| Global Search     | ❌                   | ❌                 | ❌             | Frontend |
+| `/concepts`       | ❌                   | ✅                 | ❌             | Backend |
+| `/micro-lesson`   | ❌                   | ✅                 | ✅             | Backend |
+| `/recommendation` | ❌                   | ✅                 | ❌             | Backend |
+| `/simulation`     | ❌                   | ✅                 | ❌             | Backend |
+| `/web-search`     | ✅                   | ✅ (with tool)     | ❌             | Backend |
+| `/lessons`        | ❌                   | ❌                 | ✅             | Backend |
+| `/career-coach`   | ❌                   | ✅                 | ✅             | Backend |
+| `/skills-forecast`| ❌                   | ✅                 | ✅             | Backend |
+| `/teams`          | ❌                   | ✅                 | ✅             | Backend |
+| `/teams/{id}/analytics` | ❌        | ✅                 | ✅             | Backend |
 
 ---
 
@@ -539,9 +613,11 @@ AI Learning with AI/
       App.test.js
       Auth.jsx
       CareerCoach.jsx
+      Certifications.jsx
       Concepts.jsx
       cypress.config.js
       Dashboard.jsx
+      GlobalSearch.jsx
       index.css
       index.js
       LessonList.jsx
@@ -552,6 +628,8 @@ AI Learning with AI/
       setupTests.js
       Simulator.jsx
       SkillsForecast.jsx
+      TeamDynamics.jsx
+      ThemeContext.jsx
       WebSearch.jsx
   package.json
   README.md
