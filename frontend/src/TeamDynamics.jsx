@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useTheme } from "./ThemeContext";
-import { apiCall } from "./api";
+import { getTeams, createTeam, generateTeamAnalytics } from "./api";
 
 function TeamDynamics() {
   const [teams, setTeams] = useState([]);
+  // eslint-disable-next-line no-unused-vars
+  const [selectedTeam, setSelectedTeam] = useState(null);
   const [newTeam, setNewTeam] = useState({
     name: "",
     description: "",
@@ -22,7 +24,7 @@ function TeamDynamics() {
   const loadTeams = async () => {
     try {
       setLoading(true);
-      const response = await apiCall("/teams", "GET");
+      const response = await getTeams();
       setTeams(response.teams || []);
     } catch (error) {
       console.error("Error loading teams:", error);
@@ -36,7 +38,7 @@ function TeamDynamics() {
     
     try {
       setLoading(true);
-      const response = await apiCall("/teams", "POST", {
+      const response = await createTeam({
         name: newTeam.name,
         description: newTeam.description,
         members: newTeam.members
@@ -55,10 +57,7 @@ function TeamDynamics() {
   const handleGenerateAnalytics = async (teamId) => {
     try {
       setLoading(true);
-      const response = await apiCall(`/teams/${teamId}/analytics`, "POST", {
-        team_id: teamId,
-        metrics: ["collaboration", "productivity", "communication", "leadership"]
-      });
+      const response = await generateTeamAnalytics(teamId);
       
       setAnalytics(prev => ({
         ...prev,

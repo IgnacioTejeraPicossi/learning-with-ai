@@ -35,6 +35,7 @@ function getDefaultProgress() {
 // - Team member join dates
 // - Career coach session timestamps
 // - Skills forecast creation dates
+// eslint-disable-next-line no-unused-vars
 function formatDate(dateStr) {
   if (!dateStr) return "-";
   const d = new Date(dateStr);
