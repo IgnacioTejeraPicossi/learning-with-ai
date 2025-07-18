@@ -29,6 +29,12 @@ function getDefaultProgress() {
   };
 }
 
+// Utility function for formatting dates - will be used for:
+// - Lesson history timestamps
+// - Activity timeline display  
+// - Team member join dates
+// - Career coach session timestamps
+// - Skills forecast creation dates
 function formatDate(dateStr) {
   if (!dateStr) return "-";
   const d = new Date(dateStr);

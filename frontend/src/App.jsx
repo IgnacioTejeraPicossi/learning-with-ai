@@ -16,19 +16,6 @@ import Auth from './Auth';
 import Sidebar from './Sidebar';
 import { ThemeProvider, useTheme } from './ThemeContext';
 
-const sectionComponents = {
-  dashboard: Dashboard,
-  "ai-concepts": Concepts,
-  "micro-lessons": MicroLesson,
-  recommendation: Recommendation,
-  simulations: Simulator,
-  "web-search": WebSearch,
-  "team-dynamics": TeamDynamics,
-  coach: CareerCoach,
-  "skills-forecast": SkillsForecast,
-  "saved-lessons": LessonList,
-};
-
 function AppContent() {
   const [user, setUser] = useState(null);
   const [section, setSection] = useState("dashboard");
@@ -38,8 +25,6 @@ function AppContent() {
     const unsubscribe = onAuthStateChanged(auth, setUser);
     return () => unsubscribe();
   }, []);
-
-  const SectionComponent = sectionComponents[section] || Dashboard;
 
   return (
     <div style={{ 

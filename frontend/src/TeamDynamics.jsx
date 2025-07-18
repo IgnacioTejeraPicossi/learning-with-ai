@@ -4,7 +4,6 @@ import { apiCall } from "./api";
 
 function TeamDynamics() {
   const [teams, setTeams] = useState([]);
-  const [selectedTeam, setSelectedTeam] = useState(null);
   const [newTeam, setNewTeam] = useState({
     name: "",
     description: "",
