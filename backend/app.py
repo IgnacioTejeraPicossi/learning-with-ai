@@ -8,7 +8,7 @@ from typing import List, Optional
 from fastapi.staticfiles import StaticFiles
 import os
 import datetime
-from backend.db import lessons_collection, career_coach_sessions, skills_forecasts, teams_collection, team_members_collection, team_analytics_collection
+from backend.db import lessons_collection, career_coach_sessions, skills_forecasts, teams_collection, team_members_collection, team_analytics_collection, certifications_collection, study_plans_collection, certification_simulations_collection
 from bson import ObjectId
 
 import firebase_admin
@@ -579,6 +579,53 @@ async def get_team_analytics(team_id: str, user=Depends(verify_token)):
     return {"analytics": analytics}
 
 # Certification Endpoints
+@app.post("/certifications/save-profile")
+async def save_user_profile(request: CertificationProfile, user=Depends(verify_token)):
+    """Save user profile for auto-fill functionality."""
+    try:
+        print(f"Saving profile for user {user['uid']}: {request.dict()}")
+        
+        # Save or update user profile
+        result = await certifications_collection.update_one(
+            {"user_id": user["uid"], "type": "profile"},
+            {
+                "$set": {
+                    "user_id": user["uid"],
+                    "user_email": user.get("email", ""),
+                    "type": "profile",
+                    "profile": request.dict(),
+                    "updated_at": datetime.datetime.utcnow()
+                }
+            },
+            upsert=True
+        )
+        
+        print(f"Profile save result: {result.modified_count} modified, {result.upserted_id} upserted")
+        return {"message": "Profile saved successfully"}
+    except Exception as e:
+        print(f"Failed to save user profile: {e}")
+        raise HTTPException(status_code=500, detail="Failed to save profile")
+
+@app.get("/certifications/user-profile")
+async def get_user_profile(user=Depends(verify_token)):
+    """Get user's latest profile for auto-fill."""
+    try:
+        print(f"Getting profile for user {user['uid']}")
+        
+        profile_doc = await certifications_collection.find_one({
+            "user_id": user["uid"],
+            "type": "profile"
+        })
+        
+        print(f"Found profile doc: {profile_doc}")
+        
+        if profile_doc and profile_doc.get("profile"):
+            return {"profile": profile_doc["profile"]}
+        return {"profile": None}
+    except Exception as e:
+        print(f"Failed to get user profile: {e}")
+        return {"profile": None}
+
 @app.post("/certifications/recommend")
 async def recommend_certifications(request: CertificationProfile, user=Depends(verify_token)):
     """Generate AI-powered certification recommendations based on user profile."""

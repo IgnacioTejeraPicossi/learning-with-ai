@@ -172,6 +172,14 @@ export async function getTeamAnalytics(teamId) {
 }
 
 // Certification API Functions
+export async function saveUserProfile(profile) {
+  return apiCall("/certifications/save-profile", "POST", profile);
+}
+
+export async function getUserProfile() {
+  return apiCall("/certifications/user-profile", "GET");
+}
+
 export async function recommendCertifications(profile) {
   return apiCall("/certifications/recommend", "POST", profile);
 }

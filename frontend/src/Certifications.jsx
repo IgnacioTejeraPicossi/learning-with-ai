@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useTheme } from "./ThemeContext";
-import { apiCall } from "./api";
+import { apiCall, getUserProfile, saveUserProfile } from "./api";
 
 function Certifications() {
   const [profile, setProfile] = useState({
@@ -20,6 +20,9 @@ function Certifications() {
   const [simulation, setSimulation] = useState(null);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("recommend");
+  const [history, setHistory] = useState([]);
+  const [expandedPlan, setExpandedPlan] = useState(null);
+  const [autoFillStatus, setAutoFillStatus] = useState("");
   const { colors } = useTheme();
 
   const experienceLevels = [
@@ -29,26 +32,50 @@ function Certifications() {
   ];
 
   useEffect(() => {
-    // Auto-fill profile from latest recommendation
-    async function fetchLatestProfile() {
+    // Auto-fill profile from saved user profile
+    async function fetchUserProfile() {
       try {
-        const res = await apiCall("/certifications/user-recommendations", "GET");
-        if (res && res.recommendations && res.recommendations.length > 0) {
-          const last = res.recommendations[0];
-          if (last.profile) {
-            setProfile({
-              role: last.profile.role || "",
-              skills: last.profile.skills || [],
-              goals: last.profile.goals || "",
-              experience_level: last.profile.experience_level || "beginner"
-            });
-          }
+        setAutoFillStatus("Loading your profile...");
+        console.log("Fetching user profile...");
+        
+        const res = await getUserProfile();
+        console.log("Profile response:", res);
+        
+        if (res && res.profile) {
+          console.log("Setting profile:", res.profile);
+          setProfile({
+            role: res.profile.role || "",
+            skills: res.profile.skills || [],
+            goals: res.profile.goals || "",
+            experience_level: res.profile.experience_level || "beginner"
+          });
+          setAutoFillStatus("Profile loaded successfully!");
+          setTimeout(() => setAutoFillStatus(""), 3000);
+        } else {
+          console.log("No profile found in response:", res);
+          setAutoFillStatus("No saved profile found. Fill in your details to get started.");
+          setTimeout(() => setAutoFillStatus(""), 5000);
         }
       } catch (e) {
-        // Ignore errors
+        console.error("Error fetching profile:", e);
+        setAutoFillStatus("Could not load saved profile. You can still fill in your details.");
+        setTimeout(() => setAutoFillStatus(""), 5000);
       }
     }
-    fetchLatestProfile();
+    fetchUserProfile();
+  }, []);
+
+  useEffect(() => {
+    // Fetch study plan history
+    async function fetchHistory() {
+      try {
+        const res = await apiCall("/certifications/user-recommendations", "GET");
+        if (res && res.study_plans) {
+          setHistory(res.study_plans);
+        }
+      } catch (e) {}
+    }
+    fetchHistory();
   }, []);
 
   const handleGetRecommendations = async () => {
@@ -56,10 +83,22 @@ function Certifications() {
     
     try {
       setLoading(true);
+      
+      // Save the profile first for auto-fill
+      console.log("Saving profile:", profile);
+      const saveResult = await saveUserProfile(profile);
+      console.log("Save result:", saveResult);
+      
+      // Get recommendations
       const response = await apiCall("/certifications/recommend", "POST", profile);
       setRecommendation(response.recommendation);
+      
+      setAutoFillStatus("Profile saved! Your details will be auto-filled next time.");
+      setTimeout(() => setAutoFillStatus(""), 3000);
     } catch (error) {
       console.error("Error getting recommendations:", error);
+      setAutoFillStatus("Error getting recommendations. Please try again.");
+      setTimeout(() => setAutoFillStatus(""), 5000);
     } finally {
       setLoading(false);
     }
@@ -142,7 +181,8 @@ function Certifications() {
         {[
           { key: "recommend", label: "Get Recommendations", icon: "🎯", title: "Get AI-powered certification suggestions based on your role, skills, and goals." },
           { key: "study-plan", label: "Study Plan", icon: "📚", title: "Generate a personalized weekly study plan for your selected certification." },
-          { key: "simulation", label: "Practice Test", icon: "🧪", title: "Practice with realistic certification interview questions and scenarios." }
+          { key: "simulation", label: "Practice Test", icon: "🧪", title: "Practice with realistic certification interview questions and scenarios." },
+          { key: "history", label: "History", icon: "🕑", title: "View your previous study plans and revisit details." }
         ].map(tab => (
           <button
             key={tab.key}
@@ -175,6 +215,21 @@ function Certifications() {
           border: `1px solid ${colors.border}`
         }}>
           <h3 style={{ color: colors.text, marginTop: 0 }}>Get AI-Powered Certification Recommendations</h3>
+          
+          {/* Auto-fill Status Message */}
+          {autoFillStatus && (
+            <div style={{
+              padding: "8px 12px",
+              marginBottom: 16,
+              borderRadius: 6,
+              fontSize: 14,
+              background: autoFillStatus.includes("Error") ? "#ffebee" : colors.primaryLight,
+              color: autoFillStatus.includes("Error") ? "#d32f2f" : colors.primary,
+              border: `1px solid ${autoFillStatus.includes("Error") ? "#d32f2f" : colors.primary}`
+            }}>
+              {autoFillStatus}
+            </div>
+          )}
           
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
             <div>
@@ -594,6 +649,63 @@ function Certifications() {
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* History Tab */}
+      {activeTab === "history" && (
+        <div style={{ background: colors.cardBackground, borderRadius: 12, padding: 24, marginBottom: 24, boxShadow: colors.shadow, border: `1px solid ${colors.border}` }}>
+          <h3 style={{ color: colors.text, marginTop: 0 }}>Study Plan History</h3>
+          {history.length === 0 ? (
+            <div style={{ color: colors.textSecondary }}>No study plans found.</div>
+          ) : (
+            <ul style={{ listStyle: "none", padding: 0 }}>
+              {history.map(plan => (
+                <li key={plan._id} style={{ marginBottom: 16, borderBottom: `1px solid ${colors.border}`, paddingBottom: 12 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div>
+                      <strong>{plan.certification_name}</strong>
+                      <span style={{ color: colors.textSecondary, marginLeft: 12, fontSize: 13 }}>
+                        {plan.created_at ? new Date(plan.created_at).toLocaleString() : ""}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => setExpandedPlan(expandedPlan === plan._id ? null : plan._id)}
+                      style={{
+                        background: colors.buttonSecondary,
+                        color: colors.text,
+                        border: `1px solid ${colors.border}`,
+                        borderRadius: 6,
+                        padding: "6px 16px",
+                        cursor: "pointer",
+                        fontSize: 14
+                      }}
+                    >
+                      {expandedPlan === plan._id ? "Hide" : "View"}
+                    </button>
+                  </div>
+                  {expandedPlan === plan._id && (
+                    <div style={{ marginTop: 12, background: colors.primaryLight, borderRadius: 8, padding: 16, color: colors.textSecondary, fontSize: 14, whiteSpace: "pre-wrap" }}>
+                      {plan.study_plan}
+                    </div>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+
+      {autoFillStatus && (
+        <div style={{ 
+          background: colors.primaryLight, 
+          color: colors.primary, 
+          padding: "12px 20px", 
+          borderRadius: 8, 
+          marginTop: 24, 
+          border: `1px solid ${colors.border}`
+        }}>
+          {autoFillStatus}
         </div>
       )}
     </div>
