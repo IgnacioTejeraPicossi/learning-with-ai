@@ -170,15 +170,17 @@ const GlobalSearch = ({ onNavigate, isOpen, onClose }) => {
       justifyContent: "center",
       paddingTop: "100px"
     }} onClick={onClose}>
-      <div style={{
-        background: colors.cardBackground,
-        borderRadius: 12,
-        padding: 20,
-        width: "90%",
-        maxWidth: "600px",
-        boxShadow: "0 10px 25px rgba(0, 0, 0, 0.2)",
-        border: `1px solid ${colors.border}`
-      }} onClick={e => e.stopPropagation()}>
+      <div 
+        data-testid="global-search-modal"
+        style={{
+          background: colors.cardBackground,
+          borderRadius: 12,
+          padding: 20,
+          width: "90%",
+          maxWidth: "600px",
+          boxShadow: "0 10px 25px rgba(0, 0, 0, 0.2)",
+          border: `1px solid ${colors.border}`
+        }} onClick={e => e.stopPropagation()}>
         {/* Search Input */}
         <div style={{
           display: "flex",
@@ -221,7 +223,9 @@ const GlobalSearch = ({ onNavigate, isOpen, onClose }) => {
 
         {/* Search Results */}
         {searchQuery && (
-          <div style={{ maxHeight: "400px", overflowY: "auto" }}>
+          <div 
+            data-testid="search-results"
+            style={{ maxHeight: "400px", overflowY: "auto" }}>
             {filteredResults.length > 0 ? (
               filteredResults.map((section, index) => (
                 <div

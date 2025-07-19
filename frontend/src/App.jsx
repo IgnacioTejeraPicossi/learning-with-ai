@@ -12,6 +12,7 @@ import SkillsForecast from "./SkillsForecast";
 import TeamDynamics from "./TeamDynamics";
 import Certifications from "./Certifications";
 import GlobalSearch from "./GlobalSearch";
+import RunTest from "./RunTest";
 import { auth } from './firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import Auth from './Auth';
@@ -133,6 +134,7 @@ function AppContent() {
           {section === "coach" && <CareerCoach />}
           {section === "skills-forecast" && <SkillsForecast />}
           {section === "saved-lessons" && <LessonList user={user} />}
+          {section === "run-test" && <RunTest />}
         </div>
       </div>
       

@@ -17,7 +17,8 @@ const Icon = ({ name, size = 20 }) => {
     team: "👥",
     award: "🏆",
     "chevron-left": "◀️",
-    "chevron-right": "▶️"
+    "chevron-right": "▶️",
+    test: "🧪"
   };
 
   return (
@@ -39,6 +40,7 @@ const navItems = [
   { key: "coach", label: "AI Career Coach", icon: "user-check" },
   { key: "skills-forecast", label: "Skills Forecast", icon: "bar-chart" },
   { key: "saved-lessons", label: "Saved Lessons", icon: "archive" },
+  { key: "run-test", label: "Run Test", icon: "test" },
 ];
 
 function Sidebar({ selected, onSelect }) {
@@ -107,6 +109,8 @@ function Sidebar({ selected, onSelect }) {
         {navItems.map(item => (
           <button
             key={item.key}
+            data-testid={`sidebar-${item.key}`}
+            className={selected === item.key ? 'active' : ''}
             onClick={() => onSelect(item.key)}
             style={{
               display: "flex",
