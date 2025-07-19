@@ -29,6 +29,10 @@ function LessonList({ user }) {
   useEffect(() => {
     if (user) {
       loadLessons();
+    } else {
+      // Set loading to false when no user, so the component renders properly
+      setLoading(false);
+      setLessons([]);
     }
   }, [user]);
 
@@ -73,12 +77,16 @@ function LessonList({ user }) {
     lesson.topic.toLowerCase().includes(filter.toLowerCase())
   );
 
-  if (loading) return <div>Loading saved lessons...</div>;
-  if (error) return <div style={{ color: "red" }}>Error: {error}</div>;
+  if (loading) return <div data-testid="saved-lessons-loading">Loading saved lessons...</div>;
+  if (error) return <div data-testid="saved-lessons-error" style={{ color: "red" }}>Error: {error}</div>;
 
   return (
-    <div style={{ margin: "32px 0", padding: "24px", maxWidth: 800, background: colors.cardBackground, borderRadius: 12, boxShadow: colors.shadow, color: colors.text }}>
-      <h2 style={{ marginTop: 0, color: colors.text }}>Saved Micro-lessons</h2>
+    <div 
+      data-testid="saved-lessons-panel"
+      style={{ margin: "32px 0", padding: "24px", maxWidth: 800, background: colors.cardBackground, borderRadius: 12, boxShadow: colors.shadow, color: colors.text }}>
+      <h2 
+        data-testid="saved-lessons-heading"
+        style={{ marginTop: 0, color: colors.text }}>Saved Micro-lessons</h2>
       <div style={{ marginBottom: 16 }}>
         <input
           type="text"
@@ -105,7 +113,7 @@ function LessonList({ user }) {
         </button>
       </div>
       {filteredLessons.length === 0 ? (
-        <div>No lessons found.</div>
+        <div data-testid="saved-lessons-empty">No lessons found.</div>
       ) : (
         <ul style={{ listStyle: "none", padding: 0 }}>
           {filteredLessons.map(lesson => (
