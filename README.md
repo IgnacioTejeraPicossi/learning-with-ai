@@ -127,6 +127,14 @@ This project is a full-stack demo for the Nordic Software AI Hackathon. It featu
     - Enter your learning history and transcript keywords
     - Get AI-powered predictions for the next skills you should develop, with explanations
     - Forecasts are saved per user for future reference
+- **🧪 Run Test** (`RunTest.jsx`):
+    - **Comprehensive Testing Suite**: Built-in testing functionality accessible from the sidebar
+    - **Manual Testing**: Quick verification that all panels load correctly
+    - **Automated Testing**: Cypress-powered tests for all sidebar options and features
+    - **Visual Results**: Real-time test results with pass/fail status and execution times
+    - **Screenshot Capture**: Automatic screenshots for visual verification of each panel
+    - **Test Coverage**: Tests all 11 sidebar options, global search, theme toggle, and responsive design
+    - **Easy Access**: Click the test tube icon (🧪) in the sidebar to run tests
 - **Shoelace-based UI:**
   - Uses [Shoelace](https://shoelace.style/) Web Components for cards, buttons, and layout in all main features (Career Coach, Skills Forecasting, Saved Micro-lessons)
   - Consistent, modern design with accessible, themeable components
@@ -693,43 +701,21 @@ AI Learning with AI/
 
 ---
 
-## Automatic Tests
+## Testing
 
-This project includes both unit/integration tests and end-to-end (E2E) tests for quality assurance.
+This project includes comprehensive testing capabilities:
 
-### Frontend
-- **Unit & Integration Tests:**
-  - Written with **Jest** and **React Testing Library** (default with Create React App)
-  - Test individual components and their interactions
-  - To run:
-    ```bash
-    cd frontend
-    npm test
-    ```
-- **End-to-End (E2E) Tests:**
-  - Written with **Cypress**
-  - Test full user flows (UI + backend)
-  - Test files are in `frontend/cypress/e2e/`
-  - To run interactively:
-    ```bash
-    cd frontend
-    npx cypress open
-    ```
-  - To run headless:
-    ```bash
-    npx cypress run
-    ```
+- **🧪 Built-in Testing**: Access the "Run Test" feature from the sidebar to test all application functionality
+- **📋 Manual Testing**: Quick verification of all panels and features
+- **🤖 Automated Testing**: Cypress-powered end-to-end tests
+- **📸 Visual Testing**: Screenshot capture for visual verification
+- **📊 Test Results**: Real-time pass/fail status with execution times
 
-### Backend
-- **Unit & Integration Tests:**
-  - Written with **pytest** and **httpx**
-  - Test API endpoints and backend logic
-  - Test files are in `backend/tests/`
-  - To run:
-    ```bash
-    cd backend
-    pytest
-    ```
+For detailed testing documentation, see [`frontend/TESTING.md`](frontend/TESTING.md).
+
+---
+
+## Quick Start
 
 ---
 
