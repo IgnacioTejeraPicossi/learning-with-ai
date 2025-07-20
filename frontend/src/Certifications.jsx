@@ -49,6 +49,13 @@ function Certifications() {
             goals: res.profile.goals || "",
             experience_level: res.profile.experience_level || "beginner"
           });
+          
+          // Also populate the study plan current skills from the saved profile
+          setStudyPlan(prev => ({
+            ...prev,
+            current_skills: res.profile.skills || []
+          }));
+          
           setAutoFillStatus("Profile loaded successfully!");
           setTimeout(() => setAutoFillStatus(""), 3000);
         } else {
@@ -135,13 +142,26 @@ function Certifications() {
     }
   };
 
+  // Function to parse skills from text (handles commas, semicolons, etc.)
+  const parseSkillsFromText = (text) => {
+    return text
+      .split(/[,;]/) // Split by comma or semicolon
+      .map(s => s.trim())
+      .filter(s => s.length > 0);
+  };
+
   const addSkill = (skill) => {
-    if (skill.trim() && !profile.skills.includes(skill.trim())) {
-      setProfile(prev => ({
-        ...prev,
-        skills: [...prev.skills, skill.trim()]
-      }));
-    }
+    // Split by comma and trim each skill
+    const skillsToAdd = parseSkillsFromText(skill);
+    
+    skillsToAdd.forEach(singleSkill => {
+      if (singleSkill && !profile.skills.includes(singleSkill)) {
+        setProfile(prev => ({
+          ...prev,
+          skills: [...prev.skills, singleSkill]
+        }));
+      }
+    });
   };
 
   const removeSkill = (index) => {
@@ -152,12 +172,17 @@ function Certifications() {
   };
 
   const addCurrentSkill = (skill) => {
-    if (skill.trim() && !studyPlan.current_skills.includes(skill.trim())) {
-      setStudyPlan(prev => ({
-        ...prev,
-        current_skills: [...prev.current_skills, skill.trim()]
-      }));
-    }
+    // Split by comma and trim each skill
+    const skillsToAdd = skill.split(',').map(s => s.trim()).filter(s => s.length > 0);
+    
+    skillsToAdd.forEach(singleSkill => {
+      if (singleSkill && !studyPlan.current_skills.includes(singleSkill)) {
+        setStudyPlan(prev => ({
+          ...prev,
+          current_skills: [...prev.current_skills, singleSkill]
+        }));
+      }
+    });
   };
 
   const removeCurrentSkill = (index) => {
@@ -165,6 +190,26 @@ function Certifications() {
       ...prev,
       current_skills: prev.current_skills.filter((_, i) => i !== index)
     }));
+  };
+
+  // Function to sync skills from profile to study plan
+  const syncSkillsToStudyPlan = () => {
+    if (profile.skills.length > 0) {
+      setStudyPlan(prev => ({
+        ...prev,
+        current_skills: [...new Set([...prev.current_skills, ...profile.skills])]
+      }));
+    }
+  };
+
+  // Handle tab switching with skill sync
+  const handleTabSwitch = (tabKey) => {
+    setActiveTab(tabKey);
+    
+    // When switching to study plan, sync skills from profile
+    if (tabKey === "study-plan") {
+      syncSkillsToStudyPlan();
+    }
   };
 
   return (
@@ -186,7 +231,7 @@ function Certifications() {
         ].map(tab => (
           <button
             key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
+            onClick={() => handleTabSwitch(tab.key)}
             title={tab.title}
             style={{
               background: activeTab === tab.key ? colors.primary : "transparent",
@@ -286,11 +331,19 @@ function Certifications() {
             <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
               <input
                 type="text"
-                placeholder="Add a skill..."
+                placeholder="Add a skill... (or paste multiple skills separated by commas)"
                 onKeyPress={(e) => {
                   if (e.key === "Enter") {
                     addSkill(e.target.value);
                     e.target.value = "";
+                  }
+                }}
+                onPaste={(e) => {
+                  // Handle paste events for multiple skills
+                  const pastedText = e.clipboardData.getData('text');
+                  if (pastedText.includes(',') || pastedText.includes(';')) {
+                    e.preventDefault();
+                    addSkill(pastedText);
                   }
                 }}
                 style={{
@@ -303,6 +356,22 @@ function Certifications() {
                   fontSize: 14
                 }}
               />
+              <button
+                onClick={() => addSkill("Selenium, Cypress, Test Automation, AI in Testing, Javascript, APIs testing with Postman")}
+                style={{
+                  background: colors.primaryLight,
+                  color: colors.primary,
+                  border: `1px solid ${colors.primary}`,
+                  borderRadius: 6,
+                  padding: "8px 12px",
+                  fontSize: 14,
+                  cursor: "pointer",
+                  whiteSpace: "nowrap"
+                }}
+                title="Quick add test skills"
+              >
+                🧪 Quick Add
+              </button>
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
               {profile.skills.map((skill, index) => (
@@ -413,6 +482,21 @@ function Certifications() {
         }}>
           <h3 style={{ color: colors.text, marginTop: 0 }}>Generate Personalized Study Plan</h3>
           
+          {/* Auto-fill Status Message for Study Plan */}
+          {profile.skills.length > 0 && studyPlan.current_skills.length > 0 && (
+            <div style={{
+              padding: "8px 12px",
+              marginBottom: 16,
+              borderRadius: 6,
+              fontSize: 14,
+              background: colors.primaryLight,
+              color: colors.primary,
+              border: `1px solid ${colors.primary}`
+            }}>
+              ✅ Skills auto-filled from your profile: {profile.skills.join(", ")}
+            </div>
+          )}
+          
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
             <div>
               <label style={{ display: "block", marginBottom: 8, color: colors.text, fontWeight: 600 }}>
@@ -482,14 +566,42 @@ function Certifications() {
             <label style={{ display: "block", marginBottom: 8, color: colors.text, fontWeight: 600 }}>
               Current Skills (for this certification)
             </label>
+            
+            {/* Sync Skills Button */}
+            {profile.skills.length > 0 && (
+              <button
+                onClick={syncSkillsToStudyPlan}
+                style={{
+                  background: colors.primaryLight,
+                  color: colors.primary,
+                  border: `1px solid ${colors.primary}`,
+                  borderRadius: 6,
+                  padding: "8px 12px",
+                  fontSize: 14,
+                  cursor: "pointer",
+                  marginBottom: 8
+                }}
+              >
+                🔄 Sync Skills from Profile ({profile.skills.length} skills)
+              </button>
+            )}
+            
             <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
               <input
                 type="text"
-                placeholder="Add a skill..."
+                placeholder="Add a skill... (or paste multiple skills separated by commas)"
                 onKeyPress={(e) => {
                   if (e.key === "Enter") {
                     addCurrentSkill(e.target.value);
                     e.target.value = "";
+                  }
+                }}
+                onPaste={(e) => {
+                  // Handle paste events for multiple skills
+                  const pastedText = e.clipboardData.getData('text');
+                  if (pastedText.includes(',') || pastedText.includes(';')) {
+                    e.preventDefault();
+                    addCurrentSkill(pastedText);
                   }
                 }}
                 style={{
