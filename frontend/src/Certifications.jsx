@@ -5,24 +5,25 @@ import { apiCall, getUserProfile, saveUserProfile } from "./api";
 function Certifications() {
   const [profile, setProfile] = useState({
     role: "",
+    experience_level: "advanced",
     skills: [],
-    goals: "",
-    experience_level: "beginner"
+    goals: ""
   });
   const [studyPlan, setStudyPlan] = useState({
     certification_name: "",
     current_skills: [],
-    study_time: 10,
-    target_date: ""
+    target_skills: [],
+    study_plan: ""
   });
-  const [recommendation, setRecommendation] = useState(null);
-  const [studyPlanResult, setStudyPlanResult] = useState(null);
-  const [simulation, setSimulation] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("recommend");
+  const [loading, setLoading] = useState(false);
+  const [recommendation, setRecommendation] = useState("");
+  const [autoFillStatus, setAutoFillStatus] = useState("");
+  const [currentSkillInput, setCurrentSkillInput] = useState("");
+  const [studyPlanResult, setStudyPlanResult] = useState("");
+  const [simulation, setSimulation] = useState("");
   const [history, setHistory] = useState([]);
   const [expandedPlan, setExpandedPlan] = useState(null);
-  const [autoFillStatus, setAutoFillStatus] = useState("");
   const { colors } = useTheme();
 
   const experienceLevels = [
@@ -112,7 +113,7 @@ function Certifications() {
   };
 
   const handleGenerateStudyPlan = async () => {
-    if (!studyPlan.certification_name || !studyPlan.target_date) return;
+    if (!studyPlan.certification_name || studyPlan.current_skills.length === 0) return;
     
     try {
       setLoading(true);
@@ -173,7 +174,7 @@ function Certifications() {
 
   const addCurrentSkill = (skill) => {
     // Split by comma and trim each skill
-    const skillsToAdd = skill.split(',').map(s => s.trim()).filter(s => s.length > 0);
+    const skillsToAdd = parseSkillsFromText(skill);
     
     skillsToAdd.forEach(singleSkill => {
       if (singleSkill && !studyPlan.current_skills.includes(singleSkill)) {
@@ -331,11 +332,13 @@ function Certifications() {
             <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
               <input
                 type="text"
+                value={currentSkillInput}
+                onChange={(e) => setCurrentSkillInput(e.target.value)}
                 placeholder="Add a skill... (or paste multiple skills separated by commas)"
                 onKeyPress={(e) => {
                   if (e.key === "Enter") {
                     addSkill(e.target.value);
-                    e.target.value = "";
+                    setCurrentSkillInput("");
                   }
                 }}
                 onPaste={(e) => {
@@ -344,6 +347,7 @@ function Certifications() {
                   if (pastedText.includes(',') || pastedText.includes(';')) {
                     e.preventDefault();
                     addSkill(pastedText);
+                    setCurrentSkillInput("");
                   }
                 }}
                 style={{
@@ -357,7 +361,12 @@ function Certifications() {
                 }}
               />
               <button
-                onClick={() => addSkill("Selenium, Cypress, Test Automation, AI in Testing, Javascript, APIs testing with Postman")}
+                onClick={() => {
+                  if (currentSkillInput.trim()) {
+                    addSkill(currentSkillInput);
+                    setCurrentSkillInput("");
+                  }
+                }}
                 style={{
                   background: colors.primaryLight,
                   color: colors.primary,
@@ -368,7 +377,7 @@ function Certifications() {
                   cursor: "pointer",
                   whiteSpace: "nowrap"
                 }}
-                title="Quick add test skills"
+                title="Add the skills you typed"
               >
                 🧪 Quick Add
               </button>
