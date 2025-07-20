@@ -15,6 +15,7 @@ flowchart TD
     SkillsForecast[SkillsForecast.jsx]
     GlobalSearch[GlobalSearch.jsx]
     Auth[Auth.jsx]
+    Certifications[Certifications.jsx]
   end
   subgraph Backend
     AppPy[app.py]
@@ -41,6 +42,7 @@ flowchart TD
   App --> SkillsForecast
   App --> GlobalSearch
   App --> Auth
+  App --> Certifications
   Simulator -->|Scenario UI| App
   API -->|HTTP requests with Firebase token| AppPy
   WebSearchNode -->|HTTP requests| OpenAI
@@ -52,6 +54,7 @@ flowchart TD
   AppPy -->|Saves user-specific data| DB
   AppPy -->|Career coach| LLM
   AppPy -->|Skills forecast| LLM
+  AppPy -->|Certifications| LLM
   AppPy -->|Verifies Firebase token| Firebase
   LLM -->|Sends prompt, gets response| OpenAI
   VectorStore -->|Future: Embeddings| DB
@@ -89,8 +92,9 @@ This project is a full-stack demo for the Nordic Software AI Hackathon. It featu
   - **Saved Micro-lessons**: All generated micro-lessons are stored in a MongoDB database for later review, with endpoints for listing, editing, and deleting lessons
   - **AI Career Coach**: An intelligent mentor that guides users through soft skills, leadership scenarios, and career goals via a `/career-coach` endpoint. Supports multi-turn conversations by accepting and responding to conversation history.
   - **Dynamic Skills Forecasting**: Predicts future skill needs based on user learning history and transcript keywords via a `/skills-forecast` endpoint.
+  - **AI-Powered Certifications**: Get personalized certification recommendations and study plans via `/certifications` endpoints with user-specific data persistence.
 - **Firebase Authentication**: Secure user authentication with Google Sign-In
-- **User-Specific Data**: All data (lessons, career sessions, forecasts) is saved per user
+- **User-Specific Data**: All data (lessons, career sessions, forecasts, certifications) is saved per user
 - Dynamic prompt handling with user input (e.g., custom micro-lesson topics)
 - Mocked AI responses if OpenAI API key is missing or invalid
 - CORS enabled for frontend-backend communication
@@ -127,7 +131,20 @@ This project is a full-stack demo for the Nordic Software AI Hackathon. It featu
     - Enter your learning history and transcript keywords
     - Get AI-powered predictions for the next skills you should develop, with explanations
     - Forecasts are saved per user for future reference
-- **🧪 Run Test** (`RunTest.jsx`):
+  - **Certifications** (`Certifications.jsx`):
+    - **AI-Powered Recommendations**: Get personalized certification suggestions based on your role, skills, and goals
+    - **Smart Skills Management**: 
+      - **Individual Skill Tags**: Skills display as removable blue tags instead of plain text
+      - **Comma-Separated Input**: Type multiple skills separated by commas (e.g., "Jira, Confluence, Slack")
+      - **Quick Add Button**: 🧪 Quick Add button to instantly add typed skills
+      - **Paste Support**: Paste multiple skills and they'll be automatically split
+      - **Auto-Sync**: Skills automatically sync between "Get Recommendations" and "Study Plan" tabs
+      - **Visual Feedback**: Clear indication when skills are auto-filled from saved profile
+    - **Study Plan Generation**: Create personalized weekly study plans for selected certifications
+    - **Practice Tests**: Interactive certification interview simulations
+    - **History Tracking**: View previous study plans and recommendations
+    - **Profile Persistence**: Your role, skills, and goals are automatically saved and restored
+  - **🧪 Run Test** (`RunTest.jsx`):
     - **Comprehensive Testing Suite**: Built-in testing functionality accessible from the sidebar
     - **Manual Testing**: Quick verification that all panels load correctly
     - **Automated Testing**: Cypress-powered tests for all sidebar options and features
@@ -145,6 +162,78 @@ This project is a full-stack demo for the Nordic Software AI Hackathon. It featu
 - Robust progress tracking and personalized dashboard
 - Displays API results in a styled, readable format with proper text wrapping
 - Ready for further expansion (user input for other endpoints, authentication, etc.)
+
+---
+
+## Recent Improvements: Enhanced Certifications Module
+
+### **🎯 Smart Skills Management System**
+
+The Certifications module has been significantly enhanced with a sophisticated skills management system:
+
+#### **Individual Skill Tags**
+- **Visual Display**: Skills now appear as individual blue tags with remove buttons (×)
+- **Easy Removal**: Click the × on any skill tag to remove it instantly
+- **Professional Look**: Clean, modern tag-based interface instead of plain text
+
+#### **Advanced Input Methods**
+- **Comma-Separated Input**: Type multiple skills at once (e.g., "Jira, Confluence, Slack")
+- **Semicolon Support**: Also supports semicolon separation (e.g., "Jira; Confluence; Slack")
+- **Paste Functionality**: Paste a list of skills and they'll be automatically parsed
+- **Quick Add Button**: 🧪 Quick Add button to instantly add whatever you've typed
+
+#### **Auto-Sync Between Tabs**
+- **Seamless Integration**: Skills automatically sync between "Get Recommendations" and "Study Plan" tabs
+- **Visual Feedback**: Clear status messages when skills are auto-filled from your saved profile
+- **Persistent Storage**: Your skills are saved and restored automatically
+
+#### **Enhanced User Experience**
+- **Input Tracking**: The input field tracks what you type for the Quick Add button
+- **Smart Parsing**: Automatically splits comma/semicolon-separated skills into individual tags
+- **Duplicate Prevention**: Prevents adding the same skill multiple times
+- **Real-time Updates**: Skills update immediately as you add or remove them
+
+### **🔧 Technical Improvements**
+
+#### **Fixed Compilation Issues**
+- **State Management**: Added missing state variables (`studyPlanResult`, `simulation`)
+- **Function References**: Fixed incorrect field references in study plan generation
+- **Error Handling**: Improved error handling and validation
+
+#### **Enhanced Testing**
+- **Cypress Integration**: Comprehensive end-to-end testing for all sidebar options
+- **Visual Verification**: Automatic screenshots for each panel test
+- **Reliable Tests**: Fixed hanging issues and improved test stability
+- **Timeout Management**: Proper timeouts to prevent test failures
+
+### **📋 Usage Examples**
+
+#### **Adding Skills**
+1. **Type**: "Jira, Confluence, Slack" in the skills input
+2. **Click**: 🧪 Quick Add button
+3. **Result**: Three separate blue tags appear: "Jira", "Confluence", "Slack"
+
+#### **Pasting Skills**
+1. **Copy**: "Selenium; Cypress; Test Automation" from another source
+2. **Paste**: Into the skills input field
+3. **Result**: Three skills automatically split and added as tags
+
+#### **Switching Between Tabs**
+1. **Add skills** in "Get Recommendations" tab
+2. **Switch** to "Study Plan" tab
+3. **See**: Skills automatically appear in the "Current Skills" section
+
+#### **Profile Persistence**
+1. **Fill out** your role, skills, and goals
+2. **Click**: "Get Recommendations" to save your profile
+3. **Refresh** the page or return later
+4. **See**: All your data is automatically restored
+
+### **🎨 Visual Improvements**
+- **Modern Tag Design**: Professional blue tags with hover effects
+- **Clear Visual Hierarchy**: Better spacing and typography
+- **Responsive Layout**: Works perfectly on all screen sizes
+- **Theme Integration**: Adapts to light/dark mode automatically
 
 ---
 
@@ -655,69 +744,3 @@ AI Learning with AI/
   ```bash
   pip install fastapi uvicorn openai python-dotenv
   ```
-- (Optional) Add your OpenAI API key to a `.env` file:
-  ```
-  OPENAI_API_KEY=sk-...
-  ```
-- Start the backend:
-  ```bash
-  uvicorn backend.app:app --reload
-  ```
-
-### 2. Frontend
-- In the `frontend` folder, install dependencies:
-  ```bash
-  npm install
-  ```
-- Start the React app:
-  ```bash
-  npm start
-  ```
-- Open [http://localhost:3000](http://localhost:3000) in your browser.
-
----
-
-## Usage
-- Click any button to call the backend API and display the result.
-- For "Micro-Lesson", enter a topic and click the button for a custom lesson.
-- Use the **Clear** button in each section to reset the input and result for that feature.
-- Hover over any button or input for a helpful tooltip/hint.
-- Progress is tracked and shown in the dashboard at the top.
-- If no valid OpenAI key is set, you will see a mocked response.
-
----
-
-## Next Steps
-- Make the Scenario Simulator interactive (done!)
-- Add user input for other endpoints
-- Add authentication/user profiles (done!)
-- Deploy to the cloud (Vercel, Google Cloud Run, etc.)
-- Connect to a real OpenAI key for live AI responses (done!)
-- Connect to a Database(MongoDB) and save data to later session (done!)
-
----
-
-**Built for the Nordic Software AI Hackathon 2025** 
-
----
-
-## Testing
-
-This project includes comprehensive testing capabilities:
-
-- **🧪 Built-in Testing**: Access the "Run Test" feature from the sidebar to test all application functionality
-- **📋 Manual Testing**: Quick verification of all panels and features
-- **🤖 Automated Testing**: Cypress-powered end-to-end tests
-- **📸 Visual Testing**: Screenshot capture for visual verification
-- **📊 Test Results**: Real-time pass/fail status with execution times
-
-For detailed testing documentation, see [`frontend/TESTING.md`](frontend/TESTING.md).
-
----
-
-## Quick Start
-
----
-
-**See the `cypress/e2e/` folder and `src/__tests__/` for sample tests.**
-If you add new features, please add or update tests to keep the project robust! 
