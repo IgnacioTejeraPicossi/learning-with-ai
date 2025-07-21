@@ -4,9 +4,11 @@ import { useTheme } from "./ThemeContext";
 const RunTest = () => {
   const [testResults, setTestResults] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
+  const [testMode, setTestMode] = useState("cypress");
   const { colors } = useTheme();
 
   const runCypressTests = async () => {
+    setTestMode("cypress");
     setIsRunning(true);
     setTestResults(null);
 
@@ -48,6 +50,7 @@ const RunTest = () => {
   };
 
   const runManualTests = () => {
+    setTestMode("manual");
     setIsRunning(true);
     setTestResults(null);
 
@@ -97,9 +100,9 @@ const RunTest = () => {
             onClick={runCypressTests}
             disabled={isRunning}
             style={{
-              background: colors.buttonPrimary,
-              color: "#fff",
-              border: 0,
+              background: testMode === "cypress" ? colors.buttonPrimary : colors.cardBackground,
+              color: testMode === "cypress" ? "#fff" : colors.text,
+              border: testMode === "cypress" ? 0 : `1px solid ${colors.border}`,
               borderRadius: 6,
               padding: "12px 24px",
               fontWeight: 600,
@@ -108,16 +111,16 @@ const RunTest = () => {
               opacity: isRunning ? 0.6 : 1
             }}
           >
-            {isRunning ? "Running Tests..." : "Run Cypress Tests"}
+            {isRunning && testMode === "cypress" ? "Running Tests..." : "Run Cypress Tests"}
           </button>
           
           <button
             onClick={runManualTests}
             disabled={isRunning}
             style={{
-              background: colors.cardBackground,
-              color: colors.text,
-              border: `1px solid ${colors.border}`,
+              background: testMode === "manual" ? colors.buttonPrimary : colors.cardBackground,
+              color: testMode === "manual" ? "#fff" : colors.text,
+              border: testMode === "manual" ? 0 : `1px solid ${colors.border}`,
               borderRadius: 6,
               padding: "12px 24px",
               fontWeight: 600,
@@ -126,7 +129,7 @@ const RunTest = () => {
               opacity: isRunning ? 0.6 : 1
             }}
           >
-            {isRunning ? "Running Tests..." : "Run Manual Tests"}
+            {isRunning && testMode === "manual" ? "Running Tests..." : "Run Manual Tests"}
           </button>
         </div>
 
