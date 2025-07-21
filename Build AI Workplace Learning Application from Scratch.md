@@ -1,5 +1,53 @@
 # Build AI Workplace Learning Application from Scratch
 
+## 🟢 First Run Checklist
+- [ ] MongoDB is running and accessible on localhost:27017
+- [ ] Backend `.env` is configured with all required variables (see below)
+- [ ] Frontend `.env` is configured with all required variables (see below)
+- [ ] Firebase service account file is present in `backend/`
+- [ ] All dependencies installed (`npm install` in `frontend`, `pip install -r requirements.txt` in `backend`)
+- [ ] Both frontend and backend servers are running (see start commands below)
+- [ ] Cypress tests pass (`npm run test:comprehensive` in `frontend`)
+
+---
+
+## 🔑 Environment Variables (REQUIRED)
+
+### Backend `.env` (place in `backend/`)
+```
+OPENAI_API_KEY=your_openai_api_key_here
+MONGO_URI=mongodb://localhost:27017
+FIREBASE_CREDENTIALS=serviceAccountKey.json
+```
+
+### Frontend `.env` (place in `frontend/`)
+```
+REACT_APP_API_BASE_URL=http://localhost:8000
+REACT_APP_FIREBASE_API_KEY=your_firebase_api_key
+REACT_APP_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+REACT_APP_FIREBASE_PROJECT_ID=your_project_id
+REACT_APP_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
+REACT_APP_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+REACT_APP_FIREBASE_APP_ID=your_app_id
+```
+
+---
+
+## ⚠️ Common Pitfalls & Troubleshooting
+
+- **npm start fails with 'Missing script: start'**: Ensure you are in the `frontend` directory and `package.json` contains a `"start"` script.
+- **uvicorn app:app --reload fails**: Ensure you are in the `backend` directory and `app.py` exists.
+- **MongoDB connection errors**: Ensure MongoDB is running and accessible at the URI in your `.env`.
+- **Firebase errors**: Ensure Google Sign-In is enabled, the web app is registered, and the service account key is present in `backend/`.
+- **Cypress tests hang**: Ensure both frontend and backend servers are running. Check for port conflicts.
+- **Port already in use**: Kill the process using the port or change the port in your start script.
+- **Node/Python version issues**: Use Node.js 18+ and Python 3.10+ for best compatibility.
+- **Component/file naming**: All references must match exactly (e.g., `Certifications.jsx`, not `Certification.jsx`).
+- **CORS errors**: Ensure CORS is enabled in FastAPI and frontend is using the correct API base URL.
+- **Cannot find module**: Ensure all dependencies are installed and paths are correct.
+
+---
+
 ## 📋 Project Overview
 
 This document provides complete instructions to build an AI-powered workplace learning application from scratch. The application features a React frontend with FastAPI backend, Firebase authentication, MongoDB database, and comprehensive testing capabilities.
@@ -36,6 +84,92 @@ This document provides complete instructions to build an AI-powered workplace le
 - **Database Operations**: MongoDB with user-specific collections
 - **CORS Support**: Cross-origin requests for frontend-backend communication
 - **Modular Architecture**: Separate modules for different features
+
+## 📁 Project Structure
+
+```
+ai-workplace-learning/
+├── frontend/                          # React Application
+│   ├── public/                        # Static files
+│   ├── src/                           # Source code
+│   │   ├── components/                # React components
+│   │   ├── contexts/                  # React contexts
+│   │   ├── api.js                     # API functions
+│   │   ├── firebase.js                # Firebase config
+│   │   └── index.js                   # Entry point
+│   ├── cypress/                       # E2E testing
+│   ├── package.json                   # Dependencies
+│   └── TESTING.md                     # Testing documentation
+├── backend/                           # FastAPI Application
+│   ├── app.py                         # Main FastAPI app
+│   ├── db.py                          # Database configuration
+│   ├── llm.py                         # OpenAI integration
+│   ├── prompts.py                     # AI prompts
+│   └── requirements.txt               # Python dependencies
+├── deployment/                        # Deployment configs
+├── docs/                             # Documentation
+└── README.md                         # Project documentation
+```
+
+## 🚀 Step-by-Step Build Instructions (AI-Optimized)
+
+### 1. **Create Project Structure**
+- Create all directories and files as shown in the structure. Do not skip any.
+
+### 2. **Install Dependencies**
+- `frontend/package.json` must include all scripts and dependencies as shown. Run `npm install` in `frontend`.
+- `backend/requirements.txt` must include all dependencies. Run `pip install -r requirements.txt` in `backend`.
+
+### 3. **Configure Environment**
+- Place all required `.env` files in the correct directories.
+- Place `serviceAccountKey.json` in `backend/`.
+
+### 4. **Start Services**
+- **MongoDB**: Start and verify with a connection test.
+- **Backend**:
+  - On Windows: `venv\Scripts\activate && uvicorn app:app --reload --host 0.0.0.0 --port 8000`
+  - On Unix: `source venv/bin/activate && uvicorn app:app --reload --host 0.0.0.0 --port 8000`
+- **Frontend**:
+  - `cd frontend && npm start`
+
+### 5. **Run Tests**
+- In `frontend`: `npm run test:comprehensive`
+- If tests fail, check all services and environment variables.
+
+---
+
+## 🔍 Verification Steps (AI Must Check)
+- All required files exist in the correct locations.
+- All environment variables are loaded and non-empty.
+- All services (MongoDB, backend, frontend) are running and accessible.
+- Cypress tests pass with 0 failures.
+- All endpoints respond with expected data.
+- All UI panels load and display correct data.
+
+---
+
+## 🧠 AI-Specific Guidance
+- Always check for missing or misnamed files/components.
+- Always check for missing or misconfigured environment variables.
+- Always check for port conflicts before starting servers.
+- Always check for dependency installation before running any scripts.
+- Always check for correct casing in file and directory names (case-sensitive on Unix).
+- Always check for correct API base URLs in both frontend and backend.
+- Always check for correct Firebase configuration and credentials.
+- Always check for CORS settings in backend.
+- Always check for MongoDB running and accessible.
+- Always check for Node.js and Python versions.
+
+---
+
+## 🏁 Final Success Criteria
+- All modules and features are present and functional.
+- All tests pass.
+- No errors in browser console or backend logs.
+- All data is persisted and loaded correctly per user.
+- All UI features (theme, search, sidebar, etc.) work as described.
+
+---
 
 ## 📁 Project Structure
 
