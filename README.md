@@ -1,82 +1,76 @@
 # AI Workplace Learning With AI
 
-```mermaid
-flowchart TD
-  subgraph Frontend
-    App[App.jsx]
-    Concepts[Concepts.jsx]
-    MicroLesson[MicroLesson.jsx]
-    Recommendation[Recommendation.jsx]
-    Simulator[Simulator.jsx]
-    API[api.js]
-    WebSearch[WebSearch.jsx]
-    LessonList[LessonList.jsx]
-    CareerCoach[CareerCoach.jsx]
-    SkillsForecast[SkillsForecast.jsx]
-    GlobalSearch[GlobalSearch.jsx]
-    Auth[Auth.jsx]
-    Certifications[Certifications.jsx]
-  end
-  subgraph Backend
-    AppPy[app.py]
-    LLM[llm.py]
-    Prompts[prompts.py]
-    VectorStore[vector_store.py]
-    WebSearchNode[websearch-backend/index.js]
-    DB[(MongoDB)]
-    Firebase[(Firebase Auth)]
-  end
-  OpenAI(OpenAI API)
+---
 
-  %% User interaction
-  User((User)) -->|Interacts with| App
-  App --> Concepts
-  App --> MicroLesson
-  App --> Recommendation
-  App --> Simulator
-  App --> WebSearch
-  App -->|Calls API functions| API
-  App -->|Calls web search API| WebSearchNode
-  App --> LessonList
-  App --> CareerCoach
-  App --> SkillsForecast
-  App --> GlobalSearch
-  App --> Auth
-  App --> Certifications
-  Simulator -->|Scenario UI| App
-  API -->|HTTP requests with Firebase token| AppPy
-  WebSearchNode -->|HTTP requests| OpenAI
+## 🤖 For Cursor AI or Automated Build Systems
 
-  %% Backend flow
-  AppPy -->|Uses prompts| Prompts
-  AppPy -->|Calls LLM| LLM
-  AppPy -->|Vector search| VectorStore
-  AppPy -->|Saves user-specific data| DB
-  AppPy -->|Career coach| LLM
-  AppPy -->|Skills forecast| LLM
-  AppPy -->|Certifications| LLM
-  AppPy -->|Verifies Firebase token| Firebase
-  LLM -->|Sends prompt, gets response| OpenAI
-  VectorStore -->|Future: Embeddings| DB
+**IMPORTANT:**
+- This project is designed to be built by both humans and AI systems (such as Cursor AI).
+- **You MUST read and follow BOTH this `README.md` and the full `Build AI Workplace Learning Application from Scratch.md` document.**
+- The build document contains exhaustive, step-by-step, and troubleshooting details. This README provides a high-level overview, quick start, and essential configuration.
+- Cross-reference both documents for maximum reliability and error recovery.
 
-  %% Data flow
-  OpenAI -- AI response --> LLM
-  LLM -- AI result --> AppPy
-  AppPy -- JSON response --> API
-  API -- Data --> App
-  App -- Shows result --> User
-  WebSearchNode -- Data --> App
-  OpenAI -- AI response --> WebSearchNode
-  DB -- User-specific data --> AppPy
+---
 
-  %% Styling
-  classDef backend fill:#e3f2fd,stroke:#1976d2,stroke-width:2px;
-  classDef frontend fill:#fffde7,stroke:#fbc02d,stroke-width:2px;
-  class Backend backend;
-  class Frontend frontend;
+## 🟢 First Run Checklist
+- [ ] MongoDB is running and accessible on localhost:27017
+- [ ] Backend `.env` is configured with all required variables (see below)
+- [ ] Frontend `.env` is configured with all required variables (see below)
+- [ ] Firebase service account file is present in `backend/`
+- [ ] All dependencies installed (`npm install` in `frontend`, `pip install -r requirements.txt` in `backend`)
+- [ ] Both frontend and backend servers are running (see start commands below)
+- [ ] Cypress tests pass (`npm run test:comprehensive` in `frontend`)
+
+---
+
+## 🔑 Environment Variables (REQUIRED)
+
+### Backend `.env` (place in `backend/`)
+```
+OPENAI_API_KEY=your_openai_api_key_here
+MONGO_URI=mongodb://localhost:27017
+FIREBASE_CREDENTIALS=serviceAccountKey.json
 ```
 
-This project is a full-stack demo for the Nordic Software AI Hackathon. It features an AI-powered backend (FastAPI + OpenAI) and a modern React frontend for interactive workplace learning, simulation, and recommendations.
+### Frontend `.env` (place in `frontend/`)
+```
+REACT_APP_API_BASE_URL=http://localhost:8000
+REACT_APP_FIREBASE_API_KEY=your_firebase_api_key
+REACT_APP_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+REACT_APP_FIREBASE_PROJECT_ID=your_project_id
+REACT_APP_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
+REACT_APP_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+REACT_APP_FIREBASE_APP_ID=your_app_id
+```
+
+---
+
+## ⚠️ Common Pitfalls & Troubleshooting
+
+- **npm start fails with 'Missing script: start'**: Ensure you are in the `frontend` directory and `package.json` contains a `"start"` script.
+- **uvicorn app:app --reload fails**: Ensure you are in the `backend` directory and `app.py` exists.
+- **MongoDB connection errors**: Ensure MongoDB is running and accessible at the URI in your `.env`.
+- **Firebase errors**: Ensure Google Sign-In is enabled, the web app is registered, and the service account key is present in `backend/`.
+- **Cypress tests hang**: Ensure both frontend and backend servers are running. Check for port conflicts.
+- **Port already in use**: Kill the process using the port or change the port in your start script.
+- **Node/Python version issues**: Use Node.js 18+ and Python 3.10+ for best compatibility.
+- **Component/file naming**: All references must match exactly (e.g., `Certifications.jsx`, not `Certification.jsx`).
+- **CORS errors**: Ensure CORS is enabled in FastAPI and frontend is using the correct API base URL.
+- **Cannot find module**: Ensure all dependencies are installed and paths are correct.
+
+---
+
+## 🧠 AI-Specific Guidance
+- Always check for missing or misnamed files/components.
+- Always check for missing or misconfigured environment variables.
+- Always check for port conflicts before starting servers.
+- Always check for dependency installation before running any scripts.
+- Always check for correct casing in file and directory names (case-sensitive on Unix).
+- Always check for correct API base URLs in both frontend and backend.
+- Always check for correct Firebase configuration and credentials.
+- Always check for CORS settings in backend.
+- Always check for MongoDB running and accessible.
+- Always check for Node.js and Python versions.
 
 ---
 
