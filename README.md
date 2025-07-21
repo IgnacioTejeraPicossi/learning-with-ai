@@ -1,5 +1,77 @@
 # AI Workplace Learning With AI
 
+```mermaid
+graph TD
+  subgraph Frontend
+    App[App.jsx]
+    Concepts[Concepts.jsx]
+    MicroLesson[MicroLesson.jsx]
+    Recommendation[Recommendation.jsx]
+    Simulator[Simulator.jsx]
+    API[api.js]
+    WebSearch[WebSearch.jsx]
+    LessonList[LessonList.jsx]
+    CareerCoach[CareerCoach.jsx]
+    SkillsForecast[SkillsForecast.jsx]
+    GlobalSearch[GlobalSearch.jsx]
+    Auth[Auth.jsx]
+    Certifications[Certifications.jsx]
+  end
+  subgraph Backend
+    AppPy[app.py]
+    LLM[llm.py]
+    Prompts[prompts.py]
+    VectorStore[vector_store.py]
+    WebSearchNode[websearch-backend/index.js]
+    DB[(MongoDB)]
+    Firebase[(Firebase Auth)]
+  end
+  OpenAI(OpenAI API)
+
+  User((User)) -->|Interacts with| App
+  App --> Concepts
+  App --> MicroLesson
+  App --> Recommendation
+  App --> Simulator
+  App --> WebSearch
+  App -->|Calls API functions| API
+  App -->|Calls web search API| WebSearchNode
+  App --> LessonList
+  App --> CareerCoach
+  App --> SkillsForecast
+  App --> GlobalSearch
+  App --> Auth
+  App --> Certifications
+  Simulator -->|Scenario UI| App
+  API -->|HTTP requests with Firebase token| AppPy
+  WebSearchNode -->|HTTP requests| OpenAI
+
+  AppPy -->|Uses prompts| Prompts
+  AppPy -->|Calls LLM| LLM
+  AppPy -->|Vector search| VectorStore
+  AppPy -->|Saves user-specific data| DB
+  AppPy -->|Career coach| LLM
+  AppPy -->|Skills forecast| LLM
+  AppPy -->|Certifications| LLM
+  AppPy -->|Verifies Firebase token| Firebase
+  LLM -->|Sends prompt, gets response| OpenAI
+  VectorStore -->|Future: Embeddings| DB
+
+  OpenAI -- AI response --> LLM
+  LLM -- AI result --> AppPy
+  AppPy -- JSON response --> API
+  API -- Data --> App
+  App -- Shows result --> User
+  WebSearchNode -- Data --> App
+  OpenAI -- AI response --> WebSearchNode
+  DB -- User-specific data --> AppPy
+
+  classDef backend fill:#e3f2fd,stroke:#1976d2,stroke-width:2px;
+  classDef frontend fill:#fffde7,stroke:#fbc02d,stroke-width:2px;
+  class Backend backend;
+  class Frontend frontend;
+```
+
 ---
 
 ## 🤖 For Cursor AI or Automated Build Systems
