@@ -18,12 +18,15 @@ import { onAuthStateChanged } from 'firebase/auth';
 import Auth from './Auth';
 import Sidebar from './Sidebar';
 import { ThemeProvider, useTheme } from './ThemeContext';
+import CommandBar from "./CommandBar";
 
 function AppContent() {
   const [user, setUser] = useState(null);
   const [section, setSection] = useState("dashboard");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { isDark, toggleTheme, colors } = useTheme();
+  const [activeModule, setActiveModule] = useState(null);
+  const [userQuery, setUserQuery] = useState("");
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, setUser);
@@ -45,6 +48,11 @@ function AppContent() {
 
   const handleSearchNavigate = (sectionId) => {
     setSection(sectionId);
+  };
+
+  const handleRoute = (module, query) => {
+    setUserQuery(query);
+    setActiveModule(module);
   };
 
   return (
@@ -121,20 +129,28 @@ function AppContent() {
           boxShadow: colors.shadow, 
           padding: 32 
         }}>
+          <CommandBar onRoute={handleRoute} />
           <Auth user={user} setUser={setUser} />
-          {/* Render the selected section only */}
-          {section === "dashboard" && <Dashboard user={user} />}
-          {section === "ai-concepts" && <Concepts />}
-          {section === "micro-lessons" && <MicroLesson />}
-          {section === "recommendation" && <Recommendation />}
-          {section === "simulations" && <Simulator />}
-          {section === "web-search" && <WebSearch />}
-          {section === "team-dynamics" && <TeamDynamics />}
-          {section === "certifications" && <Certifications />}
-          {section === "coach" && <CareerCoach />}
-          {section === "skills-forecast" && <SkillsForecast />}
-          {section === "saved-lessons" && <LessonList user={user} />}
-          {section === "run-test" && <RunTest />}
+          {/* Render the routed module if set, otherwise fall back to section navigation */}
+          {activeModule === 'concepts' && <Concepts query={userQuery} />}
+          {activeModule === 'microlesson' && <MicroLesson query={userQuery} />}
+          {activeModule === 'simulation' && <Simulator query={userQuery} />}
+          {activeModule === 'recommendation' && <Recommendation query={userQuery} />}
+          {activeModule === 'coach' && <CareerCoach query={userQuery} />}
+          {activeModule === 'forecast' && <SkillsForecast query={userQuery} />}
+          {activeModule === 'certification' && <Certifications query={userQuery} />}
+          {!activeModule && section === "dashboard" && <Dashboard user={user} />}
+          {!activeModule && section === "ai-concepts" && <Concepts />}
+          {!activeModule && section === "micro-lessons" && <MicroLesson />}
+          {!activeModule && section === "recommendation" && <Recommendation />}
+          {!activeModule && section === "simulations" && <Simulator />}
+          {!activeModule && section === "web-search" && <WebSearch />}
+          {!activeModule && section === "team-dynamics" && <TeamDynamics />}
+          {!activeModule && section === "certifications" && <Certifications />}
+          {!activeModule && section === "coach" && <CareerCoach />}
+          {!activeModule && section === "skills-forecast" && <SkillsForecast />}
+          {!activeModule && section === "saved-lessons" && <LessonList user={user} />}
+          {!activeModule && section === "run-test" && <RunTest />}
         </div>
       </div>
       

@@ -195,3 +195,7 @@ export async function startCertificationSimulation(simulation) {
 export async function getUserCertifications() {
   return apiCall("/certifications/user-recommendations", "GET");
 }
+
+export async function postRoute(prompt) {
+  return apiCall('/route', 'POST', { prompt });
+}

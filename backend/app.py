@@ -724,3 +724,13 @@ async def get_user_certifications(user=Depends(verify_token)):
         "study_plans": study_plans,
         "simulations": simulations
     } 
+
+from backend.llm import call_llm_router
+
+class RouteRequest(BaseModel):
+    prompt: str
+
+@app.post("/route")
+async def route_prompt(request: RouteRequest):
+    result = await call_llm_router(request.prompt)
+    return result 

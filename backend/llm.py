@@ -45,3 +45,37 @@ def web_search_query(query):
         tool_choice="auto"
     )
     return response.choices[0].message.content 
+
+import json
+
+ROUTER_PROMPT = """
+You are an AI router in a workplace learning platform.
+A user sends a free-form request. Your job is to determine which module should handle it.
+
+Available modules:
+- concepts: Generate 3 learning concepts
+- microlesson: Generate a short learning module with quiz
+- simulation: Create a scenario-based training simulation
+- recommendation: Suggest what to learn next
+- certification: Recommend and plan for official certification
+- coach: Career advice and planning
+- forecast: Skill prediction and development advice
+
+Respond with:
+{ \"module\": \"<module_name>\", \"reason\": \"<why this module is a good fit>\" }
+
+User query:
+\"{query}\"
+"""
+
+async def call_llm_router(query):
+    prompt = ROUTER_PROMPT.replace("{query}", query)
+    response = ask_openai(prompt=prompt, model="gpt-4", max_tokens=128)
+    try:
+        parsed = json.loads(response)
+        if "module" in parsed and "reason" in parsed:
+            return parsed
+    except Exception:
+        pass
+    # Fallback
+    return {"module": "recommendation", "reason": "Default fallback"} 
