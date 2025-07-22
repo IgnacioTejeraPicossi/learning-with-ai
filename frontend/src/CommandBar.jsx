@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { postRoute } from './api';
-import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+// import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 
 function CommandBar({ onRoute }) {
   const [input, setInput] = useState('');
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const { transcript, listening, resetTranscript } = useSpeechRecognition();
+  // const { transcript, listening, resetTranscript } = useSpeechRecognition();
 
   const handleSubmit = async (value) => {
-    const prompt = value || input || transcript;
+    const prompt = value || input; // || transcript;
     if (!prompt.trim()) return;
     setLoading(true);
     setError(null);
@@ -18,7 +18,7 @@ function CommandBar({ onRoute }) {
       if (!res.module) throw new Error('Routing failed');
       onRoute(res.module, prompt);
       setInput('');
-      resetTranscript();
+      // resetTranscript && resetTranscript();
     } catch (err) {
       setError("Sorry, I couldn't understand your request. Try rephrasing.");
     } finally {
@@ -26,14 +26,14 @@ function CommandBar({ onRoute }) {
     }
   };
 
-  const handleVoiceStart = () => {
-    resetTranscript();
-    SpeechRecognition.startListening({ continuous: false });
-  };
+  // const handleVoiceStart = () => {
+  //   resetTranscript();
+  //   SpeechRecognition.startListening({ continuous: false });
+  // };
 
-  const handleVoiceStop = () => {
-    SpeechRecognition.stopListening();
-  };
+  // const handleVoiceStop = () => {
+  //   SpeechRecognition.stopListening();
+  // };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 24 }}>
@@ -41,7 +41,7 @@ function CommandBar({ onRoute }) {
         <input
           type="text"
           placeholder="Ask AI anything..."
-          value={input || transcript}
+          value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && handleSubmit()}
           style={{ flex: 1, padding: 10, borderRadius: 6, border: '1px solid #ccc', fontSize: 16 }}
@@ -54,6 +54,7 @@ function CommandBar({ onRoute }) {
         >
           {loading ? '...' : 'Go'}
         </button>
+        {/*
         <button
           onClick={listening ? handleVoiceStop : handleVoiceStart}
           disabled={loading}
@@ -62,13 +63,16 @@ function CommandBar({ onRoute }) {
         >
           {listening ? '🎤...' : '🎤'}
         </button>
+        */}
       </div>
+      {/*
       {transcript && !listening && (
         <div style={{ color: '#333', fontSize: 14, marginTop: 4 }}>
           <span>Voice input: "{transcript}"</span>
           <button onClick={() => handleSubmit(transcript)} style={{ marginLeft: 8, fontSize: 13, padding: '2px 8px', borderRadius: 4, border: '1px solid #007bff', background: '#fff', color: '#007bff', cursor: 'pointer' }}>Submit</button>
         </div>
       )}
+      */}
       {error && <div style={{ color: 'red', fontSize: 14 }}>{error}</div>}
     </div>
   );
