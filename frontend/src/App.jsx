@@ -19,6 +19,7 @@ import Auth from './Auth';
 import Sidebar from './Sidebar';
 import { ThemeProvider, useTheme } from './ThemeContext';
 import CommandBar from "./CommandBar";
+import VideoLesson from "./VideoLesson";
 
 function AppContent() {
   const [user, setUser] = useState(null);
@@ -151,6 +152,7 @@ function AppContent() {
           {!activeModule && section === "skills-forecast" && <SkillsForecast />}
           {!activeModule && section === "saved-lessons" && <LessonList user={user} />}
           {!activeModule && section === "run-test" && <RunTest />}
+          {!activeModule && section === "video-lessons" && <VideoLesson />}
         </div>
       </div>
       

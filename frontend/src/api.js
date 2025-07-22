@@ -199,3 +199,7 @@ export async function getUserCertifications() {
 export async function postRoute(prompt) {
   return apiCall('/route', 'POST', { prompt });
 }
+
+export async function generateVideoQuiz(summary) {
+  return apiCall('/video-quiz', 'POST', { summary });
+}

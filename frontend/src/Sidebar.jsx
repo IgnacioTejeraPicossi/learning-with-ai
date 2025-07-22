@@ -32,6 +32,7 @@ const navItems = [
   { key: "dashboard", label: "Dashboard", icon: "house" },
   { key: "ai-concepts", label: "AI Concepts", icon: "lightbulb" },
   { key: "micro-lessons", label: "Micro-lessons", icon: "book" },
+  { key: "video-lessons", label: "Video Lessons", icon: "play-circle" },
   { key: "recommendation", label: "Recommendation", icon: "star" },
   { key: "simulations", label: "Simulations", icon: "play-circle" },
   { key: "web-search", label: "Web Search", icon: "globe" },

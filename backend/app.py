@@ -2,7 +2,7 @@
 from fastapi import FastAPI, Request, Body, HTTPException, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from backend.prompts import CONCEPT_PROMPT, MICROLESSON_PROMPT, SIMULATION_PROMPT, RECOMMENDATION_PROMPT, PROMPTS, CERTIFICATION_RECOMMENDATION_PROMPT, CERTIFICATION_STUDY_PLAN_PROMPT, CERTIFICATION_SIMULATION_PROMPT, CERTIFICATION_CAREER_COACH_PROMPT
+from backend.prompts import CONCEPT_PROMPT, MICROLESSON_PROMPT, SIMULATION_PROMPT, RECOMMENDATION_PROMPT, PROMPTS, CERTIFICATION_RECOMMENDATION_PROMPT, CERTIFICATION_STUDY_PLAN_PROMPT, CERTIFICATION_SIMULATION_PROMPT, CERTIFICATION_CAREER_COACH_PROMPT, video_quiz_prompt
 from backend.llm import ask_openai, web_search_query
 from typing import List, Optional
 from fastapi.staticfiles import StaticFiles
@@ -734,3 +734,15 @@ class RouteRequest(BaseModel):
 async def route_prompt(request: RouteRequest):
     result = await call_llm_router(request.prompt)
     return result 
+
+@app.post("/video-quiz")
+async def video_quiz(request: Request):
+    data = await request.json()
+    summary = data.get("summary", "")
+    prompt = video_quiz_prompt.format(summary=summary)
+    result = ask_openai(prompt)
+    try:
+        questions = json.loads(result)
+    except Exception:
+        questions = [{"question": "Failed to parse quiz", "options": [], "answer": "", "explanation": ""}]
+    return {"quiz": questions} 

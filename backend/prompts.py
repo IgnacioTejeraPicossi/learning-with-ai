@@ -136,3 +136,26 @@ PROMPTS = {
     "career_coach": career_coach_prompt,
     "skills_forecast": skills_forecast_prompt,
 } 
+
+video_quiz_prompt = """
+You are an AI learning assistant. A user just watched this video. Based on the following video summary, generate a quiz.
+
+Summary:
+{summary}
+
+Create 3 multiple-choice questions. For each:
+- Provide a clear question
+- List 4 options (A, B, C, D)
+- Indicate the correct answer
+- Add a brief explanation for the correct answer
+
+Output JSON format:
+[
+  {
+    "question": "...",
+    "options": ["A", "B", "C", "D"],
+    "answer": "B",
+    "explanation": "..."
+  }
+]
+""" 
