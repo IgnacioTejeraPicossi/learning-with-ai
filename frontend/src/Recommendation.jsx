@@ -2,15 +2,17 @@ import React, { useState } from "react";
 import { fetchRecommendation } from "./api";
 import ModalDialog from "./ModalDialog";
 
-function Recommendation() {
-  const [skillGap, setSkillGap] = useState("");
+function Recommendation({ query }) {
+  const [skillGap, setSkillGap] = useState(query || "");
   const [modalOpen, setModalOpen] = useState(false);
   const [aiOutput, setAiOutput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showSim, setShowSim] = useState(false);
 
   const handleGetRecommendation = async () => {
     setLoading(true);
     setModalOpen(true);
+    setShowSim(false);
     try {
       const result = await fetchRecommendation(skillGap);
       setAiOutput(result.recommendation || JSON.stringify(result, null, 2));
@@ -18,6 +20,10 @@ function Recommendation() {
       setAiOutput("Error fetching recommendation.");
     }
     setLoading(false);
+  };
+
+  const handleTrySimulation = () => {
+    setShowSim(true);
   };
 
   return (
@@ -51,13 +57,29 @@ function Recommendation() {
       </button>
       <ModalDialog
         isOpen={modalOpen}
-        onRequestClose={() => setModalOpen(false)}
+        onRequestClose={() => { setModalOpen(false); setShowSim(false); }}
         title="Recommendation"
       >
         {loading ? (
-          <div>Loading...</div>
+          <div style={{ width: '100%', margin: '24px 0' }}>
+            <div style={{ height: 8, background: '#eee', borderRadius: 4, overflow: 'hidden' }}>
+              <div style={{ width: '80%', height: '100%', background: '#d32f2f', animation: 'progressBar 1.2s linear infinite alternate' }} />
+            </div>
+            <style>{`@keyframes progressBar { 0%{width:10%} 100%{width:90%} }`}</style>
+          </div>
+        ) : showSim ? (
+          <div>
+            <h3>Try a Simulation</h3>
+            <p>Would you like to launch a scenario-based simulation to practice this skill?</p>
+            <button onClick={() => window.location.reload()} style={{ background: '#1976d2', color: '#fff', border: 0, borderRadius: 6, padding: '8px 18px', fontWeight: 600, fontSize: 16, marginTop: 8 }}>Go to Simulator</button>
+          </div>
         ) : (
-          <pre style={{ whiteSpace: "pre-wrap" }}>{aiOutput}</pre>
+          <>
+            <pre style={{ whiteSpace: "pre-wrap" }}>{aiOutput}</pre>
+            {aiOutput && (
+              <button onClick={handleTrySimulation} style={{ background: '#1976d2', color: '#fff', border: 0, borderRadius: 6, padding: '8px 18px', fontWeight: 600, fontSize: 16, marginTop: 16 }}>Try Simulation</button>
+            )}
+          </>
         )}
       </ModalDialog>
     </div>
