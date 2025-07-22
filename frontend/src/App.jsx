@@ -140,6 +140,7 @@ function AppContent() {
           {activeModule === 'coach' && <CareerCoach query={userQuery} />}
           {activeModule === 'forecast' && <SkillsForecast query={userQuery} />}
           {activeModule === 'certification' && <Certifications query={userQuery} />}
+          {activeModule === 'videolesson' && <VideoLesson query={userQuery} />}
           {!activeModule && section === "dashboard" && <Dashboard user={user} />}
           {!activeModule && section === "ai-concepts" && <Concepts />}
           {!activeModule && section === "micro-lessons" && <MicroLesson />}

@@ -60,6 +60,7 @@ Available modules:
 - certification: Recommend and plan for official certification
 - coach: Career advice and planning
 - forecast: Skill prediction and development advice
+- videolesson: Show a video-based lesson with quiz
 
 Respond with:
 { \"module\": \"<module_name>\", \"reason\": \"<why this module is a good fit>\" }

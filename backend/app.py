@@ -2,7 +2,7 @@
 from fastapi import FastAPI, Request, Body, HTTPException, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from backend.prompts import CONCEPT_PROMPT, MICROLESSON_PROMPT, SIMULATION_PROMPT, RECOMMENDATION_PROMPT, PROMPTS, CERTIFICATION_RECOMMENDATION_PROMPT, CERTIFICATION_STUDY_PLAN_PROMPT, CERTIFICATION_SIMULATION_PROMPT, CERTIFICATION_CAREER_COACH_PROMPT, video_quiz_prompt
+from backend.prompts import CONCEPT_PROMPT, MICROLESSON_PROMPT, SIMULATION_PROMPT, RECOMMENDATION_PROMPT, PROMPTS, CERTIFICATION_RECOMMENDATION_PROMPT, CERTIFICATION_STUDY_PLAN_PROMPT, CERTIFICATION_SIMULATION_PROMPT, CERTIFICATION_CAREER_COACH_PROMPT, video_quiz_prompt, video_summary_prompt
 from backend.llm import ask_openai, web_search_query
 from typing import List, Optional
 from fastapi.staticfiles import StaticFiles
@@ -746,3 +746,11 @@ async def video_quiz(request: Request):
     except Exception:
         questions = [{"question": "Failed to parse quiz", "options": [], "answer": "", "explanation": ""}]
     return {"quiz": questions} 
+
+@app.post("/video-summary")
+async def video_summary(request: Request):
+    data = await request.json()
+    transcript = data.get("transcript", "")
+    prompt = video_summary_prompt.format(transcript=transcript)
+    summary = ask_openai(prompt)
+    return {"summary": summary} 

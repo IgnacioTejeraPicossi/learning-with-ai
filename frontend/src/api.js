@@ -203,3 +203,7 @@ export async function postRoute(prompt) {
 export async function generateVideoQuiz(summary) {
   return apiCall('/video-quiz', 'POST', { summary });
 }
+
+export async function generateVideoSummary(transcript) {
+  return apiCall('/video-summary', 'POST', { transcript });
+}

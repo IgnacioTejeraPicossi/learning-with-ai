@@ -680,6 +680,27 @@ The **Certification Path Recommendation** module helps users discover, plan, and
 
 ---
 
+## ✨ New Features
+
+### Video Lessons
+Enhance learning with short, focused video content followed by adaptive AI-generated quizzes. Users can:
+- Paste a YouTube embed URL or MP4 link.
+- Optionally paste a transcript/captions and auto-generate a summary.
+- Generate a quiz based on the video summary using AI.
+- Take the quiz, receive instant feedback, and earn a badge for high scores.
+- Use cases: Soft skills, technical tutorials, compliance, and more.
+
+### Interface-less UX (Zero-UI CommandBar)
+A signature innovation: users can interact with the app using a single natural language input bar (“Ask AI anything…”). The AI routes requests to the correct module, including:
+- Concepts, Micro-lessons, Simulations, Recommendations, Certifications, Career Coach, Skills Forecast, Team Dynamics, and now Video Lessons.
+- Example prompts:
+  - “Show me a video lesson on Agile.”
+  - “Give me a micro-lesson on conflict resolution.”
+  - “What’s my next best skill to develop?”
+- The app dynamically displays the right experience, reducing the need for manual navigation.
+
+---
+
 ## 4. Summary Table
 
 | Feature/Endpoint    | Uses Web Search Tool? | Uses Standard LLM? | User-Specific? | Type |

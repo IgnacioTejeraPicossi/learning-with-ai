@@ -159,3 +159,8 @@ Output JSON format:
   }
 ]
 """ 
+
+video_summary_prompt = """
+Summarize this video transcript into 5 key points for learning purposes:
+{transcript}
+""" 
