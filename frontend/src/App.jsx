@@ -216,7 +216,6 @@ function AppContent() {
             boxShadow: colors.shadow, 
             padding: 32 
           }}>
-            <CommandBar onRoute={handleRoute} />
             <Auth user={user} setUser={setUser} />
             {/* Render the routed module if set, otherwise fall back to section navigation */}
             {activeModule === 'concepts' && <Concepts query={userQuery} />}
