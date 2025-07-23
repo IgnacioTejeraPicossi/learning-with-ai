@@ -1,19 +1,19 @@
 // Scenario Simulator component skeleton
 import React, { useState } from "react";
-import { fetchSimulation } from "./api";
+import { askStream } from "./api";
 import { useTheme } from "./ThemeContext";
 
 function Simulator() {
   const [scenarioType, setScenarioType] = useState("");
-  const [simulation, setSimulation] = useState(null);
+  const [simulation, setSimulation] = useState("");
   const [loading, setLoading] = useState(false);
   const { colors } = useTheme();
 
   const handleStartSimulation = async () => {
     setLoading(true);
+    setSimulation("");
     try {
-      const data = await fetchSimulation();
-      setSimulation(data.simulation);
+      await askStream({ prompt: `Create a scenario-based training simulation for: ${scenarioType}` }, (output) => setSimulation(output));
     } catch (error) {
       console.error("Failed to start simulation:", error);
     }
@@ -22,7 +22,7 @@ function Simulator() {
 
   const handleClear = () => {
     setScenarioType("");
-    setSimulation(null);
+    setSimulation("");
   };
 
   return (

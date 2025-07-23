@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { fetchMicroLesson } from "./api";
+import { askStream } from "./api";
 import ModalDialog from "./ModalDialog";
 
 function MicroLesson({ query }) {
@@ -13,9 +13,9 @@ function MicroLesson({ query }) {
     setLoading(true);
     setModalOpen(true);
     setShowQuiz(false);
+    setAiOutput("");
     try {
-      const result = await fetchMicroLesson(topic);
-      setAiOutput(result.lesson || JSON.stringify(result, null, 2));
+      await askStream({ prompt: `Write a concise, practical micro-lesson for the following workplace topic: ${topic}` }, (output) => setAiOutput(output));
     } catch (err) {
       setAiOutput("Error fetching micro-lesson.");
     }

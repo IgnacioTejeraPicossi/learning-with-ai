@@ -1,18 +1,18 @@
 import React, { useState } from "react";
-import { postCareerCoach } from "./api";
+import { askStream } from "./api";
 import { useTheme } from "./ThemeContext";
 
 function CareerCoach() {
   const [question, setQuestion] = useState("");
-  const [response, setResponse] = useState(null);
+  const [response, setResponse] = useState("");
   const [loading, setLoading] = useState(false);
   const { colors } = useTheme();
 
   const handleAskCoach = async () => {
     setLoading(true);
+    setResponse("");
     try {
-      const data = await postCareerCoach({ question });
-      setResponse(data.response || JSON.stringify(data, null, 2));
+      await askStream({ prompt: `You are an AI career coach. ${question}` }, (output) => setResponse(output));
     } catch (error) {
       console.error("Failed to get career advice:", error);
       setResponse("Error getting career advice.");
@@ -22,7 +22,7 @@ function CareerCoach() {
 
   const handleClear = () => {
     setQuestion("");
-    setResponse(null);
+    setResponse("");
   };
 
   return (

@@ -37,6 +37,39 @@ def ask_openai(prompt=None, model="gpt-4", max_tokens=512, messages=None):
     except Exception as e:
         return f"[MOCKED RESPONSE - Error: {str(e)}] This would be the AI's answer to: {prompt[:60]}..." 
 
+def ask_openai_stream(prompt=None, model="gpt-4", max_tokens=512, messages=None):
+    if not OPENAI_API_KEY or OPENAI_API_KEY.strip() == "":
+        # No key found, yield a mock response
+        yield "[MOCKED STREAMING RESPONSE]"
+        return
+    try:
+        client = openai.OpenAI(api_key=OPENAI_API_KEY)
+        if messages:
+            response = client.chat.completions.create(
+                model=model,
+                messages=messages,
+                max_tokens=max_tokens,
+                temperature=0.7,
+                stream=True,
+            )
+        else:
+            response = client.chat.completions.create(
+                model=model,
+                messages=[{"role": "user", "content": prompt}],
+                max_tokens=max_tokens,
+                temperature=0.7,
+                stream=True,
+            )
+        for chunk in response:
+            if hasattr(chunk, 'choices') and chunk.choices:
+                delta = chunk.choices[0].delta
+                content = getattr(delta, 'content', None)
+                if content:
+                    print(f"[STREAM CHUNK] {content}", flush=True)
+                    yield content
+    except Exception as e:
+        yield f"[MOCKED STREAMING ERROR: {str(e)}]"
+
 def web_search_query(query):
     response = openai.chat.completions.create(
         model="gpt-4-1106-preview",  # or "gpt-4.1" if available

@@ -207,3 +207,22 @@ export async function generateVideoQuiz(summary) {
 export async function generateVideoSummary(transcript) {
   return apiCall('/video-summary', 'POST', { transcript });
 }
+
+export async function askStream({ prompt, messages, model = "gpt-4", max_tokens = 512 }, onData) {
+  const response = await fetch("http://127.0.0.1:8000/llm-stream", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ prompt, messages, model, max_tokens })
+  });
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let result = '';
+  while (true) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    const chunk = decoder.decode(value, { stream: true });
+    result += chunk;
+    if (onData) onData(result, chunk);
+  }
+  return result;
+}

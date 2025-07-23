@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useTheme } from "./ThemeContext";
-import { apiCall, getUserProfile, saveUserProfile } from "./api";
+import { apiCall, getUserProfile, saveUserProfile, askStream } from "./api";
 
 function Certifications() {
   const [profile, setProfile] = useState({
@@ -97,9 +97,9 @@ function Certifications() {
       const saveResult = await saveUserProfile(profile);
       console.log("Save result:", saveResult);
       
-      // Get recommendations
-      const response = await apiCall("/certifications/recommend", "POST", profile);
-      setRecommendation(response.recommendation);
+      // Get recommendations (streamed)
+      setRecommendation("");
+      await askStream({ prompt: `Based on my role (${profile.role}), experience (${profile.experience_level}), skills (${profile.skills.join(", ")}), and goals (${profile.goals}), recommend the best certifications and why.` }, (output) => setRecommendation(output));
       
       setAutoFillStatus("Profile saved! Your details will be auto-filled next time.");
       setTimeout(() => setAutoFillStatus(""), 3000);
@@ -117,8 +117,8 @@ function Certifications() {
     
     try {
       setLoading(true);
-      const response = await apiCall("/certifications/study-plan", "POST", studyPlan);
-      setStudyPlanResult(response.study_plan);
+      setStudyPlanResult("");
+      await askStream({ prompt: `Generate a personalized study plan for the ${studyPlan.certification_name} certification. My current skills: ${studyPlan.current_skills.join(", ")}. I can study ${studyPlan.study_time} hours/week. Target date: ${studyPlan.target_date}.` }, (output) => setStudyPlanResult(output));
     } catch (error) {
       console.error("Error generating study plan:", error);
     } finally {
@@ -131,11 +131,8 @@ function Certifications() {
     
     try {
       setLoading(true);
-      const response = await apiCall("/certifications/simulate", "POST", {
-        certification_name: studyPlan.certification_name,
-        user_responses: []
-      });
-      setSimulation(response.simulation);
+      setSimulation("");
+      await askStream({ prompt: `Simulate a certification interview for ${studyPlan.certification_name}. Ask me realistic questions and provide feedback.` }, (output) => setSimulation(output));
     } catch (error) {
       console.error("Error starting simulation:", error);
     } finally {

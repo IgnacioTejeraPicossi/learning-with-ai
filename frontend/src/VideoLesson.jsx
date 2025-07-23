@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { generateVideoQuiz, generateVideoSummary } from './api';
+import { generateVideoQuiz, generateVideoSummary, askStream } from './api';
 
 const EXAMPLE_VIDEO = "https://www.youtube.com/embed/1hHMwLxN6EM";
 const EXAMPLE_SUMMARY = "This video explains the basics of Agile methodology, including its iterative approach, team collaboration, and adaptability to change. Key points: Agile is not waterfall, it values individuals and interactions, and it uses sprints to deliver value incrementally.";
@@ -16,8 +16,17 @@ function VideoLesson() {
   const handleGenerateQuiz = async () => {
     setLoading(true);
     try {
-      const res = await generateVideoQuiz(summary);
-      setQuiz(res.quiz || []);
+      let quizText = '';
+      await askStream({ prompt: `Create a quiz based on this video summary: ${summary}` }, (output, chunk) => {
+        quizText = output;
+        // Optionally, parse quizText as JSON if the LLM outputs it as such
+        try {
+          const parsed = JSON.parse(quizText);
+          setQuiz(Array.isArray(parsed) ? parsed : []);
+        } catch {
+          // Not valid JSON yet, keep streaming
+        }
+      });
     } catch (err) {
       alert("Quiz generation failed.");
     }
@@ -27,8 +36,11 @@ function VideoLesson() {
   const handleGenerateSummary = async () => {
     setSummaryLoading(true);
     try {
-      const res = await generateVideoSummary(transcript);
-      setSummary(res.summary || '');
+      let streamed = '';
+      await askStream({ prompt: `Summarize this video transcript into 5 key points for learning purposes: ${transcript}` }, (output) => {
+        streamed = output;
+        setSummary(streamed);
+      });
     } catch (err) {
       alert("Summary generation failed.");
     }

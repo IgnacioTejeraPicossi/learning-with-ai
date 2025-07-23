@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { fetchRecommendation } from "./api";
+import { askStream } from "./api";
 import ModalDialog from "./ModalDialog";
 
 function Recommendation({ query }) {
@@ -13,9 +13,9 @@ function Recommendation({ query }) {
     setLoading(true);
     setModalOpen(true);
     setShowSim(false);
+    setAiOutput("");
     try {
-      const result = await fetchRecommendation(skillGap);
-      setAiOutput(result.recommendation || JSON.stringify(result, null, 2));
+      await askStream({ prompt: `Suggest what to learn next if my skill gap is: ${skillGap}` }, (output) => setAiOutput(output));
     } catch (err) {
       setAiOutput("Error fetching recommendation.");
     }

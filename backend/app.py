@@ -35,6 +35,8 @@ static_dir = os.path.join(os.path.dirname(__file__), "static")
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 from fastapi.responses import FileResponse
+from fastapi.responses import StreamingResponse
+from backend.llm import ask_openai_stream
 
 @app.get("/favicon.ico")
 async def favicon():
@@ -113,6 +115,12 @@ class CertificationStudyPlan(BaseModel):
 class CertificationSimulation(BaseModel):
     certification_name: str
     user_responses: List[str] = []
+
+class LLMStreamRequest(BaseModel):
+    prompt: str = None
+    messages: list = None
+    model: str = "gpt-4"
+    max_tokens: int = 512
 
 @app.get("/")
 def root():
@@ -734,6 +742,20 @@ class RouteRequest(BaseModel):
 async def route_prompt(request: RouteRequest):
     result = await call_llm_router(request.prompt)
     return result 
+
+@app.post("/llm-stream")
+async def llm_stream(request: LLMStreamRequest):
+    print(f"[LLM STREAM] New request: {request}", flush=True)
+    def event_stream():
+        for chunk in ask_openai_stream(
+            prompt=request.prompt,
+            model=request.model,
+            max_tokens=request.max_tokens,
+            messages=request.messages
+        ):
+            print(f"[LLM STREAM] Sending chunk: {chunk}", flush=True)
+            yield chunk
+    return StreamingResponse(event_stream(), media_type="text/plain")
 
 @app.post("/video-quiz")
 async def video_quiz(request: Request):

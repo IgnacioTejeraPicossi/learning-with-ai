@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { postRoute } from './api';
+import { postRoute, askStream } from './api';
 // import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 
 function CommandBar({ onRoute }) {
   const [input, setInput] = useState('');
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [streamedOutput, setStreamedOutput] = useState('');
   // const { transcript, listening, resetTranscript } = useSpeechRecognition();
 
   const handleSubmit = async (value) => {
@@ -13,11 +14,15 @@ function CommandBar({ onRoute }) {
     if (!prompt.trim()) return;
     setLoading(true);
     setError(null);
+    setStreamedOutput('');
     try {
       const res = await postRoute(prompt);
       if (!res.module) throw new Error('Routing failed');
       onRoute(res.module, prompt);
       setInput('');
+      // Optionally, stream LLM output for the routed module here
+      // Example: stream a generic LLM response for demo
+      await askStream({ prompt }, (output) => setStreamedOutput(output));
       // resetTranscript && resetTranscript();
     } catch (err) {
       setError("Sorry, I couldn't understand your request. Try rephrasing.");
@@ -74,6 +79,11 @@ function CommandBar({ onRoute }) {
       )}
       */}
       {error && <div style={{ color: 'red', fontSize: 14 }}>{error}</div>}
+      {streamedOutput && (
+        <div style={{ marginTop: 16, background: '#f4f4f4', borderRadius: 8, padding: 16, fontFamily: 'monospace', whiteSpace: 'pre-wrap', minHeight: 40 }}>
+          {streamedOutput}
+        </div>
+      )}
     </div>
   );
 }

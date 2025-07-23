@@ -1,18 +1,18 @@
 import React, { useState } from "react";
-import { postSkillsForecast } from "./api";
+import { askStream } from "./api";
 import { useTheme } from "./ThemeContext";
 
 function SkillsForecast() {
   const [input, setInput] = useState("");
-  const [forecast, setForecast] = useState(null);
+  const [forecast, setForecast] = useState("");
   const [loading, setLoading] = useState(false);
   const { colors } = useTheme();
 
   const handleGetForecast = async () => {
     setLoading(true);
+    setForecast("");
     try {
-      const data = await postSkillsForecast({ input });
-      setForecast(data.forecast || JSON.stringify(data, null, 2));
+      await askStream({ prompt: `Given my current skills and career goals: ${input}, predict the next best skills to develop and provide a personalized forecast.` }, (output) => setForecast(output));
     } catch (error) {
       console.error("Failed to get skills forecast:", error);
       setForecast("Error getting skills forecast.");
@@ -22,7 +22,7 @@ function SkillsForecast() {
 
   const handleClear = () => {
     setInput("");
-    setForecast(null);
+    setForecast("");
   };
 
   return (
