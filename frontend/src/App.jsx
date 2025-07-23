@@ -175,6 +175,9 @@ function AppContent() {
               <h2 style={{ marginBottom: "2rem", fontSize: "2rem", color: colors.text }}>
                 🤖 Ask AI Anything
               </h2>
+              <p style={{ marginBottom: "2rem", fontSize: "1rem", color: colors.text, opacity: 0.8 }}>
+                Interface-less UX
+              </p>
               <CommandBar onRoute={handleRoute} />
               <div style={{ marginTop: "2rem", display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "1rem" }}>
                 <div style={{ padding: "0.5rem 1rem", background: colors.primaryLight, borderRadius: "20px", fontSize: "0.9rem", color: colors.primary }}>
