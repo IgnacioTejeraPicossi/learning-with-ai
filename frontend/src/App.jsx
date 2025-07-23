@@ -87,7 +87,7 @@ function AppContent() {
           justifyContent: "space-between",
           alignItems: "center"
         }}>
-          <h1 style={{ margin: 0 }}>{isAIFullScreen ? "🤖 Ask AI Anything" : "AI Workplace Learning Chat UI"}</h1>
+          <h1 style={{ margin: 0 }}>{isAIFullScreen ? "🤖 Ask AI Anything" : "Workplace Learning With AI"}</h1>
           <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
             {/* Search Button */}
             {!isAIFullScreen && (
