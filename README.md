@@ -699,6 +699,19 @@ A signature innovation: users can interact with the app using a single natural l
   - “What’s my next best skill to develop?”
 - The app dynamically displays the right experience, reducing the need for manual navigation.
 
+### Streaming LLM Responses (ChatGPT-like Experience)
+All AI-powered features now stream their responses in real time, just like ChatGPT. Users see answers, lessons, recommendations, simulations, and quizzes appear word-by-word or chunk-by-chunk, dramatically improving perceived speed and engagement. This applies to:
+- CommandBar (Interface-less UX)
+- Micro-lessons
+- Recommendations
+- Scenario Simulations
+- AI Career Coach
+- Skills Forecast
+- Certifications (Recommendations, Study Plan, Practice Test)
+- Video Lessons (Summary & Quiz Generation)
+
+This streaming-first approach makes the app feel fast, modern, and AI-native.
+
 ---
 
 ## 4. Summary Table
