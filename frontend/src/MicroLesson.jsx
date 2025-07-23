@@ -14,11 +14,18 @@ function MicroLesson({ query }) {
     setModalOpen(true);
     setShowQuiz(false);
     setAiOutput("");
+    let finalOutput = "";
     try {
-      await askStream({ prompt: `Write a concise, practical micro-lesson for the following workplace topic: ${topic}` }, (output) => setAiOutput(output));
+      await askStream(
+        { prompt: `Write a concise, practical micro-lesson for the following workplace topic: ${topic}` },
+        (output) => {
+          setAiOutput(output);
+          finalOutput = output;
+        }
+      );
       // Save the lesson after streaming is complete
-      if (topic && aiOutput) {
-        await saveMicroLesson(topic, aiOutput);
+      if (topic && finalOutput) {
+        await saveMicroLesson(topic, finalOutput);
       }
     } catch (err) {
       setAiOutput("Error fetching micro-lesson.");
