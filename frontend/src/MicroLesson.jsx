@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { askStream } from "./api";
+import { askStream, saveMicroLesson } from "./api";
 import ModalDialog from "./ModalDialog";
 
 function MicroLesson({ query }) {
@@ -16,6 +16,10 @@ function MicroLesson({ query }) {
     setAiOutput("");
     try {
       await askStream({ prompt: `Write a concise, practical micro-lesson for the following workplace topic: ${topic}` }, (output) => setAiOutput(output));
+      // Save the lesson after streaming is complete
+      if (topic && aiOutput) {
+        await saveMicroLesson(topic, aiOutput);
+      }
     } catch (err) {
       setAiOutput("Error fetching micro-lesson.");
     }

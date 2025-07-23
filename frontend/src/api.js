@@ -226,3 +226,7 @@ export async function askStream({ prompt, messages, model = "gpt-4", max_tokens 
   }
   return result;
 }
+
+export async function saveMicroLesson(topic, lesson) {
+  return apiCall('/micro-lesson', 'POST', { topic, lesson });
+}

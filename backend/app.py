@@ -141,14 +141,16 @@ def generate_micro_lesson(topic: str) -> str:
 async def micro_lesson(request: Request, user=Depends(verify_token)):
     data = await request.json()
     topic = data.get("topic", "default topic")
-    lesson_text = generate_micro_lesson(topic)
+    lesson_text = data.get("lesson")
+    if not lesson_text:
+        lesson_text = generate_micro_lesson(topic)
     # Save to MongoDB with user ID
     await lessons_collection.insert_one({
-        "topic": topic, 
+        "topic": topic,
         "lesson": lesson_text,
-        "user_id": user["uid"],  # Add user ID
-        "user_email": user.get("email", ""),  # Optional: store email for reference
-        "created_at": datetime.datetime.utcnow()  # Add timestamp
+        "user_id": user["uid"],
+        "user_email": user.get("email", ""),
+        "created_at": datetime.datetime.utcnow()
     })
     return {"lesson": lesson_text}
 
