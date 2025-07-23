@@ -77,7 +77,7 @@ function AppContent() {
       display: "flex",
       color: colors.text
     }}>
-      {!isAIFullScreen && <Sidebar selected={section} onSelect={setSection} />}
+      {!isAIFullScreen && <Sidebar selected={section} onSelect={(key) => { setSection(key); setActiveModule(null); }} />}
       <div style={{ flex: 1, minWidth: 0 }}>
         <header style={{ 
           background: colors.primary, 
