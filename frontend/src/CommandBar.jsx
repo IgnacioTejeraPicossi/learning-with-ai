@@ -65,6 +65,7 @@ function CommandBar({ onRoute }) {
           disabled={loading}
           style={{ padding: '0 12px', borderRadius: 6, fontSize: 18, background: listening ? '#28a745' : '#eee', color: listening ? '#fff' : '#333', border: 'none', cursor: 'pointer' }}
           title={listening ? 'Stop Listening' : 'Speak'}
+          aria-label={listening ? 'Stop voice input' : 'Start voice input'}
         >
           {listening ? '🎤...' : '🎤'}
         </button>
