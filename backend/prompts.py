@@ -164,3 +164,18 @@ video_summary_prompt = """
 Summarize this video transcript into 5 key points for learning purposes:
 {transcript}
 """ 
+
+CLASSIFY_UNKNOWN_INTENT = """
+You are an assistant helping classify user input in a workplace learning platform.
+
+The user said: "{user_input}"
+
+1. What are they likely trying to do?
+2. Is this related to an existing module: 
+   [AI Concepts, Micro-lessons, Video Lessons, Recommendations, Simulations, Career Coach, Skills Forecast, Certifications, Web Search]?
+3. If not a match, suggest a possible new feature name (short and descriptive).
+4. Confidence level (High, Medium, Low)
+5. Ask ONE follow-up question to clarify the intent, if needed.
+
+Respond as a JSON object with keys: intent, module_match, new_feature, confidence, follow_up_question
+""" 

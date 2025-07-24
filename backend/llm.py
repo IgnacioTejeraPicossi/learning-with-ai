@@ -3,6 +3,7 @@
 import os
 from dotenv import load_dotenv
 import openai
+from backend.prompts import CLASSIFY_UNKNOWN_INTENT
 
 load_dotenv()  # Loads .env file if present
 
@@ -113,3 +114,20 @@ async def call_llm_router(query):
         pass
     # Fallback
     return {"module": "recommendation", "reason": "Default fallback"} 
+
+def classify_intent(user_input: str) -> dict:
+    """Classify a user's unknown request and return structured insight."""
+    prompt = CLASSIFY_UNKNOWN_INTENT.format(user_input=user_input)
+    try:
+        response = ask_openai(prompt=prompt, model="gpt-4", max_tokens=512)
+        import json
+        return json.loads(response)
+    except Exception as e:
+        print("Classification error:", e)
+        return {
+            "intent": None,
+            "module_match": None,
+            "new_feature": None,
+            "confidence": "Low",
+            "follow_up_question": "Sorry, I didn’t quite understand that. Could you rephrase?"
+        } 

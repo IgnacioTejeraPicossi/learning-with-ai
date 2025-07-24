@@ -3,7 +3,7 @@ from fastapi import FastAPI, Request, Body, HTTPException, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from backend.prompts import CONCEPT_PROMPT, MICROLESSON_PROMPT, SIMULATION_PROMPT, RECOMMENDATION_PROMPT, PROMPTS, CERTIFICATION_RECOMMENDATION_PROMPT, CERTIFICATION_STUDY_PLAN_PROMPT, CERTIFICATION_SIMULATION_PROMPT, CERTIFICATION_CAREER_COACH_PROMPT, video_quiz_prompt, video_summary_prompt
-from backend.llm import ask_openai, web_search_query
+from backend.llm import ask_openai, web_search_query, classify_intent
 from typing import List, Optional
 from fastapi.staticfiles import StaticFiles
 import os
@@ -778,3 +778,11 @@ async def video_summary(request: Request):
     prompt = video_summary_prompt.format(transcript=transcript)
     summary = ask_openai(prompt)
     return {"summary": summary} 
+
+class IntentInput(BaseModel):
+    query: str
+
+@app.post("/classify-intent")
+async def handle_intent(input_data: IntentInput):
+    result = classify_intent(input_data.query)
+    return result 
