@@ -18,8 +18,8 @@ const RunTest = () => {
       await new Promise(resolve => setTimeout(resolve, 2000));
       
       const mockResults = {
-        total: 11,
-        passed: 10,
+        total: 12,
+        passed: 11,
         failed: 1,
         tests: [
           { name: "Dashboard Panel", status: "passed", time: "0.5s" },
@@ -32,7 +32,8 @@ const RunTest = () => {
           { name: "Certifications Panel", status: "passed", time: "0.6s" },
           { name: "AI Career Coach Panel", status: "passed", time: "0.4s" },
           { name: "Skills Forecast Panel", status: "passed", time: "0.3s" },
-          { name: "Saved Lessons Panel", status: "failed", time: "0.2s", error: "Panel not loading correctly" }
+          { name: "Saved Lessons Panel", status: "failed", time: "0.2s", error: "Panel not loading correctly" },
+          { name: "Idea Log Panel", status: "passed", time: "0.2s" }
         ]
       };
       
@@ -57,8 +58,8 @@ const RunTest = () => {
     // Simulate manual test results
     setTimeout(() => {
       setTestResults({
-        total: 11,
-        passed: 11,
+        total: 12,
+        passed: 12,
         failed: 0,
         tests: [
           { name: "Dashboard Panel", status: "passed", time: "0.2s" },
@@ -71,7 +72,8 @@ const RunTest = () => {
           { name: "Certifications Panel", status: "passed", time: "0.2s" },
           { name: "AI Career Coach Panel", status: "passed", time: "0.2s" },
           { name: "Skills Forecast Panel", status: "passed", time: "0.2s" },
-          { name: "Saved Lessons Panel", status: "passed", time: "0.2s" }
+          { name: "Saved Lessons Panel", status: "passed", time: "0.2s" },
+          { name: "Idea Log Panel", status: "passed", time: "0.2s" }
         ]
       });
       setIsRunning(false);
