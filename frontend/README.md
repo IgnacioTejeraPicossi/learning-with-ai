@@ -12,6 +12,7 @@ This is the React frontend for the AI Workplace Learning Platform. It provides a
   - Lessons Completed Over Time (Line Chart)
   - Lessons by Topic Breakdown (Pie Chart)
 - **Modal Dialogs** for AI outputs (AI Concepts, Micro-lesson, Recommendation)
+- **Per-Query Confidence Bar**: Choose how strictly your query is matched to AI modules (High, Medium, Low) before each search
 - **Consistent Theming** with color-coded buttons and cards
 - **Responsive Design** for desktop and mobile
 - **Firebase Authentication** integration
@@ -57,6 +58,7 @@ This is the React frontend for the AI Workplace Learning Platform. It provides a
 - **AI Features:**
   - Get AI Concepts, Micro-lessons, and Recommendations
   - Results shown in beautiful modal dialogs
+  - **Confidence Bar:** Above the search field, select High (100%), Medium (50%), or Low (0%) confidence for each query. High only routes exact/very close matches, Medium allows some flexibility, Low routes to the closest available option. Tooltips explain each level.
 
 ---
 
