@@ -800,3 +800,33 @@ async def get_unknown_intents():
         idea["_id"] = str(idea["_id"])
         ideas.append(idea)
     return {"ideas": ideas} 
+
+@app.post("/admin/unknown-intents/{idea_id}/upvote")
+async def upvote_idea(idea_id: str):
+    result = await unknown_intents_collection.update_one(
+        {"_id": ObjectId(idea_id)},
+        {"$inc": {"upvotes": 1}}
+    )
+    return {"success": result.modified_count == 1}
+
+@app.post("/admin/unknown-intents/{idea_id}/subscribe")
+async def subscribe_idea(idea_id: str, data: dict = Body(...)):
+    email = data.get("email")
+    if not email:
+        return {"success": False, "error": "Email required"}
+    result = await unknown_intents_collection.update_one(
+        {"_id": ObjectId(idea_id)},
+        {"$addToSet": {"subscribers": email}}
+    )
+    return {"success": result.modified_count == 1}
+
+@app.post("/admin/unknown-intents/{idea_id}/status")
+async def update_idea_status(idea_id: str, data: dict = Body(...)):
+    status_val = data.get("status")
+    if not status_val:
+        return {"success": False, "error": "Status required"}
+    result = await unknown_intents_collection.update_one(
+        {"_id": ObjectId(idea_id)},
+        {"$set": {"status": status_val}}
+    )
+    return {"success": result.modified_count == 1} 
