@@ -43,6 +43,7 @@ const navItems = [
   { key: "skills-forecast", label: "Skills Forecast", icon: "bar-chart" },
   { key: "saved-lessons", label: "Saved Lessons", icon: "archive" },
   { key: "idea-log", label: "Idea Log", icon: "lightbulb" },
+  { key: "feature-roadmap", label: "Feature Roadmap", icon: "star" },
   { key: "run-test", label: "Run Test", icon: "test" },
 ];
 

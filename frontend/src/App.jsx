@@ -21,6 +21,7 @@ import { ThemeProvider, useTheme } from './ThemeContext';
 import CommandBar from "./CommandBar";
 import VideoLesson from "./VideoLesson";
 import IdeaLog from "./IdeaLog";
+import FeatureRoadmap from "./FeatureRoadmap";
 
 function AppContent() {
   const [user, setUser] = useState(null);
@@ -241,6 +242,7 @@ function AppContent() {
             {!activeModule && section === "run-test" && <RunTest />}
             {!activeModule && section === "video-lessons" && <VideoLesson />}
             {!activeModule && section === "idea-log" && <IdeaLog />}
+            {!activeModule && section === "feature-roadmap" && <FeatureRoadmap />}
           </div>
         )}
       </div>
