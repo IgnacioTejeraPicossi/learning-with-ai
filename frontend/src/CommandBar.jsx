@@ -26,6 +26,10 @@ function CommandBar({ onRoute, inputPlaceholder }) {
   const [confidenceLevel, setConfidenceLevel] = useState('High');
   // const { transcript, listening, resetTranscript } = useSpeechRecognition();
 
+  // BUGBOT TEST: Deliberate code smell for Bugbot to catch
+  var bugbotTest = 'This is a test variable for Bugbot review.';
+  console.log('Bugbot test variable:', bugbotTest);
+
   const moduleMap = {
     // AI Concepts
     concepts: 'ai-concepts',
