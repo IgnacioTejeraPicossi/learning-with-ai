@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useTheme } from "./ThemeContext";
+import ModalDialog from "./ModalDialog";
 
 // Simulate admin check (replace with real auth in production)
 const isAdmin = true;
@@ -11,6 +12,7 @@ function FeatureRoadmap() {
   const [subscribing, setSubscribing] = useState("");
   const [upvoting, setUpvoting] = useState("");
   const [statusUpdating, setStatusUpdating] = useState("");
+  const [scaffoldModal, setScaffoldModal] = useState({ open: false, code: "", feature: null });
   const { colors } = useTheme();
 
   const fetchFeatures = async () => {
@@ -62,6 +64,33 @@ function FeatureRoadmap() {
     });
     await fetchFeatures();
     setStatusUpdating("");
+  };
+
+  const handleGenerateScaffold = async (idea) => {
+    // For now, mock the backend response with a sample code stub
+    const codeStub = `// Scaffold for: ${idea.classification?.new_feature || idea.user_input}
+import React from 'react';
+
+function ${
+      (idea.classification?.new_feature || "Feature").replace(/[^a-zA-Z0-9]/g, "")
+    }() {
+  return (
+    <div>
+      <h2>${idea.classification?.new_feature || "Feature"}</h2>
+      <p>This is a scaffolded component for: {` +
+      '`' +
+      (idea.classification?.intent || idea.user_input) +
+      '`' +
+      `}</p>
+    </div>
+  );
+}
+
+export default ${
+      (idea.classification?.new_feature || "Feature").replace(/[^a-zA-Z0-9]/g, "")
+    };
+`;
+    setScaffoldModal({ open: true, code: codeStub, feature: idea });
   };
 
   const statusOptions = ["Idea", "Planned", "In Review", "Coming Soon", "Implemented"];
@@ -128,11 +157,36 @@ function FeatureRoadmap() {
                   </button>
                 </td>
                 <td style={{ padding: 8, border: `1px solid ${colors.border}` }}>{idea.created_at ? new Date(idea.created_at).toLocaleString() : "-"}</td>
+                <td style={{ padding: 8, border: `1px solid ${colors.border}` }}>
+                  <button
+                    onClick={() => handleGenerateScaffold(idea)}
+                    style={{ background: '#eee', border: '1px solid #ccc', borderRadius: 6, padding: '2px 10px', cursor: 'pointer', fontWeight: 600 }}
+                    title="Generate code scaffold for this feature"
+                  >
+                    🛠️ Generate Scaffold
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       )}
+      <ModalDialog
+        isOpen={scaffoldModal.open}
+        onRequestClose={() => setScaffoldModal({ open: false, code: "", feature: null })}
+        title={`Code Scaffold for: ${scaffoldModal.feature?.classification?.new_feature || scaffoldModal.feature?.user_input || "Feature"}`}
+      >
+        <pre style={{ background: '#f4f4f4', padding: 16, borderRadius: 8, fontSize: 14, maxHeight: 400, overflow: 'auto' }}>{scaffoldModal.code}</pre>
+        <button
+          onClick={() => {
+            navigator.clipboard.writeText(scaffoldModal.code);
+            alert("Code copied to clipboard!");
+          }}
+          style={{ marginTop: 16, background: '#1976d2', color: '#fff', border: 0, borderRadius: 6, padding: '8px 18px', fontWeight: 600, fontSize: 16 }}
+        >
+          Copy Code
+        </button>
+      </ModalDialog>
     </div>
   );
 }
