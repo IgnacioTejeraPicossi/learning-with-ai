@@ -14,6 +14,7 @@ This is the React frontend for the AI Workplace Learning Platform. It provides a
 - **Modal Dialogs** for AI outputs (AI Concepts, Micro-lesson, Recommendation)
 - **Per-Query Confidence Bar**: Choose how strictly your query is matched to AI modules (High, Medium, Low) before each search
 - - **Idea Log**: Admin panel to view and manage user requests and ideas that don’t match existing features, supporting continuous product evolution
+- - **Feature Roadmap & AI Code Generation**: View, upvote, and subscribe to user-requested features. Admins can update status and generate code scaffolds for new features using AI (LLM-powered backend). Generated code is shown in a modal for review and copy.
 - **Consistent Theming** with color-coded buttons and cards
 - **Responsive Design** for desktop and mobile
 - **Firebase Authentication** integration
@@ -48,7 +49,7 @@ This is the React frontend for the AI Workplace Learning Platform. It provides a
 ## 🖥️ UI Overview
 
 - **Sidebar Navigation:**
-  - Quick access to Dashboard, AI Concepts, Micro-lessons, Recommendation, Simulations, Career Coach, Skills Forecast, Saved Lessons, Idea Log, and Run Test (last option)
+  - Quick access to Dashboard, AI Concepts, Micro-lessons, Recommendation, Simulations, Career Coach, Skills Forecast, Saved Lessons, Idea Log, Feature Roadmap (AI code generation), and Run Test (last option)
 - **Dashboard:**
   - Welcome message and sign out
   - Progress cards for lessons, simulations, and streak
@@ -60,6 +61,7 @@ This is the React frontend for the AI Workplace Learning Platform. It provides a
   - Get AI Concepts, Micro-lessons, and Recommendations
   - Results shown in beautiful modal dialogs
   - **Confidence Bar:** Above the search field, select High (100%), Medium (50%), or Low (0%) confidence for each query. High only routes exact/very close matches, Medium allows some flexibility, Low routes to the closest available option. Tooltips explain each level.
+  - **Feature Roadmap & AI Code Generation:** View and upvote feature ideas, subscribe for notifications, and (admin) update status. Admins can generate code scaffolds for new features using the backend LLM, with results shown in a modal for review and copy.
 
 ---
 
