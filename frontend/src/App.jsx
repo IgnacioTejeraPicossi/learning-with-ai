@@ -87,7 +87,7 @@ function AppContent() {
           justifyContent: "space-between",
           alignItems: "center"
         }}>
-          <h1 style={{ margin: 0 }}>{isAIFullScreen ? "🤖 Ask AI Anything" : "Workplace Learning With AI"}</h1>
+          <h1 style={{ margin: 0 }}>{isAIFullScreen ? "🤖 Ask AI About Workplace Learning" : "Workplace Learning With AI"}</h1>
           <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
             {/* Search Button */}
             {!isAIFullScreen && (
@@ -131,7 +131,7 @@ function AppContent() {
                 transition: "all 0.2s",
                 marginRight: 8
               }}
-              title="Ask AI Anything"
+              title="Ask AI About Workplace Learning"
             >
               🤖
             </button>
@@ -173,12 +173,12 @@ function AppContent() {
               textAlign: "center"
             }}>
               <h2 style={{ marginBottom: "2rem", fontSize: "2rem", color: colors.text }}>
-                🤖 Ask AI Anything
+                🤖 Ask AI About Workplace Learning
               </h2>
               <p style={{ marginBottom: "2rem", fontSize: "1rem", color: colors.text, opacity: 0.8 }}>
-                Interface-less UX
+                Interface-less UX / Zero-UI mode
               </p>
-              <CommandBar onRoute={handleRoute} />
+              <CommandBar onRoute={handleRoute} inputPlaceholder="Ask AI about workplace learning..." />
               <div style={{ marginTop: "2rem", display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "1rem" }}>
                 <div style={{ padding: "0.5rem 1rem", background: colors.primaryLight, borderRadius: "20px", fontSize: "0.9rem", color: colors.primary }}>
                   💡 "Show me a video lesson on Agile"

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { postRoute, askStream } from './api';
 // import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 
-function CommandBar({ onRoute }) {
+function CommandBar({ onRoute, inputPlaceholder }) {
   const [input, setInput] = useState('');
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -45,7 +45,7 @@ function CommandBar({ onRoute }) {
       <div style={{ display: 'flex', gap: 8 }}>
         <input
           type="text"
-          placeholder="Ask AI anything..."
+          placeholder={inputPlaceholder || "Ask AI anything..."}
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && handleSubmit()}
