@@ -24,6 +24,8 @@ function CommandBar({ onRoute, inputPlaceholder }) {
   const [unknownIntent, setUnknownIntent] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [confidenceLevel, setConfidenceLevel] = useState('High');
+  const [clarification, setClarification] = useState("");
+  const [clarifying, setClarifying] = useState(false);
   // const { transcript, listening, resetTranscript } = useSpeechRecognition();
 
   const moduleMap = {
@@ -133,6 +135,27 @@ function CommandBar({ onRoute, inputPlaceholder }) {
     }
   };
 
+  const handleClarify = async () => {
+    if (!clarification.trim()) return;
+    setClarifying(true);
+    // Combine original input and clarification for re-classification
+    const combinedQuery = `${input} ${clarification}`;
+    try {
+      const classifyRes = await fetch('http://localhost:8000/classify-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: combinedQuery })
+      });
+      const classifyData = await classifyRes.json();
+      setUnknownIntent(classifyData);
+      setClarification("");
+    } catch (err) {
+      setUnknownIntent({ intent: null, module_match: null, new_feature: null, confidence: "Low", follow_up_question: "Sorry, something went wrong. Try again." });
+    } finally {
+      setClarifying(false);
+    }
+  };
+
   // const handleVoiceStart = () => {
   //   resetTranscript();
   //   SpeechRecognition.startListening({ continuous: false });
@@ -222,7 +245,26 @@ function CommandBar({ onRoute, inputPlaceholder }) {
             <p><b>Suggested Feature:</b> {unknownIntent.new_feature || 'None'}</p>
             <p><b>Confidence:</b> {unknownIntent.confidence || 'Unknown'}</p>
             {unknownIntent.follow_up_question && (
-              <p><b>Follow-up Question:</b> {unknownIntent.follow_up_question}</p>
+              <div style={{ marginTop: 12 }}>
+                <p><b>Follow-up Question:</b> {unknownIntent.follow_up_question}</p>
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 8 }}>
+                  <input
+                    type="text"
+                    value={clarification}
+                    onChange={e => setClarification(e.target.value)}
+                    placeholder="Type your answer..."
+                    style={{ flex: 1, padding: 8, borderRadius: 6, border: '1px solid #ccc', fontSize: 15 }}
+                    disabled={clarifying}
+                  />
+                  <button
+                    onClick={handleClarify}
+                    disabled={clarifying || !clarification.trim()}
+                    style={{ background: '#1976d2', color: '#fff', border: 0, borderRadius: 6, padding: '8px 16px', fontWeight: 600, fontSize: 15 }}
+                  >
+                    {clarifying ? 'Clarifying...' : 'Submit'}
+                  </button>
+                </div>
+              </div>
             )}
             <button
               onClick={() => setModalOpen(false)}
