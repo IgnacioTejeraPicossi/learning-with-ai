@@ -3,7 +3,7 @@ from fastapi import FastAPI, Request, Body, HTTPException, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from backend.prompts import CONCEPT_PROMPT, MICROLESSON_PROMPT, SIMULATION_PROMPT, RECOMMENDATION_PROMPT, PROMPTS, CERTIFICATION_RECOMMENDATION_PROMPT, CERTIFICATION_STUDY_PLAN_PROMPT, CERTIFICATION_SIMULATION_PROMPT, CERTIFICATION_CAREER_COACH_PROMPT, video_quiz_prompt, video_summary_prompt
-from backend.llm import ask_openai, web_search_query, classify_intent
+from backend.llm import ask_openai, web_search_query, classify_intent, generate_scaffold
 from typing import List, Optional
 from fastapi.staticfiles import StaticFiles
 import os
@@ -830,3 +830,12 @@ async def update_idea_status(idea_id: str, data: dict = Body(...)):
         {"$set": {"status": status_val}}
     )
     return {"success": result.modified_count == 1} 
+
+class ScaffoldRequest(BaseModel):
+    feature_name: str
+    feature_summary: str
+
+@app.post("/generate-scaffold")
+async def generate_scaffold_endpoint(req: ScaffoldRequest):
+    code = generate_scaffold(req.feature_name, req.feature_summary)
+    return {"code": code} 

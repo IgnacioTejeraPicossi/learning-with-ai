@@ -179,3 +179,12 @@ The user said: "{user_input}"
 
 Respond as a JSON object with keys: intent, module_match, new_feature, confidence, follow_up_question
 """ 
+
+GENERATE_SCAFFOLD_PROMPT = """
+You are an expert software engineer. Generate a code scaffold for the following feature request:
+
+Feature Name: {feature_name}
+Feature Summary: {feature_summary}
+
+Generate a React component (JSX, functional, with a placeholder UI) that could serve as a starting point for this feature. Include only the code, no explanations.
+""" 

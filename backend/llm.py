@@ -3,7 +3,7 @@
 import os
 from dotenv import load_dotenv
 import openai
-from backend.prompts import CLASSIFY_UNKNOWN_INTENT
+from backend.prompts import CLASSIFY_UNKNOWN_INTENT, GENERATE_SCAFFOLD_PROMPT
 
 load_dotenv()  # Loads .env file if present
 
@@ -130,3 +130,7 @@ def classify_intent(user_input: str) -> dict:
             "confidence": "Low",
             "follow_up_question": "Sorry, I didn’t quite understand that. Could you rephrase?"
         } 
+
+def generate_scaffold(feature_name: str, feature_summary: str) -> str:
+    prompt = GENERATE_SCAFFOLD_PROMPT.format(feature_name=feature_name, feature_summary=feature_summary)
+    return ask_openai(prompt=prompt, model="gpt-4", max_tokens=512) 

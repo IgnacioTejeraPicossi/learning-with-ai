@@ -67,29 +67,22 @@ function FeatureRoadmap() {
   };
 
   const handleGenerateScaffold = async (idea) => {
-    // For now, mock the backend response with a sample code stub
-    const codeStub = `// Scaffold for: ${idea.classification?.new_feature || idea.user_input}
-import React from 'react';
-
-function ${
-      (idea.classification?.new_feature || "Feature").replace(/[^a-zA-Z0-9]/g, "")
-    }() {
-  return (
-    <div>
-      <h2>${idea.classification?.new_feature || "Feature"}</h2>
-      <p>This is a scaffolded component for: {` +
-      '`' +
-      (idea.classification?.intent || idea.user_input) +
-      '`' +
-      `}</p>
-    </div>
-  );
-}
-
-export default ${
-      (idea.classification?.new_feature || "Feature").replace(/[^a-zA-Z0-9]/g, "")
-    };
-`;
+    // Call backend to generate scaffold
+    let codeStub = "";
+    try {
+      const res = await fetch("http://localhost:8000/generate-scaffold", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          feature_name: idea.classification?.new_feature || idea.user_input,
+          feature_summary: idea.classification?.intent || idea.user_input
+        })
+      });
+      const data = await res.json();
+      codeStub = data.code || "(No code generated)";
+    } catch (err) {
+      codeStub = `// Scaffold for: ${idea.classification?.new_feature || idea.user_input}\n// (Backend error, using mock)\nimport React from 'react';\nfunction Feature() { return <div>Feature scaffold</div>; }\nexport default Feature;`;
+    }
     setScaffoldModal({ open: true, code: codeStub, feature: idea });
   };
 
