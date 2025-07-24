@@ -104,16 +104,15 @@ User query:
 """
 
 async def call_llm_router(query):
-    prompt = ROUTER_PROMPT.replace("{query}", query)
-    response = ask_openai(prompt=prompt, model="gpt-4", max_tokens=128)
-    try:
-        parsed = json.loads(response)
-        if "module" in parsed and "reason" in parsed:
-            return parsed
-    except Exception:
-        pass
-    # Fallback
-    return {"module": "recommendation", "reason": "Default fallback"} 
+    # Use the classifier to get intent and confidence
+    classification = classify_intent(query)
+    confidence = classification.get('confidence', 'Low')
+    module = classification.get('module_match')
+    reason = classification.get('intent')
+    if confidence == 'High' and module:
+        return {"module": module, "reason": reason, "confidence": confidence}
+    else:
+        return {"module": None, "reason": reason, "confidence": confidence} 
 
 def classify_intent(user_input: str) -> dict:
     """Classify a user's unknown request and return structured insight."""

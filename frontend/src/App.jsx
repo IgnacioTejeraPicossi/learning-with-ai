@@ -20,6 +20,7 @@ import Sidebar from './Sidebar';
 import { ThemeProvider, useTheme } from './ThemeContext';
 import CommandBar from "./CommandBar";
 import VideoLesson from "./VideoLesson";
+import IdeaLog from "./IdeaLog";
 
 function AppContent() {
   const [user, setUser] = useState(null);
@@ -225,7 +226,7 @@ function AppContent() {
             {activeModule === 'coach' && <CareerCoach query={userQuery} />}
             {activeModule === 'forecast' && <SkillsForecast query={userQuery} />}
             {activeModule === 'certification' && <Certifications query={userQuery} />}
-            {activeModule === 'videolesson' && <VideoLesson query={userQuery} />}
+            {activeModule === 'video-lessons' && <VideoLesson query={userQuery} />}
             {!activeModule && section === "dashboard" && <Dashboard user={user} />}
             {!activeModule && section === "ai-concepts" && <Concepts />}
             {!activeModule && section === "micro-lessons" && <MicroLesson />}
@@ -239,6 +240,7 @@ function AppContent() {
             {!activeModule && section === "saved-lessons" && <LessonList user={user} />}
             {!activeModule && section === "run-test" && <RunTest />}
             {!activeModule && section === "video-lessons" && <VideoLesson />}
+            {!activeModule && section === "idea-log" && <IdeaLog />}
           </div>
         )}
       </div>

@@ -8,7 +8,7 @@ from typing import List, Optional
 from fastapi.staticfiles import StaticFiles
 import os
 import datetime
-from backend.db import lessons_collection, career_coach_sessions, skills_forecasts, teams_collection, team_members_collection, team_analytics_collection, certifications_collection, study_plans_collection, certification_simulations_collection
+from backend.db import lessons_collection, career_coach_sessions, skills_forecasts, teams_collection, team_members_collection, team_analytics_collection, certifications_collection, study_plans_collection, certification_simulations_collection, unknown_intents_collection
 from bson import ObjectId
 
 import firebase_admin
@@ -785,4 +785,18 @@ class IntentInput(BaseModel):
 @app.post("/classify-intent")
 async def handle_intent(input_data: IntentInput):
     result = classify_intent(input_data.query)
+    # Log to database
+    await unknown_intents_collection.insert_one({
+        "user_input": input_data.query,
+        "classification": result,
+        "created_at": datetime.datetime.utcnow()
+    })
     return result 
+
+@app.get("/admin/unknown-intents")
+async def get_unknown_intents():
+    ideas = []
+    async for idea in unknown_intents_collection.find().sort("created_at", -1):
+        idea["_id"] = str(idea["_id"])
+        ideas.append(idea)
+    return {"ideas": ideas} 

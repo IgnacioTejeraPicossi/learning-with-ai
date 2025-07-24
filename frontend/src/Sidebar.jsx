@@ -18,7 +18,8 @@ const Icon = ({ name, size = 20 }) => {
     award: "🏆",
     "chevron-left": "◀️",
     "chevron-right": "▶️",
-    test: "🧪"
+    test: "🧪",
+    robot: "🤖"
   };
 
   return (
@@ -30,7 +31,7 @@ const Icon = ({ name, size = 20 }) => {
 
 const navItems = [
   { key: "dashboard", label: "Dashboard", icon: "house" },
-  { key: "ai-concepts", label: "AI Concepts", icon: "lightbulb" },
+  { key: "ai-concepts", label: "AI Concepts", icon: "bar-chart" },
   { key: "micro-lessons", label: "Micro-lessons", icon: "book" },
   { key: "video-lessons", label: "Video Lessons", icon: "play-circle" },
   { key: "recommendation", label: "Recommendation", icon: "star" },
@@ -41,6 +42,7 @@ const navItems = [
   { key: "coach", label: "AI Career Coach", icon: "user-check" },
   { key: "skills-forecast", label: "Skills Forecast", icon: "bar-chart" },
   { key: "saved-lessons", label: "Saved Lessons", icon: "archive" },
+  { key: "idea-log", label: "Idea Log", icon: "lightbulb" },
   { key: "run-test", label: "Run Test", icon: "test" },
 ];
 
