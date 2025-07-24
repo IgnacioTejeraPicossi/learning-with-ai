@@ -3,6 +3,19 @@ import { postRoute, askStream } from './api';
 // import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 import ModalDialog from './ModalDialog';
 
+const CONFIDENCE_LEVELS = [
+  { key: 'High', label: 'High (100%)', value: 2, tooltip: 'Only exact or very close matches (strict).' },
+  { key: 'Medium', label: 'Medium (50%)', value: 1, tooltip: 'Allow some flexibility, but avoid weak matches.' },
+  { key: 'Low', label: 'Low (0%)', value: 0, tooltip: 'Route to the closest available option, even if not a strong match.' },
+];
+
+function confidenceToValue(conf) {
+  if (!conf) return 0;
+  if (conf.toLowerCase() === 'high') return 2;
+  if (conf.toLowerCase() === 'medium') return 1;
+  return 0;
+}
+
 function CommandBar({ onRoute, inputPlaceholder }) {
   const [input, setInput] = useState('');
   const [error, setError] = useState(null);
@@ -10,17 +23,65 @@ function CommandBar({ onRoute, inputPlaceholder }) {
   const [streamedOutput, setStreamedOutput] = useState('');
   const [unknownIntent, setUnknownIntent] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [confidenceLevel, setConfidenceLevel] = useState('High');
   // const { transcript, listening, resetTranscript } = useSpeechRecognition();
 
   const moduleMap = {
+    // AI Concepts
     concepts: 'ai-concepts',
+    concept: 'ai-concepts',
+    'ai-concepts': 'ai-concepts',
+    'ai concepts': 'ai-concepts',
+    'aiconcepts': 'ai-concepts',
+    'ai concept': 'ai-concepts',
+    'AI Concepts': 'ai-concepts',
+    'AI Concept': 'ai-concepts',
+    'AICONCEPTS': 'ai-concepts',
+    // Micro-lessons
     microlesson: 'micro-lessons',
+    microlessons: 'micro-lessons',
+    'micro-lesson': 'micro-lessons',
+    'micro-lessons': 'micro-lessons',
+    'micro lesson': 'micro-lessons',
+    'micro lessons': 'micro-lessons',
+    'Micro Lessons': 'micro-lessons',
+    'Micro Lesson': 'micro-lessons',
+    'MICRO LESSONS': 'micro-lessons',
+    // Simulations
     simulation: 'simulations',
+    simulations: 'simulations',
+    'simulation': 'simulations',
+    'simulations': 'simulations',
+    'Simulation': 'simulations',
+    'Simulations': 'simulations',
+    // Recommendation
     recommendation: 'recommendation',
+    recommendations: 'recommendation',
+    'recommendation': 'recommendation',
+    'recommendations': 'recommendation',
+    'Recommendation': 'recommendation',
+    'Recommendations': 'recommendation',
+    // Certification
     certification: 'certifications',
+    certifications: 'certifications',
+    'certification': 'certifications',
+    'certifications': 'certifications',
+    'Certification': 'certifications',
+    'Certifications': 'certifications',
+    // Coach
     coach: 'coach',
+    'ai coach': 'coach',
+    'career coach': 'coach',
+    'AI Coach': 'coach',
+    'Career Coach': 'coach',
+    // Skills Forecast
     forecast: 'skills-forecast',
-    // Robust mapping for video lessons
+    'skills-forecast': 'skills-forecast',
+    'skills forecast': 'skills-forecast',
+    'skill forecast': 'skills-forecast',
+    'Skill Forecast': 'skills-forecast',
+    'Skills Forecast': 'skills-forecast',
+    // Video Lessons (already robust)
     videolesson: 'video-lessons',
     videolessons: 'video-lessons',
     'video-lesson': 'video-lessons',
@@ -41,8 +102,11 @@ function CommandBar({ onRoute, inputPlaceholder }) {
     setStreamedOutput('');
     try {
       const res = await postRoute(prompt);
-      if (!res.module) {
-        // Routing failed, classify unknown intent
+      // Use confidence threshold
+      const threshold = confidenceToValue(confidenceLevel);
+      const backendConfidence = confidenceToValue(res.confidence);
+      if (!res.module || backendConfidence < threshold) {
+        // Routing failed or below threshold, classify unknown intent
         const classifyRes = await fetch('http://localhost:8000/classify-intent', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -57,7 +121,7 @@ function CommandBar({ onRoute, inputPlaceholder }) {
       // Normalize module name for robust mapping
       const normalizedModule = (res.module || '').toLowerCase().replace(/[-_ ]/g, '');
       let mappedModule = moduleMap[normalizedModule] || moduleMap[res.module] || res.module;
-      console.log('Routing debug:', { backendModule: res.module, normalizedModule, mappedModule });
+      console.log('Routing debug:', { backendModule: res.module, normalizedModule, mappedModule, backendConfidence, threshold });
       onRoute(mappedModule, prompt);
       setInput('');
       await askStream({ prompt }, (output) => setStreamedOutput(output));
@@ -80,6 +144,29 @@ function CommandBar({ onRoute, inputPlaceholder }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 24 }}>
+      {/* Confidence Bar UI */}
+      <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 8 }}>
+        <span style={{ fontWeight: 600, fontSize: 15 }}>Confidence:</span>
+        {CONFIDENCE_LEVELS.map(level => (
+          <div
+            key={level.key}
+            onClick={() => setConfidenceLevel(level.key)}
+            style={{
+              padding: '4px 12px',
+              borderRadius: 6,
+              background: confidenceLevel === level.key ? '#1976d2' : '#eee',
+              color: confidenceLevel === level.key ? '#fff' : '#333',
+              fontWeight: confidenceLevel === level.key ? 700 : 500,
+              cursor: 'pointer',
+              border: confidenceLevel === level.key ? '2px solid #1976d2' : '1px solid #ccc',
+              position: 'relative',
+            }}
+            title={level.tooltip}
+          >
+            {level.label}
+          </div>
+        ))}
+      </div>
       <div style={{ display: 'flex', gap: 8 }}>
         <input
           type="text"
