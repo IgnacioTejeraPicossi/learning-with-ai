@@ -132,7 +132,7 @@ def classify_intent(user_input: str) -> dict:
         } 
 
 def generate_scaffold(feature_name, feature_summary, scaffold_type="API Route"):
-    from prompts import SCAFFOLD_TYPE_PROMPT
+    from backend.prompts import SCAFFOLD_TYPE_PROMPT
     prompt = SCAFFOLD_TYPE_PROMPT.format(
         scaffold_type=scaffold_type,
         feature_name=feature_name,
