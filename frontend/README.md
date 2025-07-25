@@ -1,98 +1,52 @@
-# AI Workplace Learning Platform – Frontend
+# AI Workplace Learning Application - Frontend
 
-This is the React frontend for the AI Workplace Learning Platform. It provides a modern, interactive dashboard for workplace learning, powered by AI and integrated with Firebase Authentication and a FastAPI backend.
+## Features
 
----
+- Sidebar navigation for all modules
+- Progress cards and charts
+- Modal dialogs for feedback and unknown intents
+- Light/dark theme toggle
+- Real user data integration
+- Streaming AI responses for all LLM-powered features
+- **Idea Log (Unknown Requests Table):**
+  - Displays all user queries that could not be matched to an existing feature
+  - **Filter by confidence level and module/topic** using dropdowns
+  - **Search** by user input or intent
+  - **Colored tags** for confidence (High/Medium/Low) and module match
+- **Feature Roadmap Panel:**
+  - Shows all user-submitted ideas and potential future features
+  - **Color-coded status badges** for each phase (Idea, Planned, In Review, Coming Soon, Implemented)
+  - **Sortable columns** for upvotes, status, and submission date (click column headers to sort)
+  - Upvote, subscribe for notifications, or (admin) update status
+  - Generate code scaffold for each feature
 
-## ✨ Features
+## UI Overview
 
-- **Modern Dashboard UI** with sidebar navigation
-- **Progress Cards** for lessons, simulations, and learning streak
-- **Interactive Charts**:
-  - Lessons Completed Over Time (Line Chart)
-  - Lessons by Topic Breakdown (Pie Chart)
-- **Modal Dialogs** for AI outputs (AI Concepts, Micro-lesson, Recommendation)
-- **Per-Query Confidence Bar**: Choose how strictly your query is matched to AI modules (High, Medium, Low) before each search
-- - **Idea Log**: Admin panel to view and manage user requests and ideas that don’t match existing features, supporting continuous product evolution
-- - **Feature Roadmap & AI Code Generation**: View, upvote, and subscribe to user-requested features. Admins can update status and generate code scaffolds for new features using AI (LLM-powered backend). Generated code is shown in a modal for review and copy.
-- **Consistent Theming** with color-coded buttons and cards
-- **Responsive Design** for desktop and mobile
-- **Firebase Authentication** integration
-- **Secure API calls** with user tokens
+### Idea Log (Unknown Requests Table)
+- Access from the sidebar: **Idea Log**
+- Use the **Confidence** and **Module** dropdowns to filter the table
+- Use the **search box** to filter by user input or intent
+- Confidence and module match are shown as **colored tags** for quick visual identification
 
----
+### Feature Roadmap
+- Access from the sidebar: **Feature Roadmap**
+- Each feature/idea shows:
+  - Feature name
+  - **Status** (color-coded badge)
+  - Summary
+  - Upvotes (sortable)
+  - Notifications
+  - Submission date (sortable)
+  - Generate Scaffold button
+- **Status Legend** above the table shows the color for each phase
+- **Click column headers** for Status, Upvotes, or Submitted to sort the table (ascending/descending)
 
-## 📦 Dependencies
+## How to Use the New Features
 
-- [React](https://reactjs.org/)
-- [Recharts](https://recharts.org/) – for charts
-- [react-modal](https://reactcommunity.org/react-modal/) – for modal dialogs
-- [Firebase](https://firebase.google.com/) – for authentication
-- [Shoelace](https://shoelace.style/) – for icons (sidebar)
-
----
-
-## 🚀 Getting Started
-
-1. **Install dependencies:**
-   ```sh
-   npm install
-   ```
-2. **Start the development server:**
-   ```sh
-   npm start
-   ```
-   The app will be available at [http://localhost:3000](http://localhost:3000)
-
----
-
-## 🖥️ UI Overview
-
-- **Sidebar Navigation:**
-  - Quick access to Dashboard, AI Concepts, Micro-lessons, Recommendation, Simulations, Career Coach, Skills Forecast, Saved Lessons, Idea Log, Feature Roadmap (AI code generation), and Run Test (last option)
-- **Dashboard:**
-  - Welcome message and sign out
-  - Progress cards for lessons, simulations, and streak
-  - Recommended next step
-  - **Charts:**
-    - Lessons Completed Over Time (line chart)
-    - Lessons by Topic (pie chart)
-- **AI Features:**
-  - Get AI Concepts, Micro-lessons, and Recommendations
-  - Results shown in beautiful modal dialogs
-  - **Confidence Bar:** Above the search field, select High (100%), Medium (50%), or Low (0%) confidence for each query. High only routes exact/very close matches, Medium allows some flexibility, Low routes to the closest available option. Tooltips explain each level.
-  - **Feature Roadmap & AI Code Generation:** View and upvote feature ideas, subscribe for notifications, and (admin) update status. Admins can generate code scaffolds for new features using the backend LLM, with results shown in a modal for review and copy.
+- To filter ideas in the Idea Log, select a confidence level or module from the dropdowns, or type in the search box
+- To sort the Feature Roadmap, click the column headers for Upvotes, Status, or Submitted; click again to toggle sort direction
+- Statuses are color-coded for easy tracking of feature progress
 
 ---
 
-## 🛠️ Customization & Extending
-
-- **Add new charts:** Use Recharts and pass processed data as props
-- **Add new sidebar sections:** Edit `Sidebar.jsx` and add new routes/components
-- **Style buttons and cards:** Use inline styles or your favorite CSS-in-JS solution
-
----
-
-## 🔒 Authentication & API
-
-- Uses Firebase Authentication for login
-- All API calls include the user’s Firebase ID token for secure backend access
-
----
-
-## 📊 Data Handling
-
-- **Lessons** are fetched from the backend and grouped by week and topic for charts
-- **Progress** is tracked and displayed per user
-
----
-
-## 🤝 Contributing
-
-Pull requests and suggestions are welcome! Please open an issue or PR to discuss improvements.
-
----
-
-## License
-
-MIT
+For more details, see the main project README or contact the development team.
