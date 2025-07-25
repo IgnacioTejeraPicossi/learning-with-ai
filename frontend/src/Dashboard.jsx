@@ -60,7 +60,7 @@ function getISOWeek(dateStr) {
   return `${year}-W${week.toString().padStart(2, '0')}`;
 }
 
-function Dashboard({ user }) {
+function Dashboard({ user, onSectionSelect }) {
   const [progress, setProgress] = useState(getDefaultProgress());
   const [loading, setLoading] = useState(true);
   const [lessonTrends, setLessonTrends] = useState([]);
@@ -151,8 +151,16 @@ function Dashboard({ user }) {
     );
   }
 
+  const phaseLinks = [
+    { phase: '1', color: '#2ecc40', label: 'Unknown Intent Logger', section: 'idea-log' },
+    { phase: '2', color: '#ffb700', label: 'Clarifying Q&A', section: 'ai-concepts' },
+    { phase: '3', color: '#ff7043', label: 'Evolution Panel', section: 'feature-roadmap' },
+    { phase: '4', color: '#3498db', label: 'Cursor-Driven Scaffolds', section: 'feature-roadmap' },
+    { phase: '5', color: '#e74c3c', label: 'Real-Time Code Integration', section: null },
+  ];
+
   return (
-    <>
+    <div>
       <div style={{
         background: colors.primaryLight,
         borderRadius: 10,
@@ -228,7 +236,52 @@ function Dashboard({ user }) {
           <TopicBreakdownChart data={topicBreakdown} />
         </div>
       </div>
-    </>
+
+      <div style={{ marginTop: 32, background: colors.cardBackground, borderRadius: 12, boxShadow: colors.shadow, padding: 24 }}>
+        <h3 style={{ marginTop: 0, color: colors.text }}>Summary Table</h3>
+        <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 12 }}>
+          <thead>
+            <tr style={{ background: colors.primaryLight }}>
+              <th style={{ padding: 8, border: `1px solid ${colors.border}` }}>Phase</th>
+              <th style={{ padding: 8, border: `1px solid ${colors.border}` }}>Title</th>
+              <th style={{ padding: 8, border: `1px solid ${colors.border}` }}>Main Feature</th>
+              <th style={{ padding: 8, border: `1px solid ${colors.border}` }}>Feasibility</th>
+            </tr>
+          </thead>
+          <tbody>
+            {phaseLinks.map((p, idx) => (
+              <tr key={p.phase} style={{ background: idx % 2 === 0 ? colors.cardBackground : '#fff' }}>
+                <td style={{ padding: 8, border: `1px solid ${colors.border}` }}>
+                  <span style={{ fontSize: 22 }}>{p.phase === '1' ? '🟢' : p.phase === '2' ? '🟡' : p.phase === '3' ? '🟠' : p.phase === '4' ? '🔵' : '🔴'}</span>
+                </td>
+                <td style={{ padding: 8, border: `1px solid ${colors.border}` }}>
+                  {p.section ? (
+                    <button
+                      onClick={() => onSectionSelect && onSectionSelect(p.section)}
+                      style={{ background: 'none', border: 'none', color: colors.primary, textDecoration: 'underline', cursor: 'pointer', fontWeight: 600 }}
+                    >
+                      {p.label}
+                    </button>
+                  ) : (
+                    <span style={{ color: colors.textSecondary }}>{p.label}</span>
+                  )}
+                </td>
+                <td style={{ padding: 8, border: `1px solid ${colors.border}` }}>
+                  {p.phase === '1' && 'Logs and classifies user ideas'}
+                  {p.phase === '2' && 'Ask follow-ups before discard'}
+                  {p.phase === '3' && 'Suggest future features'}
+                  {p.phase === '4' && 'Code gen by AI'}
+                  {p.phase === '5' && 'Update system instantly'}
+                </td>
+                <td style={{ padding: 8, border: `1px solid ${colors.border}` }}>
+                  {p.phase === '1' || p.phase === '2' || p.phase === '3' ? <span style={{ color: '#2ecc40', fontWeight: 600 }}>High</span> : p.phase === '4' ? <span style={{ color: '#f4b400', fontWeight: 600 }}>Medium (experimental)</span> : <span style={{ color: '#e74c3c', fontWeight: 600 }}>Low (R&D)</span>}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 }
 

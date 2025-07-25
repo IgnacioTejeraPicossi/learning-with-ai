@@ -253,7 +253,7 @@ function AppContent() {
             {activeModule === 'forecast' && <SkillsForecast query={userQuery} />}
             {activeModule === 'certification' && <Certifications query={userQuery} />}
             {activeModule === 'video-lessons' && <VideoLesson query={userQuery} />}
-            {!activeModule && section === "dashboard" && <Dashboard user={user} />}
+            {!activeModule && section === "dashboard" && <Dashboard user={user} onSectionSelect={setSection} />}
             {!activeModule && section === "ai-concepts" && <Concepts />}
             {!activeModule && section === "micro-lessons" && <MicroLesson />}
             {!activeModule && section === "recommendation" && <Recommendation />}

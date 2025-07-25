@@ -104,11 +104,12 @@ function CommandBar({ onRoute, inputPlaceholder }) {
     setStreamedOutput('');
     try {
       const res = await postRoute(prompt);
-      // Use confidence threshold
+      console.log('Routing debug:', res);
       const threshold = confidenceToValue(confidenceLevel);
       const backendConfidence = confidenceToValue(res.confidence);
-      if (!res.module || backendConfidence < threshold) {
-        // Routing failed or below threshold, classify unknown intent
+      const isLowConfidence = res.confidence && typeof res.confidence === 'string' && res.confidence.toLowerCase() === 'low';
+      if (!res.module || backendConfidence < threshold || isLowConfidence) {
+        // Show feedback modal, do NOT call askStream or route
         const classifyRes = await fetch('http://localhost:8000/classify-intent', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -120,10 +121,9 @@ function CommandBar({ onRoute, inputPlaceholder }) {
         setLoading(false);
         return;
       }
-      // Normalize module name for robust mapping
+      // Only here, call askStream and route
       const normalizedModule = (res.module || '').toLowerCase().replace(/[-_ ]/g, '');
       let mappedModule = moduleMap[normalizedModule] || moduleMap[res.module] || res.module;
-      console.log('Routing debug:', { backendModule: res.module, normalizedModule, mappedModule, backendConfidence, threshold });
       onRoute(mappedModule, prompt);
       setInput('');
       await askStream({ prompt }, (output) => setStreamedOutput(output));
@@ -164,6 +164,24 @@ function CommandBar({ onRoute, inputPlaceholder }) {
   // const handleVoiceStop = () => {
   //   SpeechRecognition.stopListening();
   // };
+
+  // Helper to explain low confidence
+  function getLowConfidenceReason(unknownIntent) {
+    if (!unknownIntent) return null;
+    if (unknownIntent.confidence && unknownIntent.confidence.toLowerCase() === 'low') {
+      return (
+        <div style={{ color: '#e67e22', marginTop: 12, fontSize: 15 }}>
+          <b>Why wasn’t this recognized?</b>
+          <ul style={{ margin: '8px 0 0 18px', padding: 0 }}>
+            <li>The request didn’t closely match any existing feature or module.</li>
+            <li>Try rephrasing your question or being more specific.</li>
+            <li>If this is a new idea, it will be logged for review and may become a future feature!</li>
+          </ul>
+        </div>
+      );
+    }
+    return null;
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 24 }}>
@@ -244,6 +262,7 @@ function CommandBar({ onRoute, inputPlaceholder }) {
             <p><b>Module Match:</b> {unknownIntent.module_match || 'None'}</p>
             <p><b>Suggested Feature:</b> {unknownIntent.new_feature || 'None'}</p>
             <p><b>Confidence:</b> {unknownIntent.confidence || 'Unknown'}</p>
+            {getLowConfidenceReason(unknownIntent)}
             {unknownIntent.follow_up_question && (
               <div style={{ marginTop: 12 }}>
                 <p><b>Follow-up Question:</b> {unknownIntent.follow_up_question}</p>
@@ -271,6 +290,12 @@ function CommandBar({ onRoute, inputPlaceholder }) {
               style={{ marginTop: 16, background: '#007bff', color: '#fff', border: 0, borderRadius: 6, padding: '8px 18px', fontWeight: 600, fontSize: 16 }}
             >
               Close
+            </button>
+            <button
+              onClick={() => { setModalOpen(false); setInput(""); }}
+              style={{ marginTop: 16, marginLeft: 8, background: '#eee', color: '#007bff', border: '1px solid #007bff', borderRadius: 6, padding: '8px 18px', fontWeight: 600, fontSize: 16 }}
+            >
+              Try Again / Rephrase
             </button>
           </div>
         ) : (

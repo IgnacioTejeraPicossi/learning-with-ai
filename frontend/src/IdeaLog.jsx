@@ -5,6 +5,9 @@ function IdeaLog() {
   const [ideas, setIdeas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [confidenceFilter, setConfidenceFilter] = useState("");
+  const [moduleFilter, setModuleFilter] = useState("");
+  const [search, setSearch] = useState("");
   const { colors } = useTheme();
 
   useEffect(() => {
@@ -25,9 +28,65 @@ function IdeaLog() {
     fetchIdeas();
   }, []);
 
+  // Extract unique confidence levels and module matches for filters
+  const confidenceLevels = Array.from(new Set(ideas.map(i => i.classification?.confidence).filter(Boolean)));
+  const moduleMatches = Array.from(new Set(ideas.map(i => i.classification?.module_match).filter(Boolean)));
+
+  // Tag color helpers
+  const confidenceColor = (level) => {
+    if (!level) return colors.border;
+    const l = level.toLowerCase();
+    if (l === "high") return "#2ecc40";
+    if (l === "medium") return "#f4b400";
+    if (l === "low") return "#e74c3c";
+    return colors.border;
+  };
+  const moduleColor = (mod) => {
+    if (!mod) return colors.border;
+    return "#1976d2";
+  };
+
+  // Filtering logic
+  const filteredIdeas = ideas.filter(idea => {
+    const conf = idea.classification?.confidence || "";
+    const mod = idea.classification?.module_match || "";
+    const userInput = idea.user_input?.toLowerCase() || "";
+    const intent = idea.classification?.intent?.toLowerCase() || "";
+    return (
+      (!confidenceFilter || conf === confidenceFilter) &&
+      (!moduleFilter || mod === moduleFilter) &&
+      (!search || userInput.includes(search.toLowerCase()) || intent.includes(search.toLowerCase()))
+    );
+  });
+
   return (
     <div style={{ color: colors.text, padding: 24 }}>
       <h2 style={{ color: colors.text }}>Idea Log (Unknown Requests)</h2>
+      <div style={{ display: 'flex', gap: 16, marginBottom: 16, alignItems: 'center' }}>
+        <label>Confidence:
+          <select value={confidenceFilter} onChange={e => setConfidenceFilter(e.target.value)} style={{ marginLeft: 8 }}>
+            <option value="">All</option>
+            {confidenceLevels.map(level => (
+              <option key={level} value={level}>{level}</option>
+            ))}
+          </select>
+        </label>
+        <label>Module:
+          <select value={moduleFilter} onChange={e => setModuleFilter(e.target.value)} style={{ marginLeft: 8 }}>
+            <option value="">All</option>
+            {moduleMatches.map(mod => (
+              <option key={mod} value={mod}>{mod}</option>
+            ))}
+          </select>
+        </label>
+        <input
+          type="text"
+          placeholder="Search user input or intent..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          style={{ marginLeft: 16, padding: 4, borderRadius: 4, border: `1px solid ${colors.border}` }}
+        />
+      </div>
       {loading ? (
         <div>Loading...</div>
       ) : error ? (
@@ -46,13 +105,25 @@ function IdeaLog() {
             </tr>
           </thead>
           <tbody>
-            {ideas.map((idea, idx) => (
+            {filteredIdeas.map((idea, idx) => (
               <tr key={idea._id || idx} style={{ background: idx % 2 === 0 ? colors.cardBackground : "#fff" }}>
                 <td style={{ padding: 8, border: `1px solid ${colors.border}` }}>{idea.user_input}</td>
                 <td style={{ padding: 8, border: `1px solid ${colors.border}` }}>{idea.classification?.intent}</td>
-                <td style={{ padding: 8, border: `1px solid ${colors.border}` }}>{idea.classification?.module_match}</td>
+                <td style={{ padding: 8, border: `1px solid ${colors.border}` }}>
+                  {idea.classification?.module_match && (
+                    <span style={{ background: moduleColor(idea.classification?.module_match), color: '#fff', borderRadius: 6, padding: '2px 8px', fontSize: 13 }}>
+                      {idea.classification?.module_match}
+                    </span>
+                  )}
+                </td>
                 <td style={{ padding: 8, border: `1px solid ${colors.border}` }}>{idea.classification?.new_feature}</td>
-                <td style={{ padding: 8, border: `1px solid ${colors.border}` }}>{idea.classification?.confidence}</td>
+                <td style={{ padding: 8, border: `1px solid ${colors.border}` }}>
+                  {idea.classification?.confidence && (
+                    <span style={{ background: confidenceColor(idea.classification?.confidence), color: '#fff', borderRadius: 6, padding: '2px 8px', fontSize: 13 }}>
+                      {idea.classification?.confidence}
+                    </span>
+                  )}
+                </td>
                 <td style={{ padding: 8, border: `1px solid ${colors.border}` }}>{idea.classification?.follow_up_question}</td>
                 <td style={{ padding: 8, border: `1px solid ${colors.border}` }}>{idea.created_at ? new Date(idea.created_at).toLocaleString() : "-"}</td>
               </tr>
