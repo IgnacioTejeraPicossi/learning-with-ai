@@ -278,6 +278,118 @@ function Dashboard({ user, onSectionSelect }) {
             ))}
           </tbody>
         </table>
+        
+        {/* Phase 5 Preview Section */}
+        <div style={{ marginTop: 32, background: colors.cardBackground, borderRadius: 12, boxShadow: colors.shadow, padding: 24 }}>
+          <h3 style={{ marginTop: 0, color: colors.text }}>
+            🔮 Phase 5 Preview: Real-Time Dynamic Feature Activation
+          </h3>
+          <p style={{ color: colors.textSecondary, marginBottom: 20 }}>
+            The future of adaptive, self-evolving applications. Watch as user ideas become live features in real-time.
+          </p>
+          
+          {/* Technical Architecture */}
+          <div style={{ marginBottom: 24 }}>
+            <h4 style={{ color: colors.text, marginBottom: 12 }}>🏗️ Technical Architecture</h4>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
+              <div style={{ background: '#f8f9fa', padding: 12, borderRadius: 8, border: '1px solid #e9ecef' }}>
+                <strong>🧠 Cursor AI + Scaffolding</strong><br/>
+                Generate backend/frontend/test/docs code
+              </div>
+              <div style={{ background: '#f8f9fa', padding: 12, borderRadius: 8, border: '1px solid #e9ecef' }}>
+                <strong>🐛 Bugbot Integration</strong><br/>
+                Catch runtime and build-time errors in AI code
+              </div>
+              <div style={{ background: '#f8f9fa', padding: 12, borderRadius: 8, border: '1px solid #e9ecef' }}>
+                <strong>🔁 Hot Reloading</strong><br/>
+                Inject new code without full restart
+              </div>
+              <div style={{ background: '#f8f9fa', padding: 12, borderRadius: 8, border: '1px solid #e9ecef' }}>
+                <strong>🧪 Sandbox Execution</strong><br/>
+                Secure VMs/containers for testing generated code
+              </div>
+              <div style={{ background: '#f8f9fa', padding: 12, borderRadius: 8, border: '1px solid #e9ecef' }}>
+                <strong>🧯 Rollback Safety</strong><br/>
+                Git snapshots or state backups before patching
+              </div>
+              <div style={{ background: '#f8f9fa', padding: 12, borderRadius: 8, border: '1px solid #e9ecef' }}>
+                <strong>🔗 Real-Time PR Automation</strong><br/>
+                Auto-create branches, PRs, and notify admins
+              </div>
+            </div>
+          </div>
+          
+          {/* Mock Demo */}
+          <div style={{ marginBottom: 24 }}>
+            <h4 style={{ color: colors.text, marginBottom: 12 }}>🎬 Live Demo Preview</h4>
+            <div style={{ background: '#2d3748', color: '#e2e8f0', padding: 16, borderRadius: 8, fontFamily: 'monospace', fontSize: 14 }}>
+              <div style={{ color: '#68d391' }}>$ User Request: "Add a dark mode toggle"</div>
+              <div style={{ color: '#fbb6ce' }}>→ AI Classification: UI Enhancement (High Confidence)</div>
+              <div style={{ color: '#90cdf4' }}>→ Cursor AI: Generating DarkModeToggle.jsx...</div>
+              <div style={{ color: '#f6ad55' }}>→ Bugbot: Code review passed ✓</div>
+              <div style={{ color: '#68d391' }}>→ Hot Reload: Injecting component...</div>
+              <div style={{ color: '#68d391' }}>✅ Feature activated in 2.3 seconds!</div>
+            </div>
+          </div>
+          
+          {/* Business Impact */}
+          <div style={{ marginBottom: 24 }}>
+            <h4 style={{ color: colors.text, marginBottom: 12 }}>📊 Business Impact</h4>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12 }}>
+              <div style={{ textAlign: 'center', padding: 12 }}>
+                <div style={{ fontSize: 24, marginBottom: 4 }}>⏱️</div>
+                <strong>Speed</strong><br/>
+                <small>Hours, not weeks</small>
+              </div>
+              <div style={{ textAlign: 'center', padding: 12 }}>
+                <div style={{ fontSize: 24, marginBottom: 4 }}>🎯</div>
+                <strong>Personalization</strong><br/>
+                <small>User-driven evolution</small>
+              </div>
+              <div style={{ textAlign: 'center', padding: 12 }}>
+                <div style={{ fontSize: 24, marginBottom: 4 }}>🔄</div>
+                <strong>Agility</strong><br/>
+                <small>Dynamic adaptation</small>
+              </div>
+              <div style={{ textAlign: 'center', padding: 12 }}>
+                <div style={{ fontSize: 24, marginBottom: 4 }}>🚀</div>
+                <strong>Competitive Edge</strong><br/>
+                <small>AI-powered innovation</small>
+              </div>
+            </div>
+          </div>
+          
+          {/* Implementation Roadmap */}
+          <div>
+            <h4 style={{ color: colors.text, marginBottom: 12 }}>🛠️ Implementation Roadmap</h4>
+            <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+              <div style={{ flex: 1, minWidth: 200 }}>
+                <h5 style={{ color: colors.primary, marginBottom: 8 }}>Short-Term (Preview)</h5>
+                <ul style={{ color: colors.textSecondary, fontSize: 14, paddingLeft: 20 }}>
+                  <li>Phase 5 Preview panel in UI</li>
+                  <li>Live scaffold testing (dev-only)</li>
+                  <li>🧪 Experimental feature tags</li>
+                </ul>
+              </div>
+              <div style={{ flex: 1, minWidth: 200 }}>
+                <h5 style={{ color: colors.primary, marginBottom: 8 }}>Medium-Term</h5>
+                <ul style={{ color: colors.textSecondary, fontSize: 14, paddingLeft: 20 }}>
+                  <li>Git snapshot rollback</li>
+                  <li>Sandbox module trials</li>
+                  <li>Enhanced security</li>
+                </ul>
+              </div>
+              <div style={{ flex: 1, minWidth: 200 }}>
+                <h5 style={{ color: colors.primary, marginBottom: 8 }}>Long-Term</h5>
+                <ul style={{ color: colors.textSecondary, fontSize: 14, paddingLeft: 20 }}>
+                  <li>Full PR generation</li>
+                  <li>Auto-validation pipelines</li>
+                  <li>Production deployment</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
