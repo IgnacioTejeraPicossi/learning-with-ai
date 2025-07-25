@@ -152,11 +152,11 @@ function Dashboard({ user, onSectionSelect }) {
   }
 
   const phaseLinks = [
-    { phase: '1', color: '#2ecc40', label: 'Unknown Intent Logger', section: 'idea-log' },
-    { phase: '2', color: '#ffb700', label: 'Clarifying Q&A', section: 'ai-concepts' },
-    { phase: '3', color: '#ff7043', label: 'Evolution Panel', section: 'feature-roadmap' },
-    { phase: '4', color: '#3498db', label: 'Cursor-Driven Scaffolds', section: 'feature-roadmap' },
-    { phase: '5', color: '#e74c3c', label: 'Real-Time Code Integration', section: null },
+    { phase: '1', label: 'Unknown Intent Logger', section: 'idea-log', main: 'Logs and classifies user ideas', feasibility: 'High', status: 'Live', color: '🟢' },
+    { phase: '2', label: 'Clarifying Q&A', section: null, main: 'Ask follow-ups before discard', feasibility: 'High', status: 'Live', color: '🟡' },
+    { phase: '3', label: 'Evolution Panel', section: 'feature-roadmap', main: 'Suggest future features, upvotes, notifications', feasibility: 'High', status: 'Live', color: '🟠' },
+    { phase: '4', label: 'Cursor-Driven Scaffolds', section: 'feature-roadmap', main: 'AI codegen, scaffold history, admin approval', feasibility: 'High', status: 'Live', color: '🔵' },
+    { phase: '5', label: 'Real-Time Code Integration', section: null, main: 'Update system instantly', feasibility: 'Low (R&D)', status: 'Planned', color: '🔴' },
   ];
 
   return (
@@ -239,21 +239,20 @@ function Dashboard({ user, onSectionSelect }) {
 
       <div style={{ marginTop: 32, background: colors.cardBackground, borderRadius: 12, boxShadow: colors.shadow, padding: 24 }}>
         <h3 style={{ marginTop: 0, color: colors.text }}>Summary Table</h3>
-        <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 12 }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 16 }}>
           <thead>
             <tr style={{ background: colors.primaryLight }}>
               <th style={{ padding: 8, border: `1px solid ${colors.border}` }}>Phase</th>
               <th style={{ padding: 8, border: `1px solid ${colors.border}` }}>Title</th>
               <th style={{ padding: 8, border: `1px solid ${colors.border}` }}>Main Feature</th>
               <th style={{ padding: 8, border: `1px solid ${colors.border}` }}>Feasibility</th>
+              <th style={{ padding: 8, border: `1px solid ${colors.border}` }}>Status</th>
             </tr>
           </thead>
           <tbody>
             {phaseLinks.map((p, idx) => (
               <tr key={p.phase} style={{ background: idx % 2 === 0 ? colors.cardBackground : '#fff' }}>
-                <td style={{ padding: 8, border: `1px solid ${colors.border}` }}>
-                  <span style={{ fontSize: 22 }}>{p.phase === '1' ? '🟢' : p.phase === '2' ? '🟡' : p.phase === '3' ? '🟠' : p.phase === '4' ? '🔵' : '🔴'}</span>
-                </td>
+                <td style={{ padding: 8, border: `1px solid ${colors.border}` }}><span style={{ fontSize: 22 }}>{p.color}</span></td>
                 <td style={{ padding: 8, border: `1px solid ${colors.border}` }}>
                   {p.section ? (
                     <button
@@ -266,15 +265,14 @@ function Dashboard({ user, onSectionSelect }) {
                     <span style={{ color: colors.textSecondary }}>{p.label}</span>
                   )}
                 </td>
+                <td style={{ padding: 8, border: `1px solid ${colors.border}` }}>{p.main}</td>
                 <td style={{ padding: 8, border: `1px solid ${colors.border}` }}>
-                  {p.phase === '1' && 'Logs and classifies user ideas'}
-                  {p.phase === '2' && 'Ask follow-ups before discard'}
-                  {p.phase === '3' && 'Suggest future features'}
-                  {p.phase === '4' && 'Code gen by AI'}
-                  {p.phase === '5' && 'Update system instantly'}
+                  <span style={{ color: p.feasibility === 'High' ? '#2ecc40' : p.feasibility.includes('Medium') ? '#f4b400' : '#e74c3c', fontWeight: 600 }}>{p.feasibility}</span>
                 </td>
                 <td style={{ padding: 8, border: `1px solid ${colors.border}` }}>
-                  {p.phase === '1' || p.phase === '2' || p.phase === '3' ? <span style={{ color: '#2ecc40', fontWeight: 600 }}>High</span> : p.phase === '4' ? <span style={{ color: '#f4b400', fontWeight: 600 }}>Medium (experimental)</span> : <span style={{ color: '#e74c3c', fontWeight: 600 }}>Low (R&D)</span>}
+                  {p.status === 'Live' && <span style={{ color: '#2ecc40', fontWeight: 600 }}>Live</span>}
+                  {p.status === 'Beta' && <span style={{ color: '#f4b400', fontWeight: 600 }}>Beta</span>}
+                  {p.status === 'Planned' && <span style={{ color: '#888', fontWeight: 600 }}>Planned</span>}
                 </td>
               </tr>
             ))}
