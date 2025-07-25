@@ -50,3 +50,14 @@
 ---
 
 For more details, see the main project README or contact the development team.
+
+## Manual Test Checklist
+- Sidebar navigation for all modules
+- Progress cards and charts
+- Modal dialogs for feedback and unknown intents
+- Light/dark theme toggle
+- Real user data integration
+- Streaming AI responses for all LLM-powered features
+- Idea Log: Filtering, tagging, delete, and search
+- **Feature Roadmap:** View, upvote, subscribe, change status, and generate AI code scaffold for features. Status badges and sorting work as expected.
+- Run Test: Now includes Feature Roadmap in the checklist

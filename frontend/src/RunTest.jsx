@@ -18,8 +18,8 @@ const RunTest = () => {
       await new Promise(resolve => setTimeout(resolve, 2000));
       
       const mockResults = {
-        total: 12,
-        passed: 11,
+        total: 13,
+        passed: 12,
         failed: 1,
         tests: [
           { name: "Dashboard Panel", status: "passed", time: "0.5s" },
@@ -33,7 +33,8 @@ const RunTest = () => {
           { name: "AI Career Coach Panel", status: "passed", time: "0.4s" },
           { name: "Skills Forecast Panel", status: "passed", time: "0.3s" },
           { name: "Saved Lessons Panel", status: "failed", time: "0.2s", error: "Panel not loading correctly" },
-          { name: "Idea Log Panel", status: "passed", time: "0.2s" }
+          { name: "Idea Log Panel", status: "passed", time: "0.2s" },
+          { name: "Feature Roadmap Panel", status: "passed", time: "0.2s" }
         ]
       };
       
@@ -58,8 +59,8 @@ const RunTest = () => {
     // Simulate manual test results
     setTimeout(() => {
       setTestResults({
-        total: 12,
-        passed: 12,
+        total: 13,
+        passed: 13,
         failed: 0,
         tests: [
           { name: "Dashboard Panel", status: "passed", time: "0.2s" },
@@ -73,7 +74,8 @@ const RunTest = () => {
           { name: "AI Career Coach Panel", status: "passed", time: "0.2s" },
           { name: "Skills Forecast Panel", status: "passed", time: "0.2s" },
           { name: "Saved Lessons Panel", status: "passed", time: "0.2s" },
-          { name: "Idea Log Panel", status: "passed", time: "0.2s" }
+          { name: "Idea Log Panel", status: "passed", time: "0.2s" },
+          { name: "Feature Roadmap Panel", status: "passed", time: "0.2s" }
         ]
       });
       setIsRunning(false);
@@ -228,6 +230,9 @@ const RunTest = () => {
             <li>Theme toggle functionality</li>
             <li>Responsive design testing</li>
             <li>Authentication flow verification</li>
+            <li>Sidebar navigation works for all modules</li>
+            <li>Idea Log: Filtering, tagging, and delete work as expected</li>
+            <li>Feature Roadmap: View, upvote, subscribe, change status, and generate AI code scaffold for features. Status badges and sorting work as expected.</li>
           </ul>
         </div>
       </div>
