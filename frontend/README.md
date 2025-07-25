@@ -139,6 +139,15 @@ It turns feature ideas into working code scaffolds — saving time and standardi
 
 ---
 
+## Admin Approval Workflow for Scaffolds
+
+- Each generated scaffold in the Feature Roadmap history can be reviewed and approved by an admin.
+- Admins can leave an approval comment/feedback when marking a scaffold as approved.
+- Approval status, approver, timestamp, and comment are displayed for each scaffold in the history modal.
+- Only unapproved scaffolds show the "Approve" button; approved scaffolds display a green check and details.
+- This creates a full audit trail and collaborative review process for all AI-generated code.
+
+Enjoy your weekend! 🎉
 
 For more details, see the main project README or contact the development team.
 
