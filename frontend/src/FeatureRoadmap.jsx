@@ -5,6 +5,15 @@ import ModalDialog from "./ModalDialog";
 // Simulate admin check (replace with real auth in production)
 const isAdmin = true;
 
+// Status color mapping
+const statusColors = {
+  "Idea": "#bdbdbd",
+  "Planned": "#1976d2",
+  "In Review": "#f4b400",
+  "Coming Soon": "#e67e22",
+  "Implemented": "#2ecc40"
+};
+
 function FeatureRoadmap() {
   const [features, setFeatures] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -13,6 +22,8 @@ function FeatureRoadmap() {
   const [upvoting, setUpvoting] = useState("");
   const [statusUpdating, setStatusUpdating] = useState("");
   const [scaffoldModal, setScaffoldModal] = useState({ open: false, code: "", feature: null });
+  const [sortBy, setSortBy] = useState("upvotes");
+  const [sortDir, setSortDir] = useState("desc");
   const { colors } = useTheme();
 
   const fetchFeatures = async () => {
@@ -88,12 +99,48 @@ function FeatureRoadmap() {
 
   const statusOptions = ["Idea", "Planned", "In Review", "Coming Soon", "Implemented"];
 
+  // Sorting logic
+  const sortedFeatures = [...features].sort((a, b) => {
+    let aVal, bVal;
+    if (sortBy === "upvotes") {
+      aVal = a.upvotes || 0;
+      bVal = b.upvotes || 0;
+    } else if (sortBy === "date") {
+      aVal = new Date(a.created_at || 0).getTime();
+      bVal = new Date(b.created_at || 0).getTime();
+    } else if (sortBy === "status") {
+      aVal = statusOptions.indexOf(a.status || "Idea");
+      bVal = statusOptions.indexOf(b.status || "Idea");
+    } else {
+      aVal = 0; bVal = 0;
+    }
+    if (aVal < bVal) return sortDir === "asc" ? -1 : 1;
+    if (aVal > bVal) return sortDir === "asc" ? 1 : -1;
+    return 0;
+  });
+
+  // Helper for clickable column headers
+  const handleSort = (col) => {
+    if (sortBy === col) {
+      setSortDir(sortDir === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(col);
+      setSortDir(col === "upvotes" || col === "date" ? "desc" : "asc");
+    }
+  };
+
   return (
     <div style={{ color: colors.text, padding: 24 }}>
       <h2 style={{ color: colors.text }}>Feature Roadmap</h2>
       <p style={{ color: colors.textSecondary, marginBottom: 24 }}>
         This panel shows user-submitted ideas and potential future features. Upvote, subscribe for notifications, or (admin) update status.
       </p>
+      <div style={{ marginBottom: 12 }}>
+        <span style={{ fontWeight: 600, marginRight: 12 }}>Status Legend:</span>
+        {statusOptions.map(opt => (
+          <span key={opt} style={{ background: statusColors[opt], color: '#fff', borderRadius: 6, padding: '2px 10px', marginRight: 8, fontSize: 13 }}>{opt}</span>
+        ))}
+      </div>
       {loading ? (
         <div>Loading...</div>
       ) : error ? (
@@ -102,31 +149,34 @@ function FeatureRoadmap() {
         <table style={{ width: "100%", borderCollapse: "collapse", marginTop: 16 }}>
           <thead>
             <tr style={{ background: colors.primaryLight }}>
-              <th style={{ padding: 8, border: `1px solid ${colors.border}` }}>Feature Name</th>
-              <th style={{ padding: 8, border: `1px solid ${colors.border}` }}>Status</th>
+              <th style={{ padding: 8, border: `1px solid ${colors.border}`, cursor: 'pointer' }} onClick={() => handleSort("feature")}>Feature Name</th>
+              <th style={{ padding: 8, border: `1px solid ${colors.border}`, cursor: 'pointer' }} onClick={() => handleSort("status")}>Status {sortBy === "status" && (sortDir === "asc" ? "▲" : "▼")}</th>
               <th style={{ padding: 8, border: `1px solid ${colors.border}` }}>Summary</th>
-              <th style={{ padding: 8, border: `1px solid ${colors.border}` }}>Upvotes</th>
+              <th style={{ padding: 8, border: `1px solid ${colors.border}`, cursor: 'pointer' }} onClick={() => handleSort("upvotes")}>Upvotes {sortBy === "upvotes" && (sortDir === "asc" ? "▲" : "▼")}</th>
               <th style={{ padding: 8, border: `1px solid ${colors.border}` }}>Notifications</th>
-              <th style={{ padding: 8, border: `1px solid ${colors.border}` }}>Submitted</th>
+              <th style={{ padding: 8, border: `1px solid ${colors.border}`, cursor: 'pointer' }} onClick={() => handleSort("date")}>Submitted {sortBy === "date" && (sortDir === "asc" ? "▲" : "▼")}</th>
+              <th style={{ padding: 8, border: `1px solid ${colors.border}` }}></th>
             </tr>
           </thead>
           <tbody>
-            {features.map((idea, idx) => (
+            {sortedFeatures.map((idea, idx) => (
               <tr key={idea._id || idx} style={{ background: idx % 2 === 0 ? colors.cardBackground : "#fff" }}>
                 <td style={{ padding: 8, border: `1px solid ${colors.border}` }}>{idea.classification?.new_feature || "(No feature name)"}</td>
                 <td style={{ padding: 8, border: `1px solid ${colors.border}` }}>
-                  {isAdmin ? (
-                    <select
-                      value={idea.status || "Idea"}
-                      onChange={e => handleStatusChange(idea._id, e.target.value)}
-                      disabled={statusUpdating === idea._id}
-                      style={{ padding: 4, borderRadius: 4 }}
-                    >
-                      {statusOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-                    </select>
-                  ) : (
-                    idea.status || "Idea"
-                  )}
+                  <span style={{ background: statusColors[idea.status || "Idea"], color: '#fff', borderRadius: 6, padding: '2px 10px', fontSize: 13, fontWeight: 600 }}>
+                    {isAdmin ? (
+                      <select
+                        value={idea.status || "Idea"}
+                        onChange={e => handleStatusChange(idea._id, e.target.value)}
+                        disabled={statusUpdating === idea._id}
+                        style={{ padding: 4, borderRadius: 4, background: statusColors[idea.status || "Idea"], color: '#fff', fontWeight: 600, border: 'none' }}
+                      >
+                        {statusOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                      </select>
+                    ) : (
+                      idea.status || "Idea"
+                    )}
+                  </span>
                 </td>
                 <td style={{ padding: 8, border: `1px solid ${colors.border}` }}>{idea.classification?.intent || idea.user_input}</td>
                 <td style={{ padding: 8, border: `1px solid ${colors.border}` }}>
