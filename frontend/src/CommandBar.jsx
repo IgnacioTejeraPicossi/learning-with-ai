@@ -26,6 +26,7 @@ function CommandBar({ onRoute, inputPlaceholder }) {
   const [confidenceLevel, setConfidenceLevel] = useState('High');
   const [clarification, setClarification] = useState("");
   const [clarifying, setClarifying] = useState(false);
+  const [notification, setNotification] = useState("");
   // const { transcript, listening, resetTranscript } = useSpeechRecognition();
 
   const moduleMap = {
@@ -96,20 +97,29 @@ function CommandBar({ onRoute, inputPlaceholder }) {
     'VIDEO LESSON': 'video-lessons',
   };
 
+  const knownModules = ["ai-concepts", "micro-lessons", "video-lessons", "recommendation", "simulations", "career-coach", "skills-forecast", "certifications", "web-search"];
+
   const handleSubmit = async (value) => {
+    console.log('handleSubmit called', { value, input });
     const prompt = value || input; // || transcript;
     if (!prompt.trim()) return;
     setLoading(true);
     setError(null);
-    setStreamedOutput('');
+    setStreamedOutput("");
+    setNotification("");
     try {
       const res = await postRoute(prompt);
-      console.log('Routing debug:', res);
       const threshold = confidenceToValue(confidenceLevel);
       const backendConfidence = confidenceToValue(res.confidence);
       const isLowConfidence = res.confidence && typeof res.confidence === 'string' && res.confidence.toLowerCase() === 'low';
-      if (!res.module || backendConfidence < threshold || isLowConfidence) {
-        // Show feedback modal, do NOT call askStream or route
+      const normalizedModule = (res.module || '').toLowerCase().replace(/[-_ ]/g, '');
+      const isKnownModule = knownModules
+        .map(m => m.replace(/[-_ ]/g, ''))
+        .includes(normalizedModule);
+      console.log('DEBUG', {res, normalizedModule, isKnownModule, backendConfidence, threshold, confidenceLevel});
+      // Only show modal/notification for ambiguous/partial matches
+      if (!isKnownModule || backendConfidence < threshold || isLowConfidence) {
+        // Always log the idea
         const classifyRes = await fetch('http://localhost:8000/classify-intent', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -117,17 +127,25 @@ function CommandBar({ onRoute, inputPlaceholder }) {
         });
         const classifyData = await classifyRes.json();
         setUnknownIntent(classifyData);
-        setModalOpen(true);
+        // Route to nearest module if possible
+        if (isKnownModule) {
+          setNotification(`We routed you to the closest match: ${res.module}. If this isn’t what you wanted, click here to give feedback.`);
+          onRoute(normalizedModule, prompt);
+          setInput("");
+          await askStream({ prompt }, (output) => setStreamedOutput(output));
+        } else {
+          // No known module, show modal as fallback
+          setModalOpen(true);
+        }
         setLoading(false);
         return;
       }
-      // Only here, call askStream and route
-      const normalizedModule = (res.module || '').toLowerCase().replace(/[-_ ]/g, '');
-      let mappedModule = moduleMap[normalizedModule] || moduleMap[res.module] || res.module;
+      // For exact/strong match: route directly, no modal/notification
+      // Use moduleMap to ensure correct mapping for App routing
+      let mappedModule = moduleMap[res.module] || moduleMap[normalizedModule] || normalizedModule;
       onRoute(mappedModule, prompt);
-      setInput('');
+      setInput("");
       await askStream({ prompt }, (output) => setStreamedOutput(output));
-      // resetTranscript && resetTranscript();
     } catch (err) {
       setError("Sorry, I couldn't understand your request. Try rephrasing.");
     } finally {
@@ -237,6 +255,11 @@ function CommandBar({ onRoute, inputPlaceholder }) {
         </button>
         */}
       </div>
+      {notification && (
+        <div style={{ background: '#f4e2b8', color: '#8a6d1b', padding: 10, borderRadius: 6, marginBottom: 8, fontSize: 15 }}>
+          {notification} <button onClick={() => setModalOpen(true)} style={{ marginLeft: 8, background: 'none', border: 'none', color: '#1976d2', textDecoration: 'underline', cursor: 'pointer' }}>Give Feedback</button>
+        </div>
+      )}
       {/*
       {transcript && !listening && (
         <div style={{ color: '#333', fontSize: 14, marginTop: 4 }}>

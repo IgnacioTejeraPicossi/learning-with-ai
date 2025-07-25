@@ -831,6 +831,11 @@ async def update_idea_status(idea_id: str, data: dict = Body(...)):
     )
     return {"success": result.modified_count == 1} 
 
+@app.delete("/admin/unknown-intents/{idea_id}")
+async def delete_unknown_intent(idea_id: str):
+    result = await unknown_intents_collection.delete_one({"_id": ObjectId(idea_id)})
+    return {"success": result.deleted_count == 1}
+
 class ScaffoldRequest(BaseModel):
     feature_name: str
     feature_summary: str

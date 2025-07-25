@@ -28,6 +28,16 @@ function IdeaLog() {
     fetchIdeas();
   }, []);
 
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this idea?')) return;
+    try {
+      await fetch(`http://localhost:8000/admin/unknown-intents/${id}`, { method: 'DELETE' });
+      setIdeas(ideas => ideas.filter(idea => idea._id !== id));
+    } catch (err) {
+      alert('Failed to delete idea.');
+    }
+  };
+
   // Extract unique confidence levels and module matches for filters
   const confidenceLevels = Array.from(new Set(ideas.map(i => i.classification?.confidence).filter(Boolean)));
   const moduleMatches = Array.from(new Set(ideas.map(i => i.classification?.module_match).filter(Boolean)));
@@ -102,6 +112,7 @@ function IdeaLog() {
               <th style={{ padding: 8, border: `1px solid ${colors.border}` }}>Confidence</th>
               <th style={{ padding: 8, border: `1px solid ${colors.border}` }}>Follow-up Question</th>
               <th style={{ padding: 8, border: `1px solid ${colors.border}` }}>Timestamp</th>
+              <th style={{ padding: 8, border: `1px solid ${colors.border}` }}>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -126,6 +137,9 @@ function IdeaLog() {
                 </td>
                 <td style={{ padding: 8, border: `1px solid ${colors.border}` }}>{idea.classification?.follow_up_question}</td>
                 <td style={{ padding: 8, border: `1px solid ${colors.border}` }}>{idea.created_at ? new Date(idea.created_at).toLocaleString() : "-"}</td>
+                <td style={{ padding: 8, border: `1px solid ${colors.border}` }}>
+                  <button onClick={() => handleDelete(idea._id)} style={{ background: '#e74c3c', color: '#fff', border: 'none', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', fontWeight: 600 }} title="Delete this idea">🗑️ Delete</button>
+                </td>
               </tr>
             ))}
           </tbody>
