@@ -1,4 +1,4 @@
-# AI Workplace Learning With AI
+# Workplace Learning With AI
 
 ```mermaid
 graph TD
