@@ -60,7 +60,85 @@ When generating a scaffold for a feature, you can now choose from 6 options:
 
 A short preview/description of each option is shown in the Feature Roadmap panel to help you choose the right scaffold type.
 
+🧠 What This Feature Is
+The scaffold dropdown in your Feature Roadmap UI allows users (usually admins, devs, or PMs) to trigger AI-generated boilerplate code for new features based on the feature type. It's powered by your integration with GPT (likely via Cursor AI or OpenAI).
+
+It turns feature ideas into working code scaffolds — saving time and standardizing structure.
+
+👤 Who It’s For
+| Role           | Usage Purpose                                                                 |
+|----------------|-------------------------------------------------------------------------------|
+| Developers     | To generate backend/frontend code quickly and stay consistent with project architecture. |
+| Tech Leads     | To spin up base code and delegate implementation.                             |
+| PMs/Admins     | To preview how a feature might look or trigger dev work with AI support.      |
+| New contributors | To understand how a feature is structured and get a head start on implementation. |
+
+🔧 How Each Scaffold Type Works
+1. 🟦 API Route
+   - Generates: @router.post("/feature-name") or similar route with FastAPI + Pydantic.
+   - Use: When adding a new backend endpoint.
+   - Example Output:
+     ```python
+     @router.post("/learning-tip")
+     async def send_tip(tip: LearningTip):
+         ...
+     ```
+2. 🟩 DB Model
+   - Generates: MongoDB/Motor model + matching Pydantic schemas.
+   - Use: When a new feature needs data persistence.
+   - Example Output:
+     ```python
+     class LearningTip(BaseModel):
+         tip: str
+         created_at: datetime = Field(default_factory=datetime.utcnow)
+     ```
+3. 🟨 Background Job
+   - Generates: An async task or Celery worker.
+   - Use: For scheduled tasks like daily emails or report generation.
+   - Example:
+     ```python
+     async def send_daily_tip():
+         ...
+     ```
+4. 🔵 Unit Test
+   - Generates: pytest unit test for API or logic.
+   - Use: To cover the newly scaffolded code with test coverage.
+   - Example:
+     ```python
+     def test_send_tip():
+         ...
+     ```
+5. 🟣 Cypress Test
+   - Generates: End-to-end UI test using Cypress.
+   - Use: When adding or validating frontend changes.
+   - Example:
+     ```js
+     it('submits daily tip', () => {
+       cy.visit('/daily-tip');
+       ...
+     });
+     ```
+6. 📄 Docs
+   - Generates: Markdown doc explaining the feature's purpose, route, and usage.
+   - Use: For internal or user-facing documentation.
+   - Example:
+     ```markdown
+     ### Daily AI Tip
+     This feature sends a daily AI-generated learning tip to users.
+     ```
+
+🚀 Workflow Example (Developer)
+- A new idea is added to roadmap: "Daily Learning Tip".
+- Admin sets status to Planned.
+- Developer chooses:
+  - API Route to generate a /daily-tip endpoint.
+  - DB Model for storing tips.
+  - Background Job for scheduling.
+  - Unit Test + Docs.
+- Cursor AI or backend LLM returns the scaffolded code → dev integrates it.
+
 ---
+
 
 For more details, see the main project README or contact the development team.
 
