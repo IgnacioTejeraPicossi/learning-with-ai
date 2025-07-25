@@ -115,6 +115,23 @@ function FeatureRoadmap() {
     }
   };
 
+  const handleApproveScaffold = async (scaffold) => {
+    const admin_comment = prompt("Enter approval comment (optional):", "");
+    const approved_by = "admin"; // Replace with real user if available
+    const res = await fetch(`http://localhost:8000/scaffold-history/${scaffold._id}/approve`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ admin_comment, approved_by })
+    });
+    const data = await res.json();
+    if (data.success) {
+      // Refresh history
+      handleShowHistory(historyModal.idea);
+    } else {
+      alert("Failed to approve scaffold.");
+    }
+  };
+
   const statusOptions = ["Idea", "Planned", "In Review", "Coming Soon", "Implemented"];
 
   const SCAFFOLD_TYPE_PREVIEWS = {
@@ -298,14 +315,32 @@ function FeatureRoadmap() {
                   <b>Type:</b> {entry.scaffold_type} &nbsp; | &nbsp;
                   <b>User:</b> {entry.user} &nbsp; | &nbsp;
                   <b>Date:</b> {new Date(entry.created_at).toLocaleString()}
+                  {entry.approved && (
+                    <span style={{ color: '#2ecc40', fontWeight: 600, marginLeft: 8 }}>
+                      ✔️ Approved by {entry.approved_by} at {entry.approved_at ? new Date(entry.approved_at).toLocaleString() : ''}
+                    </span>
+                  )}
                 </div>
                 <pre style={{ background: '#f4f4f4', padding: 12, borderRadius: 6, fontSize: 13, maxHeight: 200, overflow: 'auto' }}>{entry.code}</pre>
+                {entry.admin_comment && (
+                  <div style={{ fontSize: 13, color: '#1976d2', marginBottom: 4 }}>
+                    <b>Admin Comment:</b> {entry.admin_comment}
+                  </div>
+                )}
                 <button
                   onClick={() => { navigator.clipboard.writeText(entry.code); alert('Code copied to clipboard!'); }}
                   style={{ background: '#1976d2', color: '#fff', border: 0, borderRadius: 6, padding: '6px 16px', fontWeight: 600, fontSize: 14 }}
                 >
                   Copy Code
                 </button>
+                {!entry.approved && (
+                  <button
+                    onClick={() => handleApproveScaffold(entry)}
+                    style={{ background: '#2ecc40', color: '#fff', border: 0, borderRadius: 6, padding: '6px 16px', fontWeight: 600, fontSize: 14, marginLeft: 8 }}
+                  >
+                    Approve
+                  </button>
+                )}
               </div>
             ))}
           </div>

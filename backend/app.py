@@ -862,3 +862,18 @@ async def get_scaffold_history(idea: str):
         entry["_id"] = str(entry["_id"])
         history.append(entry)
     return {"history": history} 
+
+@app.patch("/scaffold-history/{scaffold_id}/approve")
+async def approve_scaffold(scaffold_id: str, data: dict = Body(...)):
+    admin_comment = data.get("admin_comment", "")
+    approved_by = data.get("approved_by", "admin")
+    result = await scaffold_history_collection.update_one(
+        {"_id": ObjectId(scaffold_id)},
+        {"$set": {
+            "approved": True,
+            "admin_comment": admin_comment,
+            "approved_at": datetime.datetime.utcnow(),
+            "approved_by": approved_by
+        }}
+    )
+    return {"success": result.modified_count == 1} 
