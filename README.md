@@ -74,6 +74,10 @@ graph TD
 
 ---
 
+## 🤖 I'm not just building a learning app — I'm creating a co-evolving AI learning assistant where users shape its growth.
+
+
+
 ## Philosophy & Approach: Building with AI, Not Just Code
 
 In this project, we intentionally chose a documentation-driven, AI-first approach to software development. Our goal was to demonstrate that, with the right architectural blueprints and explicit instructions, a modern AI system—such as Cursor AI—can build a complex, full-stack application from scratch, even in environments where pre-existing code is not allowed.
@@ -100,7 +104,7 @@ This project is a proof of concept for the next generation of software developme
 
 ---
 
-## 🤖 For Cursor AI or Automated Build Systems
+## For Cursor AI or Automated Build Systems
 
 **IMPORTANT:**
 - This project is designed to be built by both humans and AI systems (such as Cursor AI).
