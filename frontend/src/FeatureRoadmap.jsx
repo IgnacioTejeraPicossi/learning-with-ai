@@ -24,6 +24,7 @@ function FeatureRoadmap() {
   const [scaffoldModal, setScaffoldModal] = useState({ open: false, code: "", feature: null });
   const [sortBy, setSortBy] = useState("upvotes");
   const [sortDir, setSortDir] = useState("desc");
+  const [scaffoldType, setScaffoldType] = useState('API Route');
   const { colors } = useTheme();
 
   const fetchFeatures = async () => {
@@ -86,7 +87,8 @@ function FeatureRoadmap() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           feature_name: idea.classification?.new_feature || idea.user_input,
-          feature_summary: idea.classification?.intent || idea.user_input
+          feature_summary: idea.classification?.intent || idea.user_input,
+          scaffold_type: scaffoldType
         })
       });
       const data = await res.json();
@@ -201,13 +203,24 @@ function FeatureRoadmap() {
                 </td>
                 <td style={{ padding: 8, border: `1px solid ${colors.border}` }}>{idea.created_at ? new Date(idea.created_at).toLocaleString() : "-"}</td>
                 <td style={{ padding: 8, border: `1px solid ${colors.border}` }}>
-                  <button
-                    onClick={() => handleGenerateScaffold(idea)}
-                    style={{ background: '#eee', border: '1px solid #ccc', borderRadius: 6, padding: '2px 10px', cursor: 'pointer', fontWeight: 600 }}
-                    title="Generate code scaffold for this feature"
-                  >
-                    🛠️ Generate Scaffold
-                  </button>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    <select
+                      value={scaffoldType}
+                      onChange={e => setScaffoldType(e.target.value)}
+                      style={{ marginBottom: 4, padding: 4, borderRadius: 4 }}
+                    >
+                      <option value="API Route">API Route</option>
+                      <option value="DB Model">DB Model</option>
+                      <option value="Background Job">Background Job</option>
+                    </select>
+                    <button
+                      onClick={() => handleGenerateScaffold(idea)}
+                      style={{ background: '#eee', border: '1px solid #ccc', borderRadius: 6, padding: '2px 10px', cursor: 'pointer', fontWeight: 600 }}
+                      title="Generate code scaffold for this feature"
+                    >
+                      🛠️ Generate Scaffold
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}

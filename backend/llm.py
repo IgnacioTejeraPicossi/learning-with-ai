@@ -131,6 +131,11 @@ def classify_intent(user_input: str) -> dict:
             "follow_up_question": "Sorry, I didn’t quite understand that. Could you rephrase?"
         } 
 
-def generate_scaffold(feature_name: str, feature_summary: str) -> str:
-    prompt = GENERATE_SCAFFOLD_PROMPT.format(feature_name=feature_name, feature_summary=feature_summary)
-    return ask_openai(prompt=prompt, model="gpt-4", max_tokens=512) 
+def generate_scaffold(feature_name, feature_summary, scaffold_type="API Route"):
+    from prompts import SCAFFOLD_TYPE_PROMPT
+    prompt = SCAFFOLD_TYPE_PROMPT.format(
+        scaffold_type=scaffold_type,
+        feature_name=feature_name,
+        feature_summary=feature_summary
+    )
+    return ask_openai(prompt=prompt, model="gpt-4", max_tokens=800) 

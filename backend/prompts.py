@@ -188,3 +188,17 @@ Feature Summary: {feature_summary}
 
 Generate a React component (JSX, functional, with a placeholder UI) that could serve as a starting point for this feature. Include only the code, no explanations.
 """ 
+
+SCAFFOLD_TYPE_PROMPT = """
+You are an expert Python developer. Generate a {scaffold_type} for the following feature in a FastAPI + MongoDB (Motor) application.
+
+Feature Name: {feature_name}
+Feature Summary: {feature_summary}
+
+Instructions:
+- If scaffold_type is 'API Route', generate a FastAPI route (with pydantic model if needed).
+- If scaffold_type is 'DB Model', generate a MongoDB (Motor) collection/model and any related pydantic schemas.
+- If scaffold_type is 'Background Job', generate an async background task (e.g., using FastAPI's BackgroundTasks or Celery).
+- Include comments and docstrings.
+- Output only the code, no explanations.
+""" 

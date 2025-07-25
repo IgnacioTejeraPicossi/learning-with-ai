@@ -839,8 +839,9 @@ async def delete_unknown_intent(idea_id: str):
 class ScaffoldRequest(BaseModel):
     feature_name: str
     feature_summary: str
+    scaffold_type: str = "API Route"
 
 @app.post("/generate-scaffold")
 async def generate_scaffold_endpoint(req: ScaffoldRequest):
-    code = generate_scaffold(req.feature_name, req.feature_summary)
+    code = generate_scaffold(req.feature_name, req.feature_summary, req.scaffold_type)
     return {"code": code} 
