@@ -20,3 +20,4 @@ study_plans_collection = database.get_collection("study_plans")
 certification_simulations_collection = database.get_collection("certification_simulations")
 
 unknown_intents_collection = database.get_collection("unknown_intents")
+scaffold_history_collection = database.get_collection("scaffold_history")

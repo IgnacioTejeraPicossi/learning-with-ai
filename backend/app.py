@@ -8,7 +8,7 @@ from typing import List, Optional
 from fastapi.staticfiles import StaticFiles
 import os
 import datetime
-from backend.db import lessons_collection, career_coach_sessions, skills_forecasts, teams_collection, team_members_collection, team_analytics_collection, certifications_collection, study_plans_collection, certification_simulations_collection, unknown_intents_collection
+from backend.db import lessons_collection, career_coach_sessions, skills_forecasts, teams_collection, team_members_collection, team_analytics_collection, certifications_collection, study_plans_collection, certification_simulations_collection, unknown_intents_collection, scaffold_history_collection
 from bson import ObjectId
 
 import firebase_admin
@@ -842,6 +842,23 @@ class ScaffoldRequest(BaseModel):
     scaffold_type: str = "API Route"
 
 @app.post("/generate-scaffold")
-async def generate_scaffold_endpoint(req: ScaffoldRequest):
+async def generate_scaffold_endpoint(req: ScaffoldRequest, user: Optional[str] = None):
     code = generate_scaffold(req.feature_name, req.feature_summary, req.scaffold_type)
+    # Save scaffold history
+    await scaffold_history_collection.insert_one({
+        "idea": req.feature_name,
+        "feature_summary": req.feature_summary,
+        "scaffold_type": req.scaffold_type,
+        "code": code,
+        "created_at": datetime.datetime.utcnow(),
+        "user": user or "anonymous"
+    })
     return {"code": code} 
+
+@app.get("/scaffold-history/{idea}")
+async def get_scaffold_history(idea: str):
+    history = []
+    async for entry in scaffold_history_collection.find({"idea": idea}).sort("created_at", -1):
+        entry["_id"] = str(entry["_id"])
+        history.append(entry)
+    return {"history": history} 

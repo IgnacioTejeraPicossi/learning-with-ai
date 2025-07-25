@@ -25,6 +25,8 @@ function FeatureRoadmap() {
   const [sortBy, setSortBy] = useState("upvotes");
   const [sortDir, setSortDir] = useState("desc");
   const [scaffoldType, setScaffoldType] = useState('API Route');
+  const [historyModal, setHistoryModal] = useState({ open: false, idea: null, history: [] });
+  const [loadingHistory, setLoadingHistory] = useState(false);
   const { colors } = useTheme();
 
   const fetchFeatures = async () => {
@@ -97,6 +99,20 @@ function FeatureRoadmap() {
       codeStub = `// Scaffold for: ${idea.classification?.new_feature || idea.user_input}\n// (Backend error, using mock)\nimport React from 'react';\nfunction Feature() { return <div>Feature scaffold</div>; }\nexport default Feature;`;
     }
     setScaffoldModal({ open: true, code: codeStub, feature: idea });
+  };
+
+  const handleShowHistory = async (idea) => {
+    setLoadingHistory(true);
+    setHistoryModal({ open: true, idea, history: [] });
+    try {
+      const res = await fetch(`http://localhost:8000/scaffold-history/${encodeURIComponent(idea.classification?.new_feature || idea.user_input)}`);
+      const data = await res.json();
+      setHistoryModal({ open: true, idea, history: data.history || [] });
+    } catch (err) {
+      setHistoryModal({ open: true, idea, history: [] });
+    } finally {
+      setLoadingHistory(false);
+    }
   };
 
   const statusOptions = ["Idea", "Planned", "In Review", "Coming Soon", "Implemented"];
@@ -235,6 +251,13 @@ function FeatureRoadmap() {
                     >
                       🛠️ Generate Scaffold
                     </button>
+                    <button
+                      onClick={() => handleShowHistory(idea)}
+                      style={{ background: '#f4e2b8', color: '#8a6d1b', border: 'none', borderRadius: 6, padding: '2px 10px', cursor: 'pointer', fontWeight: 600, marginTop: 2 }}
+                      title="View scaffold history for this feature"
+                    >
+                      📜 History
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -257,6 +280,36 @@ function FeatureRoadmap() {
         >
           Copy Code
         </button>
+      </ModalDialog>
+      <ModalDialog
+        isOpen={historyModal.open}
+        onRequestClose={() => setHistoryModal({ open: false, idea: null, history: [] })}
+        title={`Scaffold History for: ${historyModal.idea?.classification?.new_feature || historyModal.idea?.user_input || "Feature"}`}
+      >
+        {loadingHistory ? (
+          <div>Loading...</div>
+        ) : historyModal.history.length === 0 ? (
+          <div style={{ color: colors.textSecondary }}>No scaffold history found for this feature.</div>
+        ) : (
+          <div style={{ maxHeight: 400, overflowY: 'auto' }}>
+            {historyModal.history.map((entry, idx) => (
+              <div key={entry._id || idx} style={{ marginBottom: 24, borderBottom: '1px solid #eee', paddingBottom: 12 }}>
+                <div style={{ fontSize: 13, color: colors.textSecondary, marginBottom: 4 }}>
+                  <b>Type:</b> {entry.scaffold_type} &nbsp; | &nbsp;
+                  <b>User:</b> {entry.user} &nbsp; | &nbsp;
+                  <b>Date:</b> {new Date(entry.created_at).toLocaleString()}
+                </div>
+                <pre style={{ background: '#f4f4f4', padding: 12, borderRadius: 6, fontSize: 13, maxHeight: 200, overflow: 'auto' }}>{entry.code}</pre>
+                <button
+                  onClick={() => { navigator.clipboard.writeText(entry.code); alert('Code copied to clipboard!'); }}
+                  style={{ background: '#1976d2', color: '#fff', border: 0, borderRadius: 6, padding: '6px 16px', fontWeight: 600, fontSize: 14 }}
+                >
+                  Copy Code
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </ModalDialog>
     </div>
   );
