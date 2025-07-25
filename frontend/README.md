@@ -47,6 +47,19 @@
 - To sort the Feature Roadmap, click the column headers for Upvotes, Status, or Submitted; click again to toggle sort direction
 - Statuses are color-coded for easy tracking of feature progress
 
+## Feature Roadmap: AI Code Scaffold Options
+
+When generating a scaffold for a feature, you can now choose from 6 options:
+
+1. **API Route**: Generates a FastAPI route (Python) with Pydantic models as needed. Use this to scaffold new API endpoints for your backend.
+2. **DB Model**: Generates a MongoDB (Motor) collection/model and any related Pydantic schemas. Use this to scaffold new database models for your backend.
+3. **Background Job**: Generates an async background task (e.g., using FastAPI's BackgroundTasks or Celery). Use this for features that require scheduled or background processing.
+4. **Unit Test**: Generates a Python unit test for the feature. Use this to scaffold tests for your backend logic or API routes.
+5. **Cypress Test**: Generates a Cypress end-to-end test for the feature. Use this to scaffold automated UI tests for your frontend.
+6. **Docs**: Generates markdown documentation for the feature. Use this to create self-documenting code and feature guides.
+
+A short preview/description of each option is shown in the Feature Roadmap panel to help you choose the right scaffold type.
+
 ---
 
 For more details, see the main project README or contact the development team.

@@ -101,6 +101,15 @@ function FeatureRoadmap() {
 
   const statusOptions = ["Idea", "Planned", "In Review", "Coming Soon", "Implemented"];
 
+  const SCAFFOLD_TYPE_PREVIEWS = {
+    'API Route': 'Generates a FastAPI route with Pydantic models as needed.',
+    'DB Model': 'Generates a MongoDB (Motor) collection/model and related schemas.',
+    'Background Job': 'Generates an async background task (e.g., with FastAPI BackgroundTasks or Celery).',
+    'Unit Test': 'Generates a Python unit test for the feature.',
+    'Cypress Test': 'Generates a Cypress end-to-end test for the feature.',
+    'Docs': 'Generates markdown documentation for the feature.'
+  };
+
   // Sorting logic
   const sortedFeatures = [...features].sort((a, b) => {
     let aVal, bVal;
@@ -212,7 +221,13 @@ function FeatureRoadmap() {
                       <option value="API Route">API Route</option>
                       <option value="DB Model">DB Model</option>
                       <option value="Background Job">Background Job</option>
+                      <option value="Unit Test">Unit Test</option>
+                      <option value="Cypress Test">Cypress Test</option>
+                      <option value="Docs">Docs</option>
                     </select>
+                    <div style={{ fontSize: 13, color: colors.textSecondary, marginBottom: 4, minHeight: 18 }}>
+                      {SCAFFOLD_TYPE_PREVIEWS[scaffoldType]}
+                    </div>
                     <button
                       onClick={() => handleGenerateScaffold(idea)}
                       style={{ background: '#eee', border: '1px solid #ccc', borderRadius: 6, padding: '2px 10px', cursor: 'pointer', fontWeight: 600 }}
