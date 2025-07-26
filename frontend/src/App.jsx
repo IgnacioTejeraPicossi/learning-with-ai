@@ -162,59 +162,47 @@ function AppContent() {
         </header>
         {isAIFullScreen ? (
           <div style={{
+            position: "relative",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
             minHeight: "calc(100vh - 80px)",
-            padding: "2rem"
+            padding: "2rem",
+            overflow: "hidden"
           }}>
-            {!user && (
-              <div style={{ marginBottom: 32, textAlign: 'center' }}>
-                <Auth user={user} setUser={setUser} />
-                <p style={{ color: colors.textSecondary, marginTop: 12 }}>Sign in to use AI-powered workplace learning features.</p>
-                <button
-                  onClick={handleBackToApp}
-                  style={{
-                    marginTop: "2rem",
-                    padding: "0.5rem 1rem",
-                    background: "transparent",
-                    border: `1px solid ${colors.primary}`,
-                    color: colors.primary,
-                    borderRadius: "6px",
-                    cursor: "pointer",
-                    fontSize: "0.9rem"
-                  }}
-                >
-                  ← Back to App
-                </button>
-              </div>
-            )}
+            {/* Background Message */}
+            <div
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                fontSize: "clamp(2.2rem, 6vw, 4.5rem)",
+                fontWeight: 400,
+                color: "rgba(103, 58, 183, 0.08)", // Very light purple
+                textAlign: "center",
+                maxWidth: "80vw",
+                lineHeight: 1.2,
+                zIndex: 0,
+                pointerEvents: "none",
+                userSelect: "none",
+                whiteSpace: "pre-line"
+              }}
+            >
+              {`I'm not just building a learning app —\nI'm creating a co-evolving AI learning assistant\nwhere users shape its growth.`}
+            </div>
+            {/* Main Content */}
             <div style={{
               maxWidth: 600,
               width: "100%",
-              textAlign: "center"
+              textAlign: "center",
+              zIndex: 1
             }}>
-              {user && (
-                <>
-                  <h2 style={{ marginBottom: "2rem", fontSize: "2rem", color: colors.text }}>
-                    🤖 Ask AI About Workplace Learning
-                  </h2>
-                  <p style={{ marginBottom: "2rem", fontSize: "1rem", color: colors.text, opacity: 0.8 }}>
-                    Interface-less UX / Zero-UI mode
-                  </p>
-                  <CommandBar onRoute={handleRoute} inputPlaceholder="Ask AI about workplace learning..." />
-                  <div style={{ marginTop: "2rem", display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "1rem" }}>
-                    <div style={{ padding: "0.5rem 1rem", background: colors.primaryLight, borderRadius: "20px", fontSize: "0.9rem", color: colors.primary }}>
-                      💡 "Show me a video lesson on Agile"
-                    </div>
-                    <div style={{ padding: "0.5rem 1rem", background: colors.primaryLight, borderRadius: "20px", fontSize: "0.9rem", color: colors.primary }}>
-                      💡 "Give me a micro-lesson on leadership"
-                    </div>
-                    <div style={{ padding: "0.5rem 1rem", background: colors.primaryLight, borderRadius: "20px", fontSize: "0.9rem", color: colors.primary }}>
-                      💡 "What should I learn next?"
-                    </div>
-                  </div>
+              {!user && (
+                <div style={{ marginBottom: 32, textAlign: 'center' }}>
+                  <Auth user={user} setUser={setUser} />
+                  <p style={{ color: colors.textSecondary, marginTop: 12 }}>Sign in to use AI-powered workplace learning features.</p>
                   <button
                     onClick={handleBackToApp}
                     style={{
@@ -230,8 +218,51 @@ function AppContent() {
                   >
                     ← Back to App
                   </button>
-                </>
+                </div>
               )}
+              <div style={{
+                maxWidth: 600,
+                width: "100%",
+                textAlign: "center"
+              }}>
+                {user && (
+                  <>
+                    <h2 style={{ marginBottom: "2rem", fontSize: "2rem", color: colors.text }}>
+                      🤖 Ask AI About Workplace Learning
+                    </h2>
+                    <p style={{ marginBottom: "2rem", fontSize: "1rem", color: colors.text, opacity: 0.8 }}>
+                      Interface-less UX / Zero-UI mode
+                    </p>
+                    <CommandBar onRoute={handleRoute} inputPlaceholder="Ask AI about workplace learning..." />
+                    <div style={{ marginTop: "2rem", display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "1rem" }}>
+                      <div style={{ padding: "0.5rem 1rem", background: colors.primaryLight, borderRadius: "20px", fontSize: "0.9rem", color: colors.primary }}>
+                        💡 "Show me a video lesson on Agile"
+                      </div>
+                      <div style={{ padding: "0.5rem 1rem", background: colors.primaryLight, borderRadius: "20px", fontSize: "0.9rem", color: colors.primary }}>
+                        💡 "Give me a micro-lesson on leadership"
+                      </div>
+                      <div style={{ padding: "0.5rem 1rem", background: colors.primaryLight, borderRadius: "20px", fontSize: "0.9rem", color: colors.primary }}>
+                        💡 "What should I learn next?"
+                      </div>
+                    </div>
+                    <button
+                      onClick={handleBackToApp}
+                      style={{
+                        marginTop: "2rem",
+                        padding: "0.5rem 1rem",
+                        background: "transparent",
+                        border: `1px solid ${colors.primary}`,
+                        color: colors.primary,
+                        borderRadius: "6px",
+                        cursor: "pointer",
+                        fontSize: "0.9rem"
+                      }}
+                    >
+                      ← Back to App
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         ) : (
