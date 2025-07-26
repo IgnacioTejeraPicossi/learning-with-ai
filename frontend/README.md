@@ -192,39 +192,80 @@ For more details, see the main project README or contact the development team.
 
 ## Run Test: Comprehensive Testing Suite
 
-The application includes a comprehensive testing suite accessible from the sidebar under **Run Test**. This feature provides three types of testing:
+The application includes a comprehensive testing suite accessible from the sidebar under **Run Test**. This feature provides three types of testing, each designed for different purposes and testing scenarios:
 
-### 🎯 Test Types
+### 🎯 Test Types & Their Logic
 
 #### 1. **Run Cypress Tests**
 - **Purpose**: Automated frontend UI testing
+- **Logic**: Simulates automated browser testing with precise timing
 - **Coverage**: All sidebar navigation, panel content, responsive design, theme toggle, authentication flow
 - **Results**: Detailed test results with timing for each component
 - **Duration**: ~18.5 seconds for full test suite
+- **Use Case**: Automated quality assurance and regression testing
 
 #### 2. **Run Manual Tests**
-- **Purpose**: Manual verification checklist for human testing
+- **Purpose**: Human-readable verification checklist for manual testing
+- **Logic**: Provides human-readable steps that a QA tester would actually perform
 - **Coverage**: Sidebar navigation, panel loading, global search, theme toggle, responsive design, authentication, Idea Log filtering, Feature Roadmap functionality
-- **Results**: Pass/fail status for each manual verification step
-- **Use Case**: Quality assurance and user acceptance testing
+- **Results**: Pass/fail status for each manual verification step (no timing needed)
+- **Duration**: N/A (manual verification)
+- **Use Case**: Quality assurance and user acceptance testing by human testers
 
-#### 3. **Run APIs**
+#### 3. **Run API Tests**
 - **Purpose**: Backend endpoint testing with real HTTP requests
+- **Logic**: Makes actual HTTP calls to verify backend functionality
 - **Coverage**: All backend API endpoints including:
-  - `GET /health` - Health check endpoint
-  - `POST /call_llm_router` - LLM routing functionality
-  - `POST /generate-micro-lesson` - Micro-lesson generation
+  - `GET /` - Root endpoint
+  - `GET /concepts` - AI concepts endpoint (requires authentication)
+  - `POST /micro-lesson` - Micro-lesson generation (requires authentication)
   - `POST /classify-intent` - Intent classification
   - `GET /admin/unknown-intents` - Admin interface endpoints
   - `POST /generate-scaffold` - AI code scaffolding
   - `GET /scaffold-history/{idea}` - Scaffold history retrieval
+  - `POST /route` - LLM routing endpoint
+  - `POST /llm-stream` - Streaming endpoint
+  - `POST /video-quiz` - Video quiz endpoint
+  - `POST /video-summary` - Video summary endpoint
 - **Features**: 
   - Real HTTP requests to `localhost:8000`
   - Response time tracking for each endpoint
-  - Status code verification (200, 404, 500, etc.)
+  - Status code verification (200, 401, 404, 500, etc.)
+  - Authentication requirement detection
   - Error handling for connection issues
   - No external tools required (no Postman needed)
-- **Results**: Detailed API test results showing endpoint, status code, and response time
+- **Results**: Detailed API test results showing endpoint, status code, response time, and authentication requirements
+- **Use Case**: Backend validation and API health monitoring
+
+### 🔄 Test Type Comparison
+
+| Test Type | Automation Level | Timing | Purpose | Best For |
+|-----------|-----------------|---------|---------|----------|
+| **Cypress Tests** | Fully Automated | Yes | UI Regression Testing | Automated CI/CD |
+| **Manual Tests** | Human Verification | No | User Acceptance Testing | QA Validation |
+| **API Tests** | Automated HTTP | Yes | Backend Health Check | API Monitoring |
+
+### 🧠 Design Philosophy
+
+The testing suite follows a **three-tier approach**:
+
+1. **Cypress Tests** - **Automated UI Testing**
+   - Simulates real user interactions
+   - Provides precise timing and detailed results
+   - Ideal for continuous integration and regression testing
+   - Tests individual panels and components systematically
+
+2. **Manual Tests** - **Human Verification Checklist**
+   - Provides human-readable verification steps
+   - Focuses on user experience and functionality
+   - No timing needed (manual verification)
+   - Tests what a human QA tester would actually check
+
+3. **API Tests** - **Backend Health Monitoring**
+   - Tests actual HTTP endpoints
+   - Validates backend functionality independently
+   - Detects authentication requirements
+   - Monitors API response times and status codes
 
 ### 📊 Test Coverage
 
@@ -238,22 +279,26 @@ The testing suite covers:
 - ✅ Sidebar navigation for all modules
 - ✅ Idea Log: Filtering, tagging, and delete functionality
 - ✅ Feature Roadmap: View, upvote, subscribe, change status, and generate AI code scaffold
-- ✅ API endpoints: Health check, LLM router, micro-lessons, intent classification, admin endpoints, scaffold generation
+- ✅ API endpoints: Root, concepts, micro-lessons, intent classification, admin endpoints, scaffold generation, route, LLM streaming, video features
 
 ### 🚀 How to Use
 
 1. **Navigate** to the **Run Test** section in the sidebar
-2. **Select** your preferred test type (Cypress, Manual, or APIs)
+2. **Select** your preferred test type based on your needs:
+   - **Cypress Tests**: For automated UI testing
+   - **Manual Tests**: For human verification
+   - **API Tests**: For backend health check
 3. **Click** the corresponding "Start" button
-4. **Wait** for test execution (typically 2-3 seconds)
+4. **Wait** for test execution (typically 2-3 seconds for automated tests)
 5. **Review** the detailed results showing pass/fail status and timing
 
 ### 🔧 Technical Details
 
-- **Frontend Tests**: Use Cypress for automated UI testing
-- **Manual Tests**: Provide human-readable checklist for manual verification
+- **Frontend Tests**: Use Cypress for automated UI testing with precise timing
+- **Manual Tests**: Provide human-readable checklist for manual verification (no timing needed)
 - **API Tests**: Make real HTTP requests to backend endpoints without requiring external tools
 - **Real-time Results**: Live feedback with detailed timing and status information
 - **Error Handling**: Graceful handling of connection issues and failed requests
+- **Authentication Detection**: Properly identifies endpoints that require authentication
 
-This comprehensive testing approach ensures both frontend and backend functionality are thoroughly verified, making it easy to identify and resolve issues across the entire application stack.
+This comprehensive testing approach ensures both frontend and backend functionality are thoroughly verified, making it easy to identify and resolve issues across the entire application stack. The three-tier approach provides flexibility for different testing scenarios and user needs.
