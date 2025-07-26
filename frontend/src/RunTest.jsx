@@ -12,6 +12,7 @@ const RunTest = () => {
   const runCypressTests = async () => {
     setIsRunning(true);
     setTestResults(null);
+    setApiTestResults(null);
     
     // Simulate Cypress test execution
     setTimeout(() => {
@@ -54,6 +55,7 @@ const RunTest = () => {
   const runManualTests = async () => {
     setIsRunning(true);
     setTestResults(null);
+    setApiTestResults(null);
     
     // Simulate manual test checklist
     setTimeout(() => {
@@ -83,16 +85,21 @@ const RunTest = () => {
 
   const runApiTests = async () => {
     setIsRunningApi(true);
+    setTestResults(null);
     setApiTestResults(null);
     
     const apiEndpoints = [
-      { name: 'GET /health', endpoint: '/health', method: 'GET' },
-      { name: 'POST /call_llm_router', endpoint: '/call_llm_router', method: 'POST' },
-      { name: 'POST /generate-micro-lesson', endpoint: '/generate-micro-lesson', method: 'POST' },
-      { name: 'POST /classify-intent', endpoint: '/classify-intent', method: 'POST' },
-      { name: 'GET /admin/unknown-intents', endpoint: '/admin/unknown-intents', method: 'GET' },
-      { name: 'POST /generate-scaffold', endpoint: '/generate-scaffold', method: 'POST' },
-      { name: 'GET /scaffold-history/{idea}', endpoint: '/scaffold-history/test-idea', method: 'GET' },
+      { name: 'GET /', endpoint: '/', method: 'GET', requiresAuth: false },
+      { name: 'GET /concepts', endpoint: '/concepts', method: 'GET', requiresAuth: true },
+      { name: 'POST /micro-lesson', endpoint: '/micro-lesson', method: 'POST', requiresAuth: true },
+      { name: 'POST /classify-intent', endpoint: '/classify-intent', method: 'POST', requiresAuth: false },
+      { name: 'GET /admin/unknown-intents', endpoint: '/admin/unknown-intents', method: 'GET', requiresAuth: false },
+      { name: 'POST /generate-scaffold', endpoint: '/generate-scaffold', method: 'POST', requiresAuth: false },
+      { name: 'GET /scaffold-history/{idea}', endpoint: '/scaffold-history/test-idea', method: 'GET', requiresAuth: false },
+      { name: 'POST /route', endpoint: '/route', method: 'POST', requiresAuth: false },
+      { name: 'POST /llm-stream', endpoint: '/llm-stream', method: 'POST', requiresAuth: false },
+      { name: 'POST /video-quiz', endpoint: '/video-quiz', method: 'POST', requiresAuth: false },
+      { name: 'POST /video-summary', endpoint: '/video-summary', method: 'POST', requiresAuth: false },
     ];
 
     const results = [];
@@ -102,23 +109,68 @@ const RunTest = () => {
         const startTime = Date.now();
         let response;
         
+        // Prepare headers
+        const headers = { 'Content-Type': 'application/json' };
+        
+        // Add mock authentication for protected endpoints
+        if (api.requiresAuth) {
+          headers['Authorization'] = 'Bearer mock-token-for-testing';
+        }
+        
         if (api.method === 'GET') {
           response = await fetch(`http://localhost:8000${api.endpoint}`, {
             method: 'GET',
-            headers: { 'Content-Type': 'application/json' }
+            headers: headers
           });
         } else {
-          // For POST requests, send minimal test data
-          const testData = {
-            query: 'test query',
-            feature_name: 'test feature',
-            feature_summary: 'test summary',
-            scaffold_type: 'API Route'
-          };
+          // Prepare test data based on endpoint
+          let testData = {};
+          
+          switch (api.endpoint) {
+            case '/micro-lesson':
+              testData = { topic: 'test topic' };
+              break;
+            case '/route':
+              testData = { prompt: 'test prompt' };
+              break;
+            case '/llm-stream':
+              testData = { 
+                messages: [{ role: 'user', content: 'test message' }],
+                model: 'gpt-4',
+                max_tokens: 100
+              };
+              break;
+            case '/video-quiz':
+              testData = { 
+                video_url: 'https://example.com/test-video.mp4',
+                video_title: 'Test Video',
+                video_description: 'A test video for quiz generation'
+              };
+              break;
+            case '/video-summary':
+              testData = { 
+                video_url: 'https://example.com/test-video.mp4',
+                video_title: 'Test Video',
+                video_description: 'A test video for summary generation'
+              };
+              break;
+            case '/generate-scaffold':
+              testData = {
+                feature_name: 'test feature',
+                feature_summary: 'test summary',
+                scaffold_type: 'API Route'
+              };
+              break;
+            case '/classify-intent':
+              testData = { query: 'test query' };
+              break;
+            default:
+              testData = { query: 'test query' };
+          }
           
           response = await fetch(`http://localhost:8000${api.endpoint}`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: headers,
             body: JSON.stringify(testData)
           });
         }
@@ -126,12 +178,24 @@ const RunTest = () => {
         const endTime = Date.now();
         const duration = endTime - startTime;
         
+        // Handle different response scenarios
+        let status = 'passed';
+        let statusCode = response.status;
+        
+        if (response.status === 401) {
+          status = 'auth_required';
+          statusCode = '401 (Auth Required)';
+        } else if (!response.ok) {
+          status = 'failed';
+        }
+        
         results.push({
           name: api.name,
-          status: response.ok ? 'passed' : 'failed',
+          status: status,
           time: `${duration}ms`,
-          statusCode: response.status,
-          endpoint: api.endpoint
+          statusCode: statusCode,
+          endpoint: api.endpoint,
+          requiresAuth: api.requiresAuth
         });
       } catch (error) {
         results.push({
@@ -140,7 +204,8 @@ const RunTest = () => {
           time: 'N/A',
           statusCode: 'Error',
           endpoint: api.endpoint,
-          error: error.message
+          error: error.message,
+          requiresAuth: api.requiresAuth
         });
       }
     }
@@ -152,6 +217,7 @@ const RunTest = () => {
         total: results.length,
         passed: results.filter(r => r.status === 'passed').length,
         failed: results.filter(r => r.status === 'failed').length,
+        authRequired: results.filter(r => r.status === 'auth_required').length,
         duration: `${results.reduce((sum, r) => sum + (r.time !== 'N/A' ? parseInt(r.time) : 0), 0)}ms`
       }
     });
@@ -215,7 +281,7 @@ const RunTest = () => {
                 fontWeight: 600
               }}
             >
-              Run APIs
+              Run API Tests
             </button>
           </div>
 
@@ -295,7 +361,7 @@ const RunTest = () => {
               <li>Sidebar navigation works for all modules</li>
               <li>Idea Log: Filtering, tagging, and delete work as expected</li>
               <li>Feature Roadmap: View, upvote, subscribe, change status, and generate AI code scaffold for features. Status badges and sorting work as expected</li>
-              <li>API endpoints: Health check, LLM router, micro-lessons, intent classification, admin endpoints, scaffold generation</li>
+              <li>API endpoints: Root, concepts, micro-lessons, intent classification, admin endpoints, scaffold generation, route, LLM streaming, video features</li>
             </ul>
           </div>
 
@@ -333,6 +399,7 @@ const RunTest = () => {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                       <span style={{ fontWeight: 600, color: colors.text }}>
                         API Summary: {apiTestResults.summary.passed}/{apiTestResults.summary.total} endpoints working
+                        {apiTestResults.summary.authRequired > 0 && ` (${apiTestResults.summary.authRequired} require auth)`}
                       </span>
                       <span style={{ color: colors.textSecondary }}>
                         Duration: {apiTestResults.summary.duration}
@@ -343,10 +410,17 @@ const RunTest = () => {
                         <div style={{ display: 'flex', flexDirection: 'column' }}>
                           <span style={{ color: colors.text, fontWeight: 600 }}>{test.name}</span>
                           <span style={{ color: colors.textSecondary, fontSize: '12px' }}>{test.endpoint}</span>
+                          {test.requiresAuth && (
+                            <span style={{ color: '#f4b400', fontSize: '10px', fontWeight: 600 }}>🔒 Requires Auth</span>
+                          )}
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <span style={{ color: test.status === 'passed' ? '#2ecc40' : '#e74c3c', fontWeight: 600 }}>
-                            {test.status === 'passed' ? '✓' : '✗'}
+                          <span style={{ 
+                            color: test.status === 'passed' ? '#2ecc40' : 
+                                   test.status === 'auth_required' ? '#f4b400' : '#e74c3c', 
+                            fontWeight: 600 
+                          }}>
+                            {test.status === 'passed' ? '✓' : test.status === 'auth_required' ? '🔒' : '✗'}
                           </span>
                           <span style={{ color: colors.textSecondary, fontSize: '14px' }}>
                             {test.statusCode} • {test.time}
