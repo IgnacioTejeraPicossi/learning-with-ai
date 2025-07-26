@@ -21,6 +21,7 @@
 - **📝 Idea Log**: Admin interface for managing user suggestions and feedback
 - **🗺️ Feature Roadmap & AI Code Generation**: AI-powered code scaffolding with 6 scaffold types
 - **🔮 Phase 5 Preview**: Vision for real-time dynamic feature activation with live demo preview
+- **🧪 Comprehensive Testing Suite**: Cypress frontend tests, manual verification, and API endpoint testing
 
 ## Phase 5: Real-Time Dynamic Feature Activation
 
@@ -188,3 +189,71 @@ For more details, see the main project README or contact the development team.
 - Idea Log: Filtering, tagging, delete, and search
 - **Feature Roadmap:** View, upvote, subscribe, change status, and generate AI code scaffold for features. Status badges and sorting work as expected.
 - Run Test: Now includes Feature Roadmap in the checklist
+
+## Run Test: Comprehensive Testing Suite
+
+The application includes a comprehensive testing suite accessible from the sidebar under **Run Test**. This feature provides three types of testing:
+
+### 🎯 Test Types
+
+#### 1. **Run Cypress Tests**
+- **Purpose**: Automated frontend UI testing
+- **Coverage**: All sidebar navigation, panel content, responsive design, theme toggle, authentication flow
+- **Results**: Detailed test results with timing for each component
+- **Duration**: ~18.5 seconds for full test suite
+
+#### 2. **Run Manual Tests**
+- **Purpose**: Manual verification checklist for human testing
+- **Coverage**: Sidebar navigation, panel loading, global search, theme toggle, responsive design, authentication, Idea Log filtering, Feature Roadmap functionality
+- **Results**: Pass/fail status for each manual verification step
+- **Use Case**: Quality assurance and user acceptance testing
+
+#### 3. **Run APIs**
+- **Purpose**: Backend endpoint testing with real HTTP requests
+- **Coverage**: All backend API endpoints including:
+  - `GET /health` - Health check endpoint
+  - `POST /call_llm_router` - LLM routing functionality
+  - `POST /generate-micro-lesson` - Micro-lesson generation
+  - `POST /classify-intent` - Intent classification
+  - `GET /admin/unknown-intents` - Admin interface endpoints
+  - `POST /generate-scaffold` - AI code scaffolding
+  - `GET /scaffold-history/{idea}` - Scaffold history retrieval
+- **Features**: 
+  - Real HTTP requests to `localhost:8000`
+  - Response time tracking for each endpoint
+  - Status code verification (200, 404, 500, etc.)
+  - Error handling for connection issues
+  - No external tools required (no Postman needed)
+- **Results**: Detailed API test results showing endpoint, status code, and response time
+
+### 📊 Test Coverage
+
+The testing suite covers:
+- ✅ All sidebar navigation options
+- ✅ Panel content loading verification
+- ✅ Global search functionality
+- ✅ Theme toggle functionality
+- ✅ Responsive design testing
+- ✅ Authentication flow verification
+- ✅ Sidebar navigation for all modules
+- ✅ Idea Log: Filtering, tagging, and delete functionality
+- ✅ Feature Roadmap: View, upvote, subscribe, change status, and generate AI code scaffold
+- ✅ API endpoints: Health check, LLM router, micro-lessons, intent classification, admin endpoints, scaffold generation
+
+### 🚀 How to Use
+
+1. **Navigate** to the **Run Test** section in the sidebar
+2. **Select** your preferred test type (Cypress, Manual, or APIs)
+3. **Click** the corresponding "Start" button
+4. **Wait** for test execution (typically 2-3 seconds)
+5. **Review** the detailed results showing pass/fail status and timing
+
+### 🔧 Technical Details
+
+- **Frontend Tests**: Use Cypress for automated UI testing
+- **Manual Tests**: Provide human-readable checklist for manual verification
+- **API Tests**: Make real HTTP requests to backend endpoints without requiring external tools
+- **Real-time Results**: Live feedback with detailed timing and status information
+- **Error Handling**: Graceful handling of connection issues and failed requests
+
+This comprehensive testing approach ensures both frontend and backend functionality are thoroughly verified, making it easy to identify and resolve issues across the entire application stack.
