@@ -8,6 +8,7 @@ from typing import List, Optional
 from fastapi.staticfiles import StaticFiles
 import os
 import datetime
+import json
 from backend.db import lessons_collection, career_coach_sessions, skills_forecasts, teams_collection, team_members_collection, team_analytics_collection, certifications_collection, study_plans_collection, certification_simulations_collection, unknown_intents_collection, scaffold_history_collection
 from bson import ObjectId
 
@@ -761,15 +762,26 @@ async def llm_stream(request: LLMStreamRequest):
 
 @app.post("/video-quiz")
 async def video_quiz(request: Request):
-    data = await request.json()
-    summary = data.get("summary", "")
-    prompt = video_quiz_prompt.format(summary=summary)
-    result = ask_openai(prompt)
     try:
-        questions = json.loads(result)
-    except Exception:
-        questions = [{"question": "Failed to parse quiz", "options": [], "answer": "", "explanation": ""}]
-    return {"quiz": questions} 
+        data = await request.json()
+        summary = data.get("summary", "")
+        if not summary:
+            return {"error": "Summary is required"}
+        
+        prompt = video_quiz_prompt.format(summary=summary)
+        result = ask_openai(prompt)
+        
+        try:
+            questions = json.loads(result)
+            if not isinstance(questions, list):
+                questions = [{"question": "Failed to parse quiz", "options": [], "answer": "", "explanation": ""}]
+        except json.JSONDecodeError:
+            questions = [{"question": "Failed to parse quiz", "options": [], "answer": "", "explanation": ""}]
+        
+        return {"quiz": questions}
+    except Exception as e:
+        print(f"Video quiz error: {e}")
+        return {"error": "Failed to generate quiz", "quiz": []} 
 
 @app.post("/video-summary")
 async def video_summary(request: Request):

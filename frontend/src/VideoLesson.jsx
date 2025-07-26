@@ -16,19 +16,23 @@ function VideoLesson() {
   const handleGenerateQuiz = async () => {
     setLoading(true);
     try {
-      let quizText = '';
-      await askStream({ prompt: `Create a quiz based on this video summary: ${summary}` }, (output, chunk) => {
-        quizText = output;
-        // Optionally, parse quizText as JSON if the LLM outputs it as such
-        try {
-          const parsed = JSON.parse(quizText);
-          setQuiz(Array.isArray(parsed) ? parsed : []);
-        } catch {
-          // Not valid JSON yet, keep streaming
-        }
-      });
+      const response = await generateVideoQuiz(summary);
+      
+      if (response.error) {
+        console.error('Quiz generation error:', response.error);
+        alert(`Quiz generation failed: ${response.error}`);
+        return;
+      }
+      
+      if (response.quiz && Array.isArray(response.quiz)) {
+        setQuiz(response.quiz);
+      } else {
+        console.error('Invalid quiz response:', response);
+        alert("Failed to generate quiz. Please try again.");
+      }
     } catch (err) {
-      alert("Quiz generation failed.");
+      console.error('Quiz generation error:', err);
+      alert("Quiz generation failed. Please check your connection and try again.");
     }
     setLoading(false);
   };

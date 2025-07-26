@@ -151,12 +151,12 @@ Create 3 multiple-choice questions. For each:
 
 Output JSON format:
 [
-  {
+  {{
     "question": "...",
     "options": ["A", "B", "C", "D"],
     "answer": "B",
     "explanation": "..."
-  }
+  }}
 ]
 """ 
 
