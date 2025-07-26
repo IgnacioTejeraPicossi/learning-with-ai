@@ -16,6 +16,10 @@ graph TD
     GlobalSearch[GlobalSearch.jsx]
     Auth[Auth.jsx]
     Certifications[Certifications.jsx]
+    VideoLesson[VideoLesson.jsx]
+    RunTest[RunTest.jsx]
+    IdeaLog[IdeaLog.jsx]
+    FeatureRoadmap[FeatureRoadmap.jsx]
   end
   subgraph Backend
     AppPy[app.py]
@@ -25,6 +29,12 @@ graph TD
     WebSearchNode[websearch-backend/index.js]
     DB[(MongoDB)]
     Firebase[(Firebase Auth)]
+  end
+  subgraph Testing
+    Cypress[Cypress Tests]
+    ManualTests[Manual Tests]
+    APITests[API Tests]
+    TestResults[Test Results]
   end
   OpenAI(OpenAI API)
 
@@ -42,6 +52,10 @@ graph TD
   App --> GlobalSearch
   App --> Auth
   App --> Certifications
+  App --> VideoLesson
+  App --> RunTest
+  App --> IdeaLog
+  App --> FeatureRoadmap
   Simulator -->|Scenario UI| App
   API -->|HTTP requests with Firebase token| AppPy
   WebSearchNode -->|HTTP requests| OpenAI
@@ -53,6 +67,7 @@ graph TD
   AppPy -->|Career coach| LLM
   AppPy -->|Skills forecast| LLM
   AppPy -->|Certifications| LLM
+  AppPy -->|Video lessons| LLM
   AppPy -->|Verifies Firebase token| Firebase
   LLM -->|Sends prompt, gets response| OpenAI
   VectorStore -->|Future: Embeddings| DB
@@ -66,10 +81,22 @@ graph TD
   OpenAI -- AI response --> WebSearchNode
   DB -- User-specific data --> AppPy
 
+  %% Testing connections
+  RunTest -->|Runs automated tests| Cypress
+  RunTest -->|Runs manual verification| ManualTests
+  RunTest -->|Tests API endpoints| APITests
+  Cypress -->|Generates test results| TestResults
+  ManualTests -->|Generates test results| TestResults
+  APITests -->|Generates test results| TestResults
+  APITests -->|Tests backend endpoints| AppPy
+  TestResults -->|Displays results| RunTest
+
   classDef backend fill:#e3f2fd,stroke:#1976d2,stroke-width:2px;
   classDef frontend fill:#fffde7,stroke:#fbc02d,stroke-width:2px;
+  classDef testing fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px;
   class Backend backend;
   class Frontend frontend;
+  class Testing testing;
 ```
 
 ---
