@@ -202,6 +202,12 @@ function AppContent() {
             }}>
               {!user && (
                 <div style={{ marginBottom: 32, textAlign: 'center' }}>
+                  <h2 style={{ marginBottom: "1rem", fontSize: "2rem", color: colors.text }}>
+                    🤖 Ask AI About Workplace Learning
+                  </h2>
+                  <p style={{ marginBottom: "2rem", fontSize: "1rem", color: colors.text, opacity: 0.8 }}>
+                    Interface-less UX / Zero-UI mode
+                  </p>
                   <Auth user={user} setUser={setUser} />
                   <p style={{ color: colors.textSecondary, marginTop: 12 }}>Sign in to use AI-powered workplace learning features.</p>
                   <button
