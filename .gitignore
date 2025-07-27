@@ -5,6 +5,7 @@ yarn.lock
 
 # Project Documentation
 docs/
+docs-md/
 
 # Build output
 dist/

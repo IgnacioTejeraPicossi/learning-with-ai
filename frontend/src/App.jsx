@@ -22,6 +22,7 @@ import CommandBar from "./CommandBar";
 import VideoLesson from "./VideoLesson";
 import IdeaLog from "./IdeaLog";
 import FeatureRoadmap from "./FeatureRoadmap";
+import FutureApp from "./FutureApp";
 
 function AppContent() {
   const [user, setUser] = useState(null);
@@ -299,6 +300,7 @@ function AppContent() {
             {!activeModule && section === "video-lessons" && <VideoLesson />}
             {!activeModule && section === "idea-log" && <IdeaLog />}
             {!activeModule && section === "feature-roadmap" && <FeatureRoadmap />}
+            {!activeModule && section === "future-app" && <FutureApp onSectionSelect={setSection} />}
           </div>
         )}
       </div>

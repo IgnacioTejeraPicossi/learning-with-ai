@@ -32,6 +32,13 @@ const GlobalSearch = ({ onNavigate, isOpen, onClose }) => {
       keywords: ["micro", "lessons", "learning", "education", "training", "bite-sized"]
     },
     {
+      id: "video-lessons",
+      title: "Video Lessons",
+      description: "Learn from videos with AI-generated quizzes",
+      icon: "🎥",
+      keywords: ["video", "lessons", "youtube", "quiz", "multimedia"]
+    },
+    {
       id: "recommendation",
       title: "Recommendation",
       description: "Get personalized learning recommendations",
@@ -86,6 +93,34 @@ const GlobalSearch = ({ onNavigate, isOpen, onClose }) => {
       description: "View and manage your saved micro-lessons",
       icon: "📦",
       keywords: ["saved", "lessons", "bookmarks", "favorites", "history"]
+    },
+    {
+      id: "idea-log",
+      title: "Idea Log",
+      description: "View and manage user-submitted feature ideas",
+      icon: "💡",
+      keywords: ["idea", "log", "feedback", "suggestions", "features"]
+    },
+    {
+      id: "feature-roadmap",
+      title: "Feature Roadmap",
+      description: "Vote on and track upcoming features",
+      icon: "⭐",
+      keywords: ["feature", "roadmap", "vote", "upcoming", "planning"]
+    },
+    {
+      id: "future-app",
+      title: "Future App",
+      description: "Explore the vision and development roadmap",
+      icon: "🔮",
+      keywords: ["future", "vision", "roadmap", "development", "phases"]
+    },
+    {
+      id: "run-test",
+      title: "Run Test",
+      description: "Comprehensive testing suite for the application",
+      icon: "🧪",
+      keywords: ["test", "testing", "cypress", "manual", "api"]
     }
   ];
 
