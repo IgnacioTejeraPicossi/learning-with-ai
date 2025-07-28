@@ -31,7 +31,6 @@ const Icon = ({ name, size = 20 }) => {
 
 const navItems = [
   { key: "dashboard", label: "Dashboard", icon: "house" },
-  { key: "ai-concepts", label: "AI Concepts", icon: "bar-chart" },
   { key: "micro-lessons", label: "Micro-lessons", icon: "book" },
   { key: "video-lessons", label: "Video Lessons", icon: "play-circle" },
   { key: "recommendation", label: "Recommendation", icon: "star" },
