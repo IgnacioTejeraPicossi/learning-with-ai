@@ -98,15 +98,40 @@ function Dashboard({ user, onSectionSelect }) {
 
         // Group lessons by week for line chart
         const weekMap = {};
+        const videoWeekMap = {};
+        
+        // Process micro-lessons
         lessons.forEach(lesson => {
           if (lesson.created_at) {
             const week = getISOWeek(lesson.created_at);
             weekMap[week] = (weekMap[week] || 0) + 1;
           }
         });
-        // Convert to array sorted by week
-        const sortedWeeks = Object.keys(weekMap).sort();
-        const trends = sortedWeeks.map(week => ({ week, lessons: weekMap[week] }));
+        
+        // Mock video lessons data (replace with actual API call when available)
+        const mockVideoLessons = [
+          { created_at: '2025-01-15', topic: 'Agile' },
+          { created_at: '2025-01-15', topic: 'Programming' },
+          { created_at: '2025-01-14', topic: 'Leadership' },
+          { created_at: '2025-01-13', topic: 'Programming' },
+          { created_at: '2025-01-12', topic: 'Programming' }
+        ];
+        
+        // Process video lessons
+        mockVideoLessons.forEach(video => {
+          if (video.created_at) {
+            const week = getISOWeek(video.created_at);
+            videoWeekMap[week] = (videoWeekMap[week] || 0) + 1;
+          }
+        });
+        
+        // Combine all weeks and create chart data
+        const allWeeks = [...new Set([...Object.keys(weekMap), ...Object.keys(videoWeekMap)])].sort();
+        const trends = allWeeks.map(week => ({ 
+          week, 
+          microLessons: weekMap[week] || 0,
+          videoLessons: videoWeekMap[week] || 0
+        }));
         setLessonTrends(trends);
 
         // Group lessons by topic for pie chart

@@ -1,5 +1,5 @@
 import React from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { useTheme } from './ThemeContext';
 
 const LearningTrendsChart = ({ data }) => {
@@ -13,7 +13,23 @@ const LearningTrendsChart = ({ data }) => {
           <XAxis dataKey="week" stroke={colors.text} tick={{ fill: colors.text }} />
           <YAxis allowDecimals={false} stroke={colors.text} tick={{ fill: colors.text }} />
           <Tooltip contentStyle={{ background: colors.cardBackground, color: colors.text, border: `1px solid ${colors.border}` }} />
-          <Line type="monotone" dataKey="lessons" stroke={colors.primary} strokeWidth={3} dot={{ r: 5, fill: colors.primary }} />
+          <Legend />
+          <Line 
+            type="monotone" 
+            dataKey="microLessons" 
+            name="Micro-lessons"
+            stroke={colors.primary} 
+            strokeWidth={3} 
+            dot={{ r: 5, fill: colors.primary }} 
+          />
+          <Line 
+            type="monotone" 
+            dataKey="videoLessons" 
+            name="Video Lessons"
+            stroke="#28a745" 
+            strokeWidth={3} 
+            dot={{ r: 5, fill: "#28a745" }} 
+          />
         </LineChart>
       </ResponsiveContainer>
     </div>
