@@ -172,26 +172,48 @@ function AppContent() {
             padding: "2rem",
             overflow: "hidden"
           }}>
-            {/* Background Message */}
+            {/* Left Side Background Message */}
             <div
               style={{
                 position: "absolute",
+                left: "2rem",
                 top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                fontSize: "clamp(2.2rem, 6vw, 4.5rem)",
+                transform: "translateY(-50%)",
+                fontSize: "clamp(1.2rem, 3vw, 2rem)",
                 fontWeight: 400,
                 color: "rgba(103, 58, 183, 0.08)", // Very light purple
-                textAlign: "center",
-                maxWidth: "80vw",
-                lineHeight: 1.2,
+                writingMode: "vertical-rl",
+                textOrientation: "mixed",
+                lineHeight: 1.4,
                 zIndex: 0,
                 pointerEvents: "none",
                 userSelect: "none",
-                whiteSpace: "pre-line"
+                maxHeight: "60vh"
               }}
             >
-              {`I'm not just building a learning app —\nI'm creating a co-evolving AI learning assistant\nwhere users shape its growth.`}
+              I'm not just building a learning app —
+            </div>
+            
+            {/* Right Side Background Message */}
+            <div
+              style={{
+                position: "absolute",
+                right: "2rem",
+                top: "50%",
+                transform: "translateY(-50%)",
+                fontSize: "clamp(1.2rem, 3vw, 2rem)",
+                fontWeight: 400,
+                color: "rgba(103, 58, 183, 0.08)", // Very light purple
+                writingMode: "vertical-rl",
+                textOrientation: "mixed",
+                lineHeight: 1.4,
+                zIndex: 0,
+                pointerEvents: "none",
+                userSelect: "none",
+                maxHeight: "60vh"
+              }}
+            >
+              I'm creating a co-evolving AI learning assistant where users shape its growth.
             </div>
             {/* Main Content */}
             <div style={{
