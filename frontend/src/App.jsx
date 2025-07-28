@@ -23,6 +23,7 @@ import VideoLesson from "./VideoLesson";
 import IdeaLog from "./IdeaLog";
 import FeatureRoadmap from "./FeatureRoadmap";
 import FutureApp from "./FutureApp";
+import SavedVideos from "./SavedVideos";
 
 function AppContent() {
   const [user, setUser] = useState(null);
@@ -309,6 +310,7 @@ function AppContent() {
             {activeModule === 'forecast' && <SkillsForecast query={userQuery} />}
             {activeModule === 'certification' && <Certifications query={userQuery} />}
             {activeModule === 'video-lessons' && <VideoLesson query={userQuery} />}
+            {activeModule === 'saved-videos' && <SavedVideos user={user} />}
             {!activeModule && section === "dashboard" && <Dashboard user={user} onSectionSelect={setSection} />}
             {!activeModule && section === "ai-concepts" && <Concepts />}
             {!activeModule && section === "micro-lessons" && <MicroLesson />}
@@ -320,6 +322,7 @@ function AppContent() {
             {!activeModule && section === "coach" && <CareerCoach />}
             {!activeModule && section === "skills-forecast" && <SkillsForecast />}
             {!activeModule && section === "saved-lessons" && <LessonList user={user} />}
+            {!activeModule && section === "saved-videos" && <SavedVideos user={user} />}
             {!activeModule && section === "run-test" && <RunTest />}
             {!activeModule && section === "video-lessons" && <VideoLesson />}
             {!activeModule && section === "idea-log" && <IdeaLog />}
