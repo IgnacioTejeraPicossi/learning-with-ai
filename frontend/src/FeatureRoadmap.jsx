@@ -204,9 +204,9 @@ function FeatureRoadmap() {
           </thead>
           <tbody>
             {sortedFeatures.map((idea, idx) => (
-              <tr key={idea._id || idx} style={{ background: idx % 2 === 0 ? colors.cardBackground : "#fff" }}>
-                <td style={{ padding: 8, border: `1px solid ${colors.border}` }}>{idea.classification?.new_feature || "(No feature name)"}</td>
-                <td style={{ padding: 8, border: `1px solid ${colors.border}` }}>
+              <tr key={idea._id || idx} style={{ background: idx % 2 === 0 ? colors.cardBackground : colors.background }}>
+                <td style={{ padding: 8, border: `1px solid ${colors.border}`, color: colors.text }}>{idea.classification?.new_feature || "(No feature name)"}</td>
+                <td style={{ padding: 8, border: `1px solid ${colors.border}`, color: colors.text }}>
                   <span style={{ background: statusColors[idea.status || "Idea"], color: '#fff', borderRadius: 6, padding: '2px 10px', fontSize: 13, fontWeight: 600 }}>
                     {isAdmin ? (
                       <select
@@ -222,8 +222,8 @@ function FeatureRoadmap() {
                     )}
                   </span>
                 </td>
-                <td style={{ padding: 8, border: `1px solid ${colors.border}` }}>{idea.classification?.intent || idea.user_input}</td>
-                <td style={{ padding: 8, border: `1px solid ${colors.border}` }}>
+                <td style={{ padding: 8, border: `1px solid ${colors.border}`, color: colors.text }}>{idea.classification?.intent || idea.user_input}</td>
+                <td style={{ padding: 8, border: `1px solid ${colors.border}`, color: colors.text }}>
                   <button
                     onClick={() => handleUpvote(idea._id)}
                     disabled={upvoting === idea._id}
@@ -233,7 +233,7 @@ function FeatureRoadmap() {
                     👍 {idea.upvotes || 0}
                   </button>
                 </td>
-                <td style={{ padding: 8, border: `1px solid ${colors.border}` }}>
+                <td style={{ padding: 8, border: `1px solid ${colors.border}`, color: colors.text }}>
                   <button
                     onClick={() => handleSubscribe(idea._id)}
                     disabled={subscribing === idea._id}
@@ -243,8 +243,8 @@ function FeatureRoadmap() {
                     🔔 Notify Me
                   </button>
                 </td>
-                <td style={{ padding: 8, border: `1px solid ${colors.border}` }}>{idea.created_at ? new Date(idea.created_at).toLocaleString() : "-"}</td>
-                <td style={{ padding: 8, border: `1px solid ${colors.border}` }}>
+                <td style={{ padding: 8, border: `1px solid ${colors.border}`, color: colors.text }}>{idea.created_at ? new Date(idea.created_at).toLocaleString() : "-"}</td>
+                <td style={{ padding: 8, border: `1px solid ${colors.border}`, color: colors.text }}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                     <select
                       value={scaffoldType}

@@ -117,27 +117,27 @@ function IdeaLog() {
           </thead>
           <tbody>
             {filteredIdeas.map((idea, idx) => (
-              <tr key={idea._id || idx} style={{ background: idx % 2 === 0 ? colors.cardBackground : "#fff" }}>
-                <td style={{ padding: 8, border: `1px solid ${colors.border}` }}>{idea.user_input}</td>
-                <td style={{ padding: 8, border: `1px solid ${colors.border}` }}>{idea.classification?.intent}</td>
-                <td style={{ padding: 8, border: `1px solid ${colors.border}` }}>
+              <tr key={idea._id || idx} style={{ background: idx % 2 === 0 ? colors.cardBackground : colors.background }}>
+                <td style={{ padding: 8, border: `1px solid ${colors.border}`, color: colors.text }}>{idea.user_input}</td>
+                <td style={{ padding: 8, border: `1px solid ${colors.border}`, color: colors.text }}>{idea.classification?.intent}</td>
+                <td style={{ padding: 8, border: `1px solid ${colors.border}`, color: colors.text }}>
                   {idea.classification?.module_match && (
                     <span style={{ background: moduleColor(idea.classification?.module_match), color: '#fff', borderRadius: 6, padding: '2px 8px', fontSize: 13 }}>
                       {idea.classification?.module_match}
                     </span>
                   )}
                 </td>
-                <td style={{ padding: 8, border: `1px solid ${colors.border}` }}>{idea.classification?.new_feature}</td>
-                <td style={{ padding: 8, border: `1px solid ${colors.border}` }}>
+                <td style={{ padding: 8, border: `1px solid ${colors.border}`, color: colors.text }}>{idea.classification?.new_feature}</td>
+                <td style={{ padding: 8, border: `1px solid ${colors.border}`, color: colors.text }}>
                   {idea.classification?.confidence && (
                     <span style={{ background: confidenceColor(idea.classification?.confidence), color: '#fff', borderRadius: 6, padding: '2px 8px', fontSize: 13 }}>
                       {idea.classification?.confidence}
                     </span>
                   )}
                 </td>
-                <td style={{ padding: 8, border: `1px solid ${colors.border}` }}>{idea.classification?.follow_up_question}</td>
-                <td style={{ padding: 8, border: `1px solid ${colors.border}` }}>{idea.created_at ? new Date(idea.created_at).toLocaleString() : "-"}</td>
-                <td style={{ padding: 8, border: `1px solid ${colors.border}` }}>
+                <td style={{ padding: 8, border: `1px solid ${colors.border}`, color: colors.text }}>{idea.classification?.follow_up_question}</td>
+                <td style={{ padding: 8, border: `1px solid ${colors.border}`, color: colors.text }}>{idea.created_at ? new Date(idea.created_at).toLocaleString() : "-"}</td>
+                <td style={{ padding: 8, border: `1px solid ${colors.border}`, color: colors.text }}>
                   <button onClick={() => handleDelete(idea._id)} style={{ background: '#e74c3c', color: '#fff', border: 'none', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', fontWeight: 600 }} title="Delete this idea">🗑️ Delete</button>
                 </td>
               </tr>
