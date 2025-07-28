@@ -177,18 +177,16 @@ function AppContent() {
               style={{
                 position: "absolute",
                 left: "2rem",
-                top: "50%",
-                transform: "translateY(-50%)",
-                fontSize: "clamp(1.2rem, 3vw, 2rem)",
+                top: "20%",
+                fontSize: "clamp(1rem, 2.5vw, 1.5rem)",
                 fontWeight: 400,
-                color: "rgba(103, 58, 183, 0.08)", // Very light purple
-                writingMode: "vertical-rl",
-                textOrientation: "mixed",
+                color: "rgba(103, 58, 183, 0.15)", // More visible purple
                 lineHeight: 1.4,
                 zIndex: 0,
                 pointerEvents: "none",
                 userSelect: "none",
-                maxHeight: "60vh"
+                maxWidth: "200px",
+                textAlign: "left"
               }}
             >
               I'm not just building a learning app —
@@ -199,18 +197,16 @@ function AppContent() {
               style={{
                 position: "absolute",
                 right: "2rem",
-                top: "50%",
-                transform: "translateY(-50%)",
-                fontSize: "clamp(1.2rem, 3vw, 2rem)",
+                bottom: "20%",
+                fontSize: "clamp(1rem, 2.5vw, 1.5rem)",
                 fontWeight: 400,
-                color: "rgba(103, 58, 183, 0.08)", // Very light purple
-                writingMode: "vertical-rl",
-                textOrientation: "mixed",
+                color: "rgba(103, 58, 183, 0.15)", // More visible purple
                 lineHeight: 1.4,
                 zIndex: 0,
                 pointerEvents: "none",
                 userSelect: "none",
-                maxHeight: "60vh"
+                maxWidth: "250px",
+                textAlign: "right"
               }}
             >
               I'm creating a co-evolving AI learning assistant where users shape its growth.
