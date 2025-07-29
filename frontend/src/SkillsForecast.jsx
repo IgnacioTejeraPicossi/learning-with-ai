@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { askStream } from "./api";
 import StreamingProgress from "./StreamingProgress";
 import StreamingText from "./StreamingText";
@@ -10,10 +10,17 @@ function SkillsForecast() {
   const [savedForecasts, setSavedForecasts] = useState([]);
   const [showResources, setShowResources] = useState(false);
   const [showSchedule, setShowSchedule] = useState(false);
+  const [showSavedForecasts, setShowSavedForecasts] = useState(false);
   const [resources, setResources] = useState([]);
   const [reminderDate, setReminderDate] = useState('');
   const { colors } = useTheme();
   
+  // Load saved forecasts on component mount
+  useEffect(() => {
+    const saved = JSON.parse(localStorage.getItem('savedForecasts') || '[]');
+    setSavedForecasts(saved);
+  }, []);
+
   // Use streaming hook for skills forecasting
   const forecastStreaming = useStreaming('Ready to analyze your skills');
 
@@ -75,6 +82,12 @@ function SkillsForecast() {
     localStorage.setItem('savedForecasts', JSON.stringify([newForecast, ...existing]));
     
     alert('✅ Forecast saved successfully! You can view it in your saved forecasts.');
+  };
+
+  const handleDeleteForecast = (id) => {
+    const updated = savedForecasts.filter(f => f.id !== id);
+    setSavedForecasts(updated);
+    localStorage.setItem('savedForecasts', JSON.stringify(updated));
   };
 
   const handleFindResources = async () => {
@@ -166,6 +179,125 @@ function SkillsForecast() {
       <p style={{ marginBottom: 20, color: colors.textSecondary }}>
         Get AI-powered predictions about which skills you should develop next based on your current profile and career goals.
       </p>
+
+      {/* Saved Forecasts Section */}
+      {savedForecasts.length > 0 && (
+        <div style={{ 
+          marginBottom: 24, 
+          padding: 16, 
+          background: colors.cardBackground,
+          borderRadius: 8,
+          border: `1px solid ${colors.border}`
+        }}>
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center',
+            marginBottom: 12
+          }}>
+            <h3 style={{ margin: 0, color: colors.text }}>
+              📋 Saved Forecasts ({savedForecasts.length})
+            </h3>
+            <button
+              onClick={() => setShowSavedForecasts(!showSavedForecasts)}
+              style={{
+                padding: '6px 12px',
+                borderRadius: 6,
+                border: `1px solid ${colors.border}`,
+                background: colors.cardBackground,
+                color: colors.text,
+                cursor: 'pointer',
+                fontSize: '0.9em'
+              }}
+            >
+              {showSavedForecasts ? 'Hide' : 'Show'}
+            </button>
+          </div>
+          
+          {showSavedForecasts && (
+            <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+              {savedForecasts.map((forecast, index) => (
+                <div 
+                  key={forecast.id}
+                  style={{ 
+                    padding: 12, 
+                    marginBottom: 8, 
+                    background: colors.background,
+                    borderRadius: 6,
+                    border: `1px solid ${colors.border}`
+                  }}
+                >
+                  <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'flex-start',
+                    marginBottom: 8
+                  }}>
+                    <div>
+                      <strong style={{ color: colors.text }}>
+                        Forecast #{savedForecasts.length - index}
+                      </strong>
+                      <div style={{ 
+                        fontSize: '0.8em', 
+                        color: colors.textSecondary,
+                        marginTop: 4
+                      }}>
+                        {new Date(forecast.timestamp).toLocaleDateString()} at {new Date(forecast.timestamp).toLocaleTimeString()}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleDeleteForecast(forecast.id)}
+                      style={{
+                        padding: '4px 8px',
+                        borderRadius: 4,
+                        border: 'none',
+                        background: '#ff4444',
+                        color: '#fff',
+                        cursor: 'pointer',
+                        fontSize: '0.8em'
+                      }}
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                  
+                  <div style={{ marginBottom: 8 }}>
+                    <strong style={{ color: colors.textSecondary }}>Input:</strong>
+                    <div style={{ 
+                      fontSize: '0.9em', 
+                      color: colors.text,
+                      marginTop: 4,
+                      fontStyle: 'italic'
+                    }}>
+                      {forecast.input.length > 100 
+                        ? `${forecast.input.substring(0, 100)}...` 
+                        : forecast.input
+                      }
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <strong style={{ color: colors.textSecondary }}>Forecast:</strong>
+                    <div style={{ 
+                      fontSize: '0.9em', 
+                      color: colors.text,
+                      marginTop: 4,
+                      maxHeight: '150px',
+                      overflowY: 'auto',
+                      lineHeight: 1.4
+                    }}>
+                      {forecast.forecast.length > 300 
+                        ? `${forecast.forecast.substring(0, 300)}...` 
+                        : forecast.forecast
+                      }
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Input Section */}
       <div style={{ marginBottom: 24 }}>
