@@ -7,6 +7,8 @@ import { useTheme } from './ThemeContext';
 
 export default function CareerCoach() {
   const [growthArea, setGrowthArea] = useState('');
+  const [customTopic, setCustomTopic] = useState('');
+  const [showCustomInput, setShowCustomInput] = useState(false);
   const { colors } = useTheme();
   
   // Use streaming hook for career coaching
@@ -41,8 +43,38 @@ export default function CareerCoach() {
     );
   };
 
+  const handleStartCustomCoaching = async () => {
+    if (!customTopic.trim()) {
+      alert('Please enter a coaching topic.');
+      return;
+    }
+
+    setGrowthArea('custom');
+    
+    coachingStreaming.startStreaming(
+      `You are an AI career coach. The user wants to focus on: ${customTopic}
+      Provide personalized coaching advice including:
+      1. Assessment of current skills in this area
+      2. Specific improvement strategies
+      3. Actionable next steps
+      4. Recommended resources
+      5. Progress tracking suggestions
+      
+      Make it conversational and encouraging.`,
+      {
+        statusMessages: STATUS_MESSAGES.CAREER_COACH,
+        onComplete: () => {
+          // Could save coaching session to user profile
+          console.log('Custom coaching session completed');
+        }
+      }
+    );
+  };
+
   const handleClear = () => {
     setGrowthArea('');
+    setCustomTopic('');
+    setShowCustomInput(false);
     coachingStreaming.clearStreaming();
   };
 
@@ -102,6 +134,109 @@ export default function CareerCoach() {
                 </button>
               </div>
             ))}
+
+            {/* Custom Coaching Card */}
+            <div
+              style={{
+                padding: 20,
+                background: colors.cardBackground,
+                borderRadius: 12,
+                border: `2px solid ${colors.border}`,
+                textAlign: 'center',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <div style={{ fontSize: '2.5em', marginBottom: 12 }}>
+                ✨
+              </div>
+              <h3 style={{ marginBottom: 8, color: colors.text }}>
+                Custom Topic
+              </h3>
+              <p style={{ 
+                color: colors.textSecondary, 
+                fontSize: '0.9em',
+                lineHeight: 1.4
+              }}>
+                Get coaching on any career topic you want to improve
+              </p>
+              
+              {!showCustomInput ? (
+                <button
+                  onClick={() => setShowCustomInput(true)}
+                  style={{
+                    marginTop: 12,
+                    padding: '8px 16px',
+                    borderRadius: 6,
+                    border: 'none',
+                    background: colors.primary,
+                    color: '#fff',
+                    cursor: 'pointer',
+                    fontSize: '0.9em'
+                  }}
+                >
+                  Start Custom
+                </button>
+              ) : (
+                <div style={{ textAlign: 'left', marginTop: 12 }}>
+                  <input
+                    type="text"
+                    value={customTopic}
+                    onChange={(e) => setCustomTopic(e.target.value)}
+                    placeholder="Enter your coaching topic (e.g., 'Time management', 'Public speaking anxiety')"
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      borderRadius: 6,
+                      border: `1px solid ${colors.border}`,
+                      background: colors.background,
+                      color: colors.text,
+                      fontSize: '0.9em',
+                      marginBottom: 8
+                    }}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        handleStartCustomCoaching();
+                      }
+                    }}
+                  />
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button
+                      onClick={handleStartCustomCoaching}
+                      disabled={!customTopic.trim()}
+                      style={{
+                        padding: '8px 16px',
+                        borderRadius: 6,
+                        border: 'none',
+                        background: customTopic.trim() ? colors.primary : colors.border,
+                        color: '#fff',
+                        cursor: customTopic.trim() ? 'pointer' : 'not-allowed',
+                        fontSize: '0.9em',
+                        flex: 1
+                      }}
+                    >
+                      Start Coaching
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowCustomInput(false);
+                        setCustomTopic("");
+                      }}
+                      style={{
+                        padding: '8px 12px',
+                        borderRadius: 6,
+                        border: `1px solid ${colors.border}`,
+                        background: colors.cardBackground,
+                        color: colors.text,
+                        cursor: 'pointer',
+                        fontSize: '0.9em'
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
@@ -119,14 +254,14 @@ export default function CareerCoach() {
             borderRadius: 8
           }}>
             <span style={{ fontSize: '1.5em' }}>
-              {growthAreas.find(a => a.key === growthArea)?.icon}
+              {growthArea === 'custom' ? '✨' : growthAreas.find(a => a.key === growthArea)?.icon}
             </span>
             <div>
               <h3 style={{ margin: 0, color: colors.text }}>
-                {growthAreas.find(a => a.key === growthArea)?.label} Development
+                {growthArea === 'custom' ? `${customTopic} Coaching` : `${growthAreas.find(a => a.key === growthArea)?.label} Coaching`}
               </h3>
               <p style={{ margin: 0, fontSize: '0.9em', color: colors.textSecondary }}>
-                AI Career Coaching Session
+                AI Career Coach Session
               </p>
             </div>
           </div>
@@ -145,8 +280,8 @@ export default function CareerCoach() {
           <StreamingText 
             content={coachingStreaming.content}
             loading={coachingStreaming.loading}
-            placeholder="Starting your personalized coaching session..."
-            style={{ minHeight: '200px' }}
+            placeholder="Starting your coaching session..."
+            style={{ minHeight: '300px' }}
           />
 
           {/* Action Buttons */}
@@ -167,7 +302,7 @@ export default function CareerCoach() {
                   cursor: 'pointer'
                 }}
               >
-                📋 Save Session
+                💬 Continue Session
               </button>
               <button
                 style={{
@@ -179,7 +314,7 @@ export default function CareerCoach() {
                   cursor: 'pointer'
                 }}
               >
-                📅 Schedule Follow-up
+                📋 Save Session
               </button>
               <button
                 onClick={handleClear}

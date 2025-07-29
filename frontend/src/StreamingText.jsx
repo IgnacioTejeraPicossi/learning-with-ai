@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTheme } from './ThemeContext';
 
 const StreamingText = ({ 
@@ -12,15 +12,34 @@ const StreamingText = ({
   const { colors } = useTheme();
   const [displayedContent, setDisplayedContent] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isStreaming, setIsStreaming] = useState(false);
+  const contentRef = useRef('');
 
+  // Reset state when content changes
   useEffect(() => {
-    if (!content) {
+    if (content !== contentRef.current) {
+      contentRef.current = content;
       setDisplayedContent('');
       setCurrentIndex(0);
+      setIsStreaming(false);
+    }
+  }, [content]);
+
+  // Handle streaming animation
+  useEffect(() => {
+    if (!content || content.length === 0) {
+      setDisplayedContent('');
+      setCurrentIndex(0);
+      setIsStreaming(false);
       return;
     }
 
-    if (currentIndex < content.length) {
+    // Start streaming
+    if (!isStreaming && content.length > 0) {
+      setIsStreaming(true);
+    }
+
+    if (isStreaming && currentIndex < content.length) {
       const timer = setTimeout(() => {
         setDisplayedContent(content.substring(0, currentIndex + 1));
         setCurrentIndex(currentIndex + 1);
@@ -28,14 +47,7 @@ const StreamingText = ({
 
       return () => clearTimeout(timer);
     }
-  }, [content, currentIndex, speed]);
-
-  useEffect(() => {
-    if (content !== displayedContent) {
-      setDisplayedContent('');
-      setCurrentIndex(0);
-    }
-  }, [content]);
+  }, [content, currentIndex, speed, isStreaming]);
 
   const defaultStyle = {
     background: colors.cardBackground,
@@ -76,7 +88,7 @@ const StreamingText = ({
       ) : (
         <>
           {displayedContent}
-          {showCursor && (loading || currentIndex < content.length) && (
+          {showCursor && (loading || (isStreaming && currentIndex < content.length)) && (
             <span style={{
               display: 'inline-block',
               width: '2px',
