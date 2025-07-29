@@ -7,6 +7,11 @@ import { useTheme } from "./ThemeContext";
 
 function SkillsForecast() {
   const [input, setInput] = useState("");
+  const [savedForecasts, setSavedForecasts] = useState([]);
+  const [showResources, setShowResources] = useState(false);
+  const [showSchedule, setShowSchedule] = useState(false);
+  const [resources, setResources] = useState([]);
+  const [reminderDate, setReminderDate] = useState('');
   const { colors } = useTheme();
   
   // Use streaming hook for skills forecasting
@@ -43,6 +48,105 @@ function SkillsForecast() {
   const handleClear = () => {
     setInput("");
     forecastStreaming.clearStreaming();
+    setShowResources(false);
+    setShowSchedule(false);
+    setResources([]);
+    setReminderDate('');
+  };
+
+  const handleSaveForecast = () => {
+    if (!forecastStreaming.content) {
+      alert('No forecast to save. Please generate a forecast first.');
+      return;
+    }
+
+    const newForecast = {
+      id: Date.now(),
+      input: input,
+      forecast: forecastStreaming.content,
+      timestamp: new Date().toISOString(),
+      status: 'active'
+    };
+
+    setSavedForecasts(prev => [newForecast, ...prev]);
+    
+    // Save to localStorage for persistence
+    const existing = JSON.parse(localStorage.getItem('savedForecasts') || '[]');
+    localStorage.setItem('savedForecasts', JSON.stringify([newForecast, ...existing]));
+    
+    alert('✅ Forecast saved successfully! You can view it in your saved forecasts.');
+  };
+
+  const handleFindResources = async () => {
+    if (!forecastStreaming.content) {
+      alert('No forecast to analyze. Please generate a forecast first.');
+      return;
+    }
+
+    setShowResources(true);
+    setShowSchedule(false);
+
+    // Generate learning resources based on the forecast
+    try {
+      let resourcesContent = '';
+      await askStream(
+        { prompt: `Based on this skills forecast: ${forecastStreaming.content}
+        
+        Generate a list of specific learning resources including:
+        1. Online courses (with platforms like Udemy, Coursera, edX)
+        2. Books and publications
+        3. Practice projects and exercises
+        4. Communities and forums
+        5. Certifications and credentials
+        
+        Format as a structured list with links and descriptions.` },
+        (output) => {
+          resourcesContent = output;
+          setResources(output.split('\n').filter(line => line.trim()));
+        }
+      );
+    } catch (error) {
+      console.error('Failed to generate resources:', error);
+      setResources(['Error generating resources. Please try again.']);
+    }
+  };
+
+  const handleScheduleReview = () => {
+    if (!forecastStreaming.content) {
+      alert('No forecast to schedule. Please generate a forecast first.');
+      return;
+    }
+
+    setShowSchedule(true);
+    setShowResources(false);
+    
+    // Set default date to 30 days from now
+    const defaultDate = new Date();
+    defaultDate.setDate(defaultDate.getDate() + 30);
+    setReminderDate(defaultDate.toISOString().split('T')[0]);
+  };
+
+  const handleSetReminder = () => {
+    if (!reminderDate) {
+      alert('Please select a reminder date.');
+      return;
+    }
+
+    const reminder = {
+      id: Date.now(),
+      forecast: forecastStreaming.content,
+      reminderDate: reminderDate,
+      status: 'pending',
+      createdAt: new Date().toISOString()
+    };
+
+    // Save to localStorage
+    const existing = JSON.parse(localStorage.getItem('forecastReminders') || '[]');
+    localStorage.setItem('forecastReminders', JSON.stringify([reminder, ...existing]));
+
+    alert(`✅ Review scheduled for ${new Date(reminderDate).toLocaleDateString()}. You'll be reminded to review your skills progress.`);
+    setShowSchedule(false);
+    setReminderDate('');
   };
 
   const sampleInputs = [
@@ -179,6 +283,7 @@ function SkillsForecast() {
               flexWrap: 'wrap'
             }}>
               <button
+                onClick={handleSaveForecast}
                 style={{
                   padding: '12px 20px',
                   borderRadius: 8,
@@ -191,6 +296,7 @@ function SkillsForecast() {
                 📋 Save Forecast
               </button>
               <button
+                onClick={handleFindResources}
                 style={{
                   padding: '12px 20px',
                   borderRadius: 8,
@@ -203,6 +309,7 @@ function SkillsForecast() {
                 📚 Find Learning Resources
               </button>
               <button
+                onClick={handleScheduleReview}
                 style={{
                   padding: '12px 20px',
                   borderRadius: 8,
@@ -216,6 +323,110 @@ function SkillsForecast() {
               </button>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Learning Resources Section */}
+      {showResources && (
+        <div style={{ 
+          marginBottom: 24, 
+          padding: 20, 
+          background: colors.cardBackground,
+          borderRadius: 8,
+          border: `1px solid ${colors.border}`
+        }}>
+          <h3 style={{ marginBottom: 16, color: colors.text }}>
+            📚 Learning Resources
+          </h3>
+          <div style={{ 
+            maxHeight: '400px', 
+            overflowY: 'auto',
+            lineHeight: 1.6,
+            color: colors.text
+          }}>
+            {resources.map((resource, index) => (
+              <div key={index} style={{ marginBottom: 8 }}>
+                {resource}
+              </div>
+            ))}
+          </div>
+          <button
+            onClick={() => setShowResources(false)}
+            style={{
+              marginTop: 16,
+              padding: '8px 16px',
+              borderRadius: 6,
+              border: `1px solid ${colors.border}`,
+              background: colors.cardBackground,
+              color: colors.text,
+              cursor: 'pointer'
+            }}
+          >
+            Close
+          </button>
+        </div>
+      )}
+
+      {/* Schedule Review Section */}
+      {showSchedule && (
+        <div style={{ 
+          marginBottom: 24, 
+          padding: 20, 
+          background: colors.cardBackground,
+          borderRadius: 8,
+          border: `1px solid ${colors.border}`
+        }}>
+          <h3 style={{ marginBottom: 16, color: colors.text }}>
+            📅 Schedule Skills Review
+          </h3>
+          <p style={{ marginBottom: 16, color: colors.textSecondary }}>
+            Set a reminder to review your skills progress and update your forecast.
+          </p>
+          <div style={{ marginBottom: 16 }}>
+            <label style={{ display: 'block', marginBottom: 8, color: colors.text }}>
+              Reminder Date:
+            </label>
+            <input
+              type="date"
+              value={reminderDate}
+              onChange={(e) => setReminderDate(e.target.value)}
+              style={{
+                padding: '8px 12px',
+                borderRadius: 6,
+                border: `1px solid ${colors.border}`,
+                background: colors.cardBackground,
+                color: colors.text
+              }}
+            />
+          </div>
+          <div style={{ display: 'flex', gap: 12 }}>
+            <button
+              onClick={handleSetReminder}
+              style={{
+                padding: '8px 16px',
+                borderRadius: 6,
+                border: 'none',
+                background: colors.primary,
+                color: '#fff',
+                cursor: 'pointer'
+              }}
+            >
+              Set Reminder
+            </button>
+            <button
+              onClick={() => setShowSchedule(false)}
+              style={{
+                padding: '8px 16px',
+                borderRadius: 6,
+                border: `1px solid ${colors.border}`,
+                background: colors.cardBackground,
+                color: colors.text,
+                cursor: 'pointer'
+              }}
+            >
+              Cancel
+            </button>
+          </div>
         </div>
       )}
 
