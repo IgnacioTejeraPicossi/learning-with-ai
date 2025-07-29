@@ -12,7 +12,9 @@ function WebSearch() {
     setLoading(true);
     try {
       const data = await webSearch(query);
-      setResults(data.results || JSON.stringify(data, null, 2));
+      // Extract the actual result content from the response
+      const resultContent = data.result || data.results || JSON.stringify(data, null, 2);
+      setResults(resultContent);
     } catch (error) {
       console.error("Failed to search:", error);
       setResults("Error performing web search.");
@@ -28,69 +30,115 @@ function WebSearch() {
   return (
     <div style={{ color: colors.text }}>
       <h2 style={{ color: colors.text }}>Web Search (AI + Internet)</h2>
-      <input
-        type="text"
-        value={query}
-        onChange={e => setQuery(e.target.value)}
-        placeholder="Ask anything..."
-        style={{ 
-          marginRight: 8,
-          padding: "8px 12px",
-          borderRadius: 6,
-          border: `1px solid ${colors.border}`,
-          background: colors.cardBackground,
-          color: colors.text,
-          fontSize: 16,
-          minWidth: 300
-        }}
-      />
-      <button
-        onClick={handleSearch}
-        disabled={loading || !query}
-        style={{
-          background: colors.buttonPrimary,
-          color: "#fff",
-          border: 0,
-          borderRadius: 6,
-          padding: "8px 18px",
-          fontWeight: 600,
-          fontSize: 16,
-          cursor: loading || !query ? "not-allowed" : "pointer",
-          marginRight: 8,
-          boxShadow: "0 1px 4px #0001"
-        }}
-      >
-        {loading ? "Searching..." : "Search"}
-      </button>
-      <button
-        onClick={handleClear}
-        disabled={loading && !query && !results}
-        style={{
-          background: colors.cardBackground,
-          color: colors.text,
-          border: `1px solid ${colors.border}`,
-          borderRadius: 6,
-          padding: "8px 18px",
-          fontWeight: 600,
-          fontSize: 16,
-          cursor: loading && !query && !results ? "not-allowed" : "pointer",
-          boxShadow: "0 1px 4px #0001"
-        }}
-      >
-        Clear
-      </button>
+      <div style={{ display: "flex", alignItems: "center", marginBottom: 16 }}>
+        <div style={{ position: "relative", flex: 1, marginRight: 8 }}>
+          <input
+            type="text"
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            placeholder="🔍 Ask anything..."
+            style={{ 
+              width: "100%",
+              padding: "12px 16px",
+              paddingLeft: "40px",
+              borderRadius: 8,
+              border: `2px solid ${colors.border}`,
+              background: colors.cardBackground,
+              color: colors.text,
+              fontSize: 16,
+              outline: "none",
+              transition: "border-color 0.2s ease",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.1)"
+            }}
+            onFocus={(e) => e.target.style.borderColor = colors.primary}
+            onBlur={(e) => e.target.style.borderColor = colors.border}
+          />
+          <span style={{
+            position: "absolute",
+            left: "12px",
+            top: "50%",
+            transform: "translateY(-50%)",
+            fontSize: "18px",
+            color: colors.textSecondary
+          }}>
+            🔍
+          </span>
+        </div>
+        <button
+          onClick={handleSearch}
+          disabled={loading || !query}
+          style={{
+            background: colors.buttonPrimary,
+            color: "#fff",
+            border: 0,
+            borderRadius: 8,
+            padding: "12px 20px",
+            fontWeight: 600,
+            fontSize: 16,
+            cursor: loading || !query ? "not-allowed" : "pointer",
+            marginRight: 8,
+            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+            transition: "transform 0.1s ease",
+            minWidth: "100px"
+          }}
+          onMouseDown={(e) => e.target.style.transform = "scale(0.98)"}
+          onMouseUp={(e) => e.target.style.transform = "scale(1)"}
+          onMouseLeave={(e) => e.target.style.transform = "scale(1)"}
+        >
+          {loading ? "⏳ Searching..." : "🔎 Search"}
+        </button>
+        <button
+          onClick={handleClear}
+          disabled={loading && !query && !results}
+          style={{
+            background: colors.cardBackground,
+            color: colors.text,
+            border: `2px solid ${colors.border}`,
+            borderRadius: 8,
+            padding: "12px 20px",
+            fontWeight: 600,
+            fontSize: 16,
+            cursor: loading && !query && !results ? "not-allowed" : "pointer",
+            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+            transition: "all 0.2s ease",
+            minWidth: "80px"
+          }}
+          onMouseEnter={(e) => e.target.style.borderColor = colors.primary}
+          onMouseLeave={(e) => e.target.style.borderColor = colors.border}
+        >
+          🗑️ Clear
+        </button>
+      </div>
       {results && (
-        <pre style={{ 
+        <div style={{ 
           marginTop: 16, 
-          background: colors.primaryLight, 
-          borderRadius: 6, 
-          padding: 12, 
-          whiteSpace: "pre-wrap", 
-          wordBreak: "break-word",
-          color: colors.text
+          background: colors.cardBackground, 
+          borderRadius: 8, 
+          padding: 20, 
+          border: `1px solid ${colors.border}`,
+          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+          maxHeight: "500px",
+          overflowY: "auto"
         }}>
-          {results}
-        </pre>
+          <h3 style={{ 
+            marginTop: 0, 
+            marginBottom: 16, 
+            color: colors.text,
+            fontSize: "18px",
+            fontWeight: "600"
+          }}>
+            🔍 Search Results for "{query}"
+          </h3>
+          <div style={{ 
+            color: colors.text,
+            lineHeight: "1.6",
+            fontSize: "14px",
+            whiteSpace: "pre-wrap", 
+            wordBreak: "break-word"
+          }}>
+            {results}
+          </div>
+        </div>
       )}
     </div>
   );
