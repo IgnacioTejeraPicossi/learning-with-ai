@@ -109,7 +109,7 @@ export async function updateLesson(id, data) {
 }
 
 export async function webSearch(query) {
-  const res = await fetch("http://localhost:8080/web-search", {
+  const res = await fetchWithAuth("http://localhost:8080/web-search", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ query }),

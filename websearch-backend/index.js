@@ -4,7 +4,12 @@ const { OpenAI } = require("openai");
 require("dotenv").config();
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 
 const openai = new OpenAI({
@@ -21,7 +26,7 @@ app.post("/web-search", async (req, res) => {
       const response = await openai.chat.completions.create({
         model: "gpt-4-1106-preview", // or "gpt-4.1" if available
         messages: [{ role: "user", content: query }],
-        tools: [{ type: "web_search_preview" }], // Try web_search_preview first
+        tools: [{ type: "web_search" }], // Fixed: use 'web_search' instead of 'web_search_preview'
         tool_choice: "auto",
       });
       return res.json({ result: response.choices[0].message.content });
