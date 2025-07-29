@@ -550,6 +550,41 @@ Additional context: This response is based on our comprehensive project knowledg
             />
           </div>
 
+          {/* Quick Test Questions */}
+          <div style={{ marginBottom: 16 }}>
+            <p style={{ 
+              marginBottom: 8, 
+              fontSize: '0.9em', 
+              color: colors.textSecondary 
+            }}>
+              💡 Quick test questions:
+            </p>
+            <div style={{ 
+              display: 'flex', 
+              gap: 8, 
+              flexWrap: 'wrap' 
+            }}>
+              {qaKnowledgeBase.slice(0, 4).map((qa, index) => (
+                <button
+                  key={index}
+                  onClick={() => setQaQuestion(qa.question)}
+                  style={{
+                    padding: '6px 12px',
+                    borderRadius: 6,
+                    border: `1px solid ${colors.border}`,
+                    background: colors.cardBackground,
+                    color: colors.text,
+                    cursor: 'pointer',
+                    fontSize: '0.8em',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  {qa.question.split(' ').slice(0, 3).join(' ')}...
+                </button>
+              ))}
+            </div>
+          </div>
+
           <button
             onClick={handleAskQuestion}
             disabled={qaStreaming.loading || !qaQuestion.trim()}
@@ -658,25 +693,86 @@ Additional context: This response is based on our comprehensive project knowledg
             }} />
           </div>
 
-          {/* Current Slide Info */}
+          {/* Timer Display */}
           <div style={{ 
-            padding: 16, 
+            textAlign: 'center', 
+            marginBottom: 16,
+            padding: '8px 16px',
             background: colors.cardBackground,
             borderRadius: 8,
-            border: `1px solid ${colors.border}`,
-            marginBottom: 16
+            border: `1px solid ${colors.border}`
           }}>
-            <h4 style={{ marginBottom: 8, color: colors.text }}>
-              {presentationSlides[currentSlide].title}
-            </h4>
-            <p style={{ marginBottom: 12, color: colors.textSecondary }}>
-              {presentationSlides[currentSlide].content}
-            </p>
-            <div>
-              <strong style={{ color: colors.textSecondary }}>Key Points:</strong>
-              <ul style={{ margin: '8px 0 0 20px', color: colors.text }}>
+            <span style={{ 
+              fontSize: '1.2em', 
+              fontWeight: 'bold', 
+              color: colors.primary 
+            }}>
+              ⏱️ {presentationSlides[currentSlide].duration}s
+            </span>
+            <span style={{ 
+              marginLeft: 12, 
+              color: colors.textSecondary 
+            }}>
+              Total: {presentationSlides.reduce((sum, slide) => sum + slide.duration, 0)}s
+            </span>
+          </div>
+
+          {/* Current Slide Info */}
+          <div style={{ 
+            padding: 20, 
+            background: colors.cardBackground,
+            borderRadius: 12,
+            border: `2px solid ${colors.border}`,
+            marginBottom: 16,
+            boxShadow: colors.shadow
+          }}>
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: 12, 
+              marginBottom: 16 
+            }}>
+              <div style={{ 
+                fontSize: '2em', 
+                background: colors.primary,
+                color: '#fff',
+                width: '50px',
+                height: '50px',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 'bold'
+              }}>
+                {currentSlide + 1}
+              </div>
+              <div>
+                <h4 style={{ margin: 0, color: colors.text, fontSize: '1.3em' }}>
+                  {presentationSlides[currentSlide].title}
+                </h4>
+                <p style={{ margin: '4px 0 0 0', color: colors.textSecondary }}>
+                  {presentationSlides[currentSlide].content}
+                </p>
+              </div>
+            </div>
+            
+            <div style={{ 
+              background: colors.background,
+              padding: 16,
+              borderRadius: 8,
+              border: `1px solid ${colors.border}`
+            }}>
+              <strong style={{ color: colors.textSecondary, display: 'block', marginBottom: 8 }}>
+                Key Points:
+              </strong>
+              <ul style={{ 
+                margin: 0, 
+                paddingLeft: 20, 
+                color: colors.text,
+                lineHeight: 1.6
+              }}>
                 {presentationSlides[currentSlide].keyPoints.map((point, index) => (
-                  <li key={index}>{point}</li>
+                  <li key={index} style={{ marginBottom: 4 }}>{point}</li>
                 ))}
               </ul>
             </div>
@@ -695,7 +791,8 @@ Additional context: This response is based on our comprehensive project knowledg
             marginTop: 16, 
             display: 'flex', 
             gap: 12,
-            flexWrap: 'wrap'
+            flexWrap: 'wrap',
+            justifyContent: 'center'
           }}>
             <button
               onClick={() => speakText(demoStreaming.content)}
@@ -706,7 +803,8 @@ Additional context: This response is based on our comprehensive project knowledg
                 border: 'none',
                 background: (isSpeaking || demoStreaming.loading) ? colors.border : colors.primary,
                 color: '#fff',
-                cursor: (isSpeaking || demoStreaming.loading) ? 'not-allowed' : 'pointer'
+                cursor: (isSpeaking || demoStreaming.loading) ? 'not-allowed' : 'pointer',
+                fontSize: '1em'
               }}
             >
               {isSpeaking ? '🔊 Speaking...' : '🔊 Speak Demo'}
@@ -719,7 +817,8 @@ Additional context: This response is based on our comprehensive project knowledg
                 border: `1px solid ${colors.border}`,
                 background: colors.cardBackground,
                 color: colors.text,
-                cursor: 'pointer'
+                cursor: 'pointer',
+                fontSize: '1em'
               }}
             >
               🔇 Stop Speaking
@@ -732,12 +831,36 @@ Additional context: This response is based on our comprehensive project knowledg
                 border: `1px solid ${colors.border}`,
                 background: colors.cardBackground,
                 color: colors.text,
-                cursor: 'pointer'
+                cursor: 'pointer',
+                fontSize: '1em'
               }}
             >
               🔄 End Demo
             </button>
           </div>
+
+          {/* Presentation Status */}
+          {isPresenting && (
+            <div style={{ 
+              textAlign: 'center', 
+              marginTop: 16,
+              padding: '12px',
+              background: colors.primaryLight,
+              borderRadius: 8,
+              border: `1px solid ${colors.primary}`
+            }}>
+              <span style={{ color: colors.primary, fontWeight: 'bold' }}>
+                🎬 Live Presentation in Progress
+              </span>
+              <div style={{ 
+                fontSize: '0.9em', 
+                color: colors.textSecondary, 
+                marginTop: 4 
+              }}>
+                Slide {currentSlide + 1} of {presentationSlides.length} • Auto-advancing
+              </div>
+            </div>
+          )}
         </div>
       )}
 
