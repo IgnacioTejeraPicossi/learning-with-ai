@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { askStream } from './api';
 import StreamingProgress from './StreamingProgress';
 import StreamingText from './StreamingText';
@@ -9,10 +9,18 @@ export default function CareerCoach() {
   const [growthArea, setGrowthArea] = useState('');
   const [customTopic, setCustomTopic] = useState('');
   const [showCustomInput, setShowCustomInput] = useState(false);
+  const [savedSessions, setSavedSessions] = useState([]);
+  const [showSavedSessions, setShowSavedSessions] = useState(false);
   const { colors } = useTheme();
   
   // Use streaming hook for career coaching
   const coachingStreaming = useStreaming('Ready to start coaching session');
+
+  // Load saved sessions on component mount
+  useEffect(() => {
+    const saved = JSON.parse(localStorage.getItem('savedCoachingSessions') || '[]');
+    setSavedSessions(saved);
+  }, []);
 
   const growthAreas = [
     { key: 'leadership', label: 'Leadership', icon: '👑', description: 'Team management, decision-making, strategic thinking' },
@@ -71,6 +79,38 @@ export default function CareerCoach() {
     );
   };
 
+  const handleSaveSession = () => {
+    if (!coachingStreaming.content) {
+      alert('No session to save. Please complete a coaching session first.');
+      return;
+    }
+
+    const sessionTitle = growthArea === 'custom' ? customTopic : growthAreas.find(a => a.key === growthArea)?.label;
+    
+    const newSession = {
+      id: Date.now(),
+      title: sessionTitle,
+      topic: growthArea === 'custom' ? customTopic : growthAreas.find(a => a.key === growthArea)?.label,
+      content: coachingStreaming.content,
+      timestamp: new Date().toISOString(),
+      status: 'active'
+    };
+
+    setSavedSessions(prev => [newSession, ...prev]);
+    
+    // Save to localStorage for persistence
+    const existing = JSON.parse(localStorage.getItem('savedCoachingSessions') || '[]');
+    localStorage.setItem('savedCoachingSessions', JSON.stringify([newSession, ...existing]));
+    
+    alert('✅ Coaching session saved successfully! You can view it in your saved sessions.');
+  };
+
+  const handleDeleteSession = (id) => {
+    const updated = savedSessions.filter(s => s.id !== id);
+    setSavedSessions(updated);
+    localStorage.setItem('savedCoachingSessions', JSON.stringify(updated));
+  };
+
   const handleClear = () => {
     setGrowthArea('');
     setCustomTopic('');
@@ -82,6 +122,122 @@ export default function CareerCoach() {
     <div style={{ maxWidth: 800, margin: '0 auto', color: colors.text }}>
       <h2 style={{ marginBottom: 16, color: colors.text }}>🎯 AI Career Coach</h2>
       
+      {/* Saved Sessions Section */}
+      {savedSessions.length > 0 && (
+        <div style={{ 
+          marginBottom: 24, 
+          padding: 16, 
+          background: colors.cardBackground,
+          borderRadius: 8,
+          border: `1px solid ${colors.border}`
+        }}>
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center',
+            marginBottom: 12
+          }}>
+            <h3 style={{ margin: 0, color: colors.text }}>
+              💬 Saved Sessions ({savedSessions.length})
+            </h3>
+            <button
+              onClick={() => setShowSavedSessions(!showSavedSessions)}
+              style={{
+                padding: '6px 12px',
+                borderRadius: 6,
+                border: `1px solid ${colors.border}`,
+                background: colors.cardBackground,
+                color: colors.text,
+                cursor: 'pointer',
+                fontSize: '0.9em'
+              }}
+            >
+              {showSavedSessions ? 'Hide' : 'Show'}
+            </button>
+          </div>
+          
+          {showSavedSessions && (
+            <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+              {savedSessions.map((session, index) => (
+                <div 
+                  key={session.id}
+                  style={{ 
+                    padding: 12, 
+                    marginBottom: 8, 
+                    background: colors.background,
+                    borderRadius: 6,
+                    border: `1px solid ${colors.border}`
+                  }}
+                >
+                  <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'flex-start',
+                    marginBottom: 8
+                  }}>
+                    <div>
+                      <strong style={{ color: colors.text }}>
+                        Session #{savedSessions.length - index}
+                      </strong>
+                      <div style={{ 
+                        fontSize: '0.8em', 
+                        color: colors.textSecondary,
+                        marginTop: 4
+                      }}>
+                        {new Date(session.timestamp).toLocaleDateString()} at {new Date(session.timestamp).toLocaleTimeString()}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleDeleteSession(session.id)}
+                      style={{
+                        padding: '4px 8px',
+                        borderRadius: 4,
+                        border: 'none',
+                        background: '#ff4444',
+                        color: '#fff',
+                        cursor: 'pointer',
+                        fontSize: '0.8em'
+                      }}
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                  
+                  <div style={{ marginBottom: 8 }}>
+                    <strong style={{ color: colors.textSecondary }}>Topic:</strong>
+                    <div style={{ 
+                      fontSize: '0.9em', 
+                      color: colors.text,
+                      marginTop: 4,
+                      fontStyle: 'italic'
+                    }}>
+                      {session.title}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <strong style={{ color: colors.textSecondary }}>Session:</strong>
+                    <div style={{ 
+                      fontSize: '0.9em', 
+                      color: colors.text,
+                      marginTop: 4,
+                      maxHeight: '150px',
+                      overflowY: 'auto',
+                      lineHeight: 1.4
+                    }}>
+                      {session.content.length > 300 
+                        ? `${session.content.substring(0, 300)}...` 
+                        : session.content
+                      }
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       {!growthArea && !coachingStreaming.content && (
         <div style={{ marginBottom: 24 }}>
           <p style={{ marginBottom: 16, color: colors.textSecondary }}>
@@ -305,6 +461,7 @@ export default function CareerCoach() {
                 💬 Continue Session
               </button>
               <button
+                onClick={handleSaveSession}
                 style={{
                   padding: '12px 20px',
                   borderRadius: 8,
