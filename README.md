@@ -512,20 +512,35 @@ The **AI Career Coach** is an intelligent mentor module that guides users throug
 
 The **Dynamic Skills Forecasting** module analyzes your learning history and transcript keywords to predict which skills you should develop next. This helps you stay ahead in your career by proactively identifying emerging skill needs.
 
-- **How it works:**
-  - The backend exposes a `/skills-forecast` endpoint powered by a dedicated prompt and the LLM.
-  - The frontend provides a `SkillsForecast.jsx` component where you can enter your learning history and transcript keywords.
-  - The AI suggests three future skills to develop, with reasons for each suggestion.
-  - **User-specific forecasts**: All predictions are saved per user for tracking over time.
-- **Planned enhancements:**
-  - Automatically extract history and keywords from user activity and meeting transcripts
-  - Save and track forecasts over time
-  - Visualize skill trends
+**Current Features:**
+- ✅ **Real-time streaming** with progress indicators and status messages
+- ✅ **Sample inputs** for quick testing (3 predefined examples)
+- ✅ **AI-powered analysis** with detailed skill recommendations
+- ✅ **Professional UI** with consistent styling and animations
+- ✅ **User-specific forecasts**: All predictions are saved per user for tracking over time
+
+**Action Buttons (UI Placeholders - Not Yet Implemented):**
+- 📋 **Save Forecast** - Will save the forecast to user profile (planned)
+- 📚 **Find Learning Resources** - Will search for relevant courses and materials (planned)  
+- 📅 **Schedule Review** - Will set up follow-up reminders (planned)
+
+**How it works:**
+- The backend exposes a `/skills-forecast` endpoint powered by a dedicated prompt and the LLM.
+- The frontend provides a `SkillsForecast.jsx` component with streaming UI.
+- The AI analyzes patterns and predicts which skills will be most valuable for your career development.
+- Results include specific skill recommendations, learning timelines, and resource suggestions.
+
+**Planned enhancements:**
+- Automatically extract history and keywords from user activity and meeting transcripts
+- Save and track forecasts over time
+- Visualize skill trends
+- Implement the action buttons functionality
 
 **How to use:**
-- Scroll to the "Skills Forecasting" section in the app
-- Enter your recent learning history and transcript keywords (or use the defaults)
-- Click **Get Forecast** to receive personalized skill suggestions
+- Navigate to the "Skills Forecast" section in the app
+- Enter your current skills and career goals (or use sample inputs)
+- Click **🔮 Get Forecast** to receive personalized predictions
+- Review the AI-generated skill development roadmap with streaming text
 
 ---
 
