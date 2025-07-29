@@ -1,87 +1,256 @@
 import React, { useState } from "react";
 import { askStream } from "./api";
-import ModalDialog from "./ModalDialog";
+import StreamingProgress from "./StreamingProgress";
+import StreamingText from "./StreamingText";
+import { useStreaming, STATUS_MESSAGES } from "./hooks/useStreaming";
+import { useTheme } from "./ThemeContext";
 
 function Recommendation({ query }) {
   const [skillGap, setSkillGap] = useState(query || "");
-  const [modalOpen, setModalOpen] = useState(false);
-  const [aiOutput, setAiOutput] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [showSim, setShowSim] = useState(false);
+  const { colors } = useTheme();
+  
+  // Use streaming hook for recommendations
+  const recommendationStreaming = useStreaming('Ready to generate recommendations');
+
+  const commonSkillGaps = [
+    "Communication and presentation skills",
+    "Project management and leadership",
+    "Technical skills and programming",
+    "Data analysis and analytics",
+    "Customer service and support",
+    "Sales and negotiation",
+    "Time management and productivity",
+    "Team collaboration and remote work"
+  ];
 
   const handleGetRecommendation = async () => {
-    setLoading(true);
-    setModalOpen(true);
-    setShowSim(false);
-    setAiOutput("");
-    try {
-      await askStream({ prompt: `Suggest what to learn next if my skill gap is: ${skillGap}` }, (output) => setAiOutput(output));
-    } catch (err) {
-      setAiOutput("Error fetching recommendation.");
+    if (!skillGap.trim()) {
+      alert('Please describe your skill gap or learning need.');
+      return;
     }
-    setLoading(false);
+
+    recommendationStreaming.startStreaming(
+      `Suggest what to learn next if my skill gap is: ${skillGap}
+      
+      Provide:
+      1. Specific learning recommendations
+      2. Recommended courses or resources
+      3. Learning path and timeline
+      4. Expected outcomes and benefits
+      5. Related skills to develop
+      
+      Make it personalized and actionable.`,
+      {
+        statusMessages: STATUS_MESSAGES.RECOMMENDATION,
+        onComplete: () => {
+          // Could save recommendation to user profile
+          console.log('Recommendation generated');
+        }
+      }
+    );
   };
 
-  const handleTrySimulation = () => {
-    setShowSim(true);
+  const handleClear = () => {
+    setSkillGap("");
+    recommendationStreaming.clearStreaming();
+  };
+
+  const handleSkillGapSelect = (gap) => {
+    setSkillGap(gap);
   };
 
   return (
-    <div>
-      <h2>Recommendation</h2>
-      <input
-        type="text"
-        value={skillGap}
-        onChange={e => setSkillGap(e.target.value)}
-        placeholder="Enter skill gap for recommendation"
-        style={{ marginRight: 8 }}
-      />
-      <button
-        onClick={handleGetRecommendation}
-        disabled={!skillGap}
-        style={{
-          background: "#d32f2f",
-          color: "#fff",
-          border: 0,
-          borderRadius: 6,
-          padding: "8px 18px",
-          fontWeight: 600,
-          fontSize: 16,
-          cursor: !skillGap ? "not-allowed" : "pointer",
-          marginRight: 8,
-          boxShadow: "0 1px 4px #0001"
-        }}
-        title="Get a personalized AI-powered learning recommendation for your skill gap."
-      >
-        Get Recommendation
-      </button>
-      <ModalDialog
-        isOpen={modalOpen}
-        onRequestClose={() => { setModalOpen(false); setShowSim(false); }}
-        title="Recommendation"
-      >
-        {loading ? (
-          <div style={{ width: '100%', margin: '24px 0' }}>
-            <div style={{ height: 8, background: '#eee', borderRadius: 4, overflow: 'hidden' }}>
-              <div style={{ width: '80%', height: '100%', background: '#d32f2f', animation: 'progressBar 1.2s linear infinite alternate' }} />
+    <div style={{ maxWidth: 800, margin: '0 auto', color: colors.text }}>
+      <h2 style={{ marginBottom: 16, color: colors.text }}>⭐ Personalized Recommendations</h2>
+      
+      <p style={{ marginBottom: 20, color: colors.textSecondary }}>
+        Tell us about your skill gaps or learning needs, and we'll provide personalized recommendations for your next steps.
+      </p>
+
+      {/* Input Section */}
+      <div style={{ marginBottom: 24 }}>
+        <label style={{ display: 'block', marginBottom: 8, fontWeight: 600, color: colors.text }}>
+          What skill gap or learning need would you like to address?
+        </label>
+        
+        <textarea
+          rows={3}
+          value={skillGap}
+          onChange={(e) => setSkillGap(e.target.value)}
+          placeholder="Describe the skill you want to develop or the area you want to improve..."
+          style={{ 
+            width: '100%', 
+            padding: 12, 
+            borderRadius: 8, 
+            border: `1px solid ${colors.border}`,
+            background: colors.cardBackground,
+            color: colors.text,
+            resize: 'vertical',
+            marginBottom: 12
+          }}
+        />
+
+        {/* Quick Selection */}
+        <div style={{ marginBottom: 16 }}>
+          <p style={{ marginBottom: 8, fontSize: '0.9em', color: colors.textSecondary }}>
+            💡 Quick selection:
+          </p>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {commonSkillGaps.map((gap, index) => (
+              <button
+                key={index}
+                onClick={() => handleSkillGapSelect(gap)}
+                style={{
+                  padding: '6px 12px',
+                  borderRadius: 6,
+                  border: `1px solid ${colors.border}`,
+                  background: colors.cardBackground,
+                  color: colors.text,
+                  cursor: 'pointer',
+                  fontSize: '0.8em',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                {gap}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+          <button
+            onClick={handleGetRecommendation}
+            disabled={recommendationStreaming.loading || !skillGap.trim()}
+            style={{
+              padding: '12px 20px',
+              borderRadius: 8,
+              border: 'none',
+              background: colors.primary,
+              color: '#fff',
+              cursor: recommendationStreaming.loading ? 'not-allowed' : 'pointer',
+              opacity: recommendationStreaming.loading ? 0.6 : 1
+            }}
+          >
+            {recommendationStreaming.loading ? '⏳ Generating...' : '⭐ Get Recommendations'}
+          </button>
+          
+          <button
+            onClick={handleClear}
+            disabled={recommendationStreaming.loading}
+            style={{
+              padding: '12px 20px',
+              borderRadius: 8,
+              border: `1px solid ${colors.border}`,
+              background: colors.cardBackground,
+              color: colors.text,
+              cursor: recommendationStreaming.loading ? 'not-allowed' : 'pointer'
+            }}
+          >
+            🗑️ Clear
+          </button>
+        </div>
+      </div>
+
+      {/* Recommendation Progress */}
+      {recommendationStreaming.loading && (
+        <StreamingProgress 
+          loading={recommendationStreaming.loading}
+          status={recommendationStreaming.status}
+          progress={recommendationStreaming.progress}
+          color="info"
+        />
+      )}
+
+      {/* Recommendation Results */}
+      {recommendationStreaming.content && (
+        <div style={{ marginBottom: 24 }}>
+          <h3 style={{ marginBottom: 16, color: colors.text }}>
+            📚 Your Personalized Recommendations
+          </h3>
+          
+          <StreamingText 
+            content={recommendationStreaming.content}
+            loading={recommendationStreaming.loading}
+            placeholder="Generating personalized recommendations..."
+            style={{ minHeight: '250px' }}
+          />
+
+          {/* Action Buttons */}
+          {recommendationStreaming.isComplete && (
+            <div style={{ 
+              marginTop: 16, 
+              display: 'flex', 
+              gap: 12,
+              flexWrap: 'wrap'
+            }}>
+              <button
+                style={{
+                  padding: '12px 20px',
+                  borderRadius: 8,
+                  border: 'none',
+                  background: colors.primary,
+                  color: '#fff',
+                  cursor: 'pointer'
+                }}
+              >
+                🎮 Try Simulation
+              </button>
+              <button
+                style={{
+                  padding: '12px 20px',
+                  borderRadius: 8,
+                  border: `1px solid ${colors.border}`,
+                  background: colors.cardBackground,
+                  color: colors.text,
+                  cursor: 'pointer'
+                }}
+              >
+                📋 Save Recommendations
+              </button>
+              <button
+                style={{
+                  padding: '12px 20px',
+                  borderRadius: 8,
+                  border: `1px solid ${colors.border}`,
+                  background: colors.cardBackground,
+                  color: colors.text,
+                  cursor: 'pointer'
+                }}
+              >
+                📅 Schedule Learning
+              </button>
             </div>
-            <style>{`@keyframes progressBar { 0%{width:10%} 100%{width:90%} }`}</style>
-          </div>
-        ) : showSim ? (
-          <div>
-            <h3>Try a Simulation</h3>
-            <p>Would you like to launch a scenario-based simulation to practice this skill?</p>
-            <button onClick={() => window.location.reload()} style={{ background: '#1976d2', color: '#fff', border: 0, borderRadius: 6, padding: '8px 18px', fontWeight: 600, fontSize: 16, marginTop: 8 }}>Go to Simulator</button>
-          </div>
-        ) : (
-          <>
-            <pre style={{ whiteSpace: "pre-wrap" }}>{aiOutput}</pre>
-            {aiOutput && (
-              <button onClick={handleTrySimulation} style={{ background: '#1976d2', color: '#fff', border: 0, borderRadius: 6, padding: '8px 18px', fontWeight: 600, fontSize: 16, marginTop: 16 }}>Try Simulation</button>
-            )}
-          </>
-        )}
-      </ModalDialog>
+          )}
+        </div>
+      )}
+
+      {/* Error Handling */}
+      {recommendationStreaming.error && (
+        <div style={{ 
+          padding: 16, 
+          background: '#ffebee', 
+          color: '#c62828',
+          borderRadius: 8,
+          marginBottom: 16
+        }}>
+          <strong>Error:</strong> {recommendationStreaming.error}
+          <button
+            onClick={handleClear}
+            style={{
+              marginLeft: 12,
+              padding: '4px 8px',
+              borderRadius: 4,
+              border: 'none',
+              background: '#c62828',
+              color: '#fff',
+              cursor: 'pointer',
+              fontSize: '0.8em'
+            }}
+          >
+            Try Again
+          </button>
+        </div>
+      )}
     </div>
   );
 }

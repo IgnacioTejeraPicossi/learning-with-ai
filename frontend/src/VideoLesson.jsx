@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
 import { generateVideoQuiz, generateVideoSummary, askStream } from './api';
+import StreamingProgress from './StreamingProgress';
+import StreamingText from './StreamingText';
+import { useStreaming, STATUS_MESSAGES } from './hooks/useStreaming';
+import { useTheme } from './ThemeContext';
 
 const EXAMPLE_VIDEO = "https://www.youtube.com/embed/1hHMwLxN6EM";
 const EXAMPLE_SUMMARY = "This video explains the basics of Agile methodology, including its iterative approach, team collaboration, and adaptability to change. Key points: Agile is not waterfall, it values individuals and interactions, and it uses sprints to deliver value incrementally.";
@@ -9,46 +13,55 @@ function VideoLesson() {
   const [summary, setSummary] = useState('');
   const [quiz, setQuiz] = useState([]);
   const [userAnswers, setUserAnswers] = useState({});
-  const [loading, setLoading] = useState(false);
   const [transcript, setTranscript] = useState('');
-  const [summaryLoading, setSummaryLoading] = useState(false);
+  const { colors } = useTheme();
+
+  // Use streaming hooks for different operations
+  const summaryStreaming = useStreaming('Ready to generate summary');
+  const quizStreaming = useStreaming('Ready to generate quiz');
 
   const handleGenerateQuiz = async () => {
-    setLoading(true);
-    try {
-      const response = await generateVideoQuiz(summary);
-      
-      if (response.error) {
-        console.error('Quiz generation error:', response.error);
-        alert(`Quiz generation failed: ${response.error}`);
-        return;
-      }
-      
-      if (response.quiz && Array.isArray(response.quiz)) {
-        setQuiz(response.quiz);
-      } else {
-        console.error('Invalid quiz response:', response);
-        alert("Failed to generate quiz. Please try again.");
-      }
-    } catch (err) {
-      console.error('Quiz generation error:', err);
-      alert("Quiz generation failed. Please check your connection and try again.");
+    if (!summary.trim()) {
+      alert('Please provide a video summary first.');
+      return;
     }
-    setLoading(false);
+
+    quizStreaming.startStreaming(
+      `Generate a quiz based on this video summary: ${summary}`,
+      {
+        statusMessages: STATUS_MESSAGES.VIDEO_ANALYSIS,
+        onComplete: async () => {
+          try {
+            const response = await generateVideoQuiz(summary);
+            if (response.quiz && Array.isArray(response.quiz)) {
+              setQuiz(response.quiz);
+            } else {
+              throw new Error('Invalid quiz response');
+            }
+          } catch (err) {
+            console.error('Quiz generation error:', err);
+            alert("Failed to generate quiz. Please try again.");
+          }
+        }
+      }
+    );
   };
 
   const handleGenerateSummary = async () => {
-    setSummaryLoading(true);
-    try {
-      let streamed = '';
-      await askStream({ prompt: `Summarize this video transcript into 5 key points for learning purposes: ${transcript}` }, (output) => {
-        streamed = output;
-        setSummary(streamed);
-      });
-    } catch (err) {
-      alert("Summary generation failed.");
+    if (!transcript.trim()) {
+      alert('Please provide a video transcript first.');
+      return;
     }
-    setSummaryLoading(false);
+
+    summaryStreaming.startStreaming(
+      `Summarize this video transcript into 5 key points for learning purposes: ${transcript}`,
+      {
+        statusMessages: STATUS_MESSAGES.VIDEO_ANALYSIS,
+        onComplete: (output) => {
+          setSummary(output);
+        }
+      }
+    );
   };
 
   const handleAnswer = (questionIdx, selected) => {
@@ -63,6 +76,18 @@ function VideoLesson() {
     setSummary(EXAMPLE_SUMMARY);
     setQuiz([]);
     setUserAnswers({});
+    summaryStreaming.clearStreaming();
+    quizStreaming.clearStreaming();
+  };
+
+  const handleClear = () => {
+    setVideoUrl('');
+    setSummary('');
+    setQuiz([]);
+    setUserAnswers({});
+    setTranscript('');
+    summaryStreaming.clearStreaming();
+    quizStreaming.clearStreaming();
   };
 
   // Calculate score
@@ -71,100 +96,245 @@ function VideoLesson() {
   const showBadge = score >= 80 && quiz.length > 0;
 
   return (
-    <div style={{ maxWidth: 700, margin: '0 auto' }}>
-      <h2 style={{ marginBottom: 8 }}>🎥 Video-Based Learning</h2>
-      <div style={{ marginBottom: 16 }}>
-        <button onClick={handlePasteExample} style={{ marginRight: 8 }}>Paste Example</button>
-        <span title="Paste a YouTube embed URL (e.g. https://www.youtube.com/embed/...) or direct MP4 link.">ℹ️ Video URL</span>
+    <div style={{ maxWidth: 800, margin: '0 auto', color: colors.text }}>
+      <h2 style={{ marginBottom: 16, color: colors.text }}>🎥 Video-Based Learning</h2>
+      
+      {/* Video URL Input */}
+      <div style={{ marginBottom: 20 }}>
+        <label style={{ display: 'block', marginBottom: 8, fontWeight: 600, color: colors.text }}>
+          Video URL:
+        </label>
+        <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+          <input
+            type="text"
+            value={videoUrl}
+            onChange={(e) => setVideoUrl(e.target.value)}
+            placeholder="https://www.youtube.com/embed/..."
+            style={{ 
+              flex: 1, 
+              padding: 12, 
+              borderRadius: 8, 
+              border: `1px solid ${colors.border}`,
+              background: colors.cardBackground,
+              color: colors.text
+            }}
+          />
+          <button 
+            onClick={handlePasteExample}
+            style={{ 
+              padding: '12px 16px', 
+              borderRadius: 8, 
+              border: `1px solid ${colors.border}`,
+              background: colors.cardBackground,
+              color: colors.text,
+              cursor: 'pointer'
+            }}
+          >
+            📋 Example
+          </button>
+        </div>
+        <small style={{ color: colors.textSecondary }}>
+          Paste a YouTube embed URL or direct MP4 link
+        </small>
       </div>
-      <input
-        type="text"
-        value={videoUrl}
-        onChange={(e) => setVideoUrl(e.target.value)}
-        placeholder="https://www.youtube.com/embed/..."
-        style={{ width: '100%', marginBottom: 12, padding: 8, borderRadius: 6, border: '1px solid #ccc' }}
-      /><br/>
 
+      {/* Video Player */}
       {videoUrl && (
         <div style={{ marginBottom: 20 }}>
           <iframe
             width="100%"
-            height="360"
+            height="315"
             src={videoUrl}
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
             title="Video"
             style={{ borderRadius: 8 }}
-          ></iframe>
+          />
         </div>
       )}
 
-      <h3 style={{ marginTop: 24 }}>🎤 Transcript (optional)</h3>
-      <textarea
-        rows={4}
-        style={{ width: '100%', marginBottom: 8, padding: 8, borderRadius: 6, border: '1px solid #ccc' }}
-        value={transcript}
-        onChange={e => setTranscript(e.target.value)}
-        placeholder="Paste transcript or captions here..."
-      ></textarea>
-      <button onClick={handleGenerateSummary} disabled={summaryLoading || !transcript} style={{ marginBottom: 16 }}>
-        {summaryLoading ? "Generating Summary..." : "Auto-generate Summary"}
-      </button>
+      {/* Transcript Input */}
+      <div style={{ marginBottom: 20 }}>
+        <label style={{ display: 'block', marginBottom: 8, fontWeight: 600, color: colors.text }}>
+          Video Transcript (for summary generation):
+        </label>
+        <textarea
+          rows={4}
+          value={transcript}
+          onChange={(e) => setTranscript(e.target.value)}
+          placeholder="Paste the video transcript here to generate a summary..."
+          style={{ 
+            width: '100%', 
+            padding: 12, 
+            borderRadius: 8, 
+            border: `1px solid ${colors.border}`,
+            background: colors.cardBackground,
+            color: colors.text,
+            resize: 'vertical'
+          }}
+        />
+        <button 
+          onClick={handleGenerateSummary}
+          disabled={summaryStreaming.loading || !transcript.trim()}
+          style={{ 
+            marginTop: 8,
+            padding: '12px 20px', 
+            borderRadius: 8, 
+            border: 'none',
+            background: colors.primary,
+            color: '#fff',
+            cursor: summaryStreaming.loading ? 'not-allowed' : 'pointer',
+            opacity: summaryStreaming.loading ? 0.6 : 1
+          }}
+        >
+          {summaryStreaming.loading ? '⏳ Generating...' : '📝 Generate Summary'}
+        </button>
+      </div>
 
-      <h3 style={{ marginTop: 24 }}>🧠 Video Summary <span title="Paste or auto-generate a summary for quiz generation.">ℹ️</span></h3>
-      <textarea
-        rows={5}
-        style={{ width: '100%', marginBottom: 8, padding: 8, borderRadius: 6, border: '1px solid #ccc' }}
-        value={summary}
-        onChange={(e) => setSummary(e.target.value)}
-        placeholder="Paste summary or main points from video..."
-      ></textarea><br/>
+      {/* Summary Streaming */}
+      {summaryStreaming.loading && (
+        <StreamingProgress 
+          loading={summaryStreaming.loading}
+          status={summaryStreaming.status}
+          progress={summaryStreaming.progress}
+          color="info"
+        />
+      )}
 
-      <button onClick={handleGenerateQuiz} disabled={loading || !summary} style={{ marginTop: 8, marginBottom: 16 }}>
-        {loading ? "Generating..." : "Generate Quiz"}
-      </button>
+      {/* Summary Display */}
+      {summary && (
+        <div style={{ marginBottom: 20 }}>
+          <h3 style={{ marginBottom: 12, color: colors.text }}>📋 Video Summary</h3>
+          <StreamingText 
+            content={summary}
+            loading={summaryStreaming.loading}
+            placeholder="Generating summary..."
+          />
+        </div>
+      )}
 
-      <hr style={{ margin: '24px 0' }}/>
+      {/* Quiz Generation */}
+      {summary && (
+        <div style={{ marginBottom: 20 }}>
+          <button 
+            onClick={handleGenerateQuiz}
+            disabled={quizStreaming.loading || !summary.trim()}
+            style={{ 
+              padding: '12px 20px', 
+              borderRadius: 8, 
+              border: 'none',
+              background: colors.primary,
+              color: '#fff',
+              cursor: quizStreaming.loading ? 'not-allowed' : 'pointer',
+              opacity: quizStreaming.loading ? 0.6 : 1
+            }}
+          >
+            {quizStreaming.loading ? '⏳ Generating Quiz...' : '🧠 Generate Quiz'}
+          </button>
+        </div>
+      )}
 
+      {/* Quiz Streaming */}
+      {quizStreaming.loading && (
+        <StreamingProgress 
+          loading={quizStreaming.loading}
+          status={quizStreaming.status}
+          progress={quizStreaming.progress}
+          color="success"
+        />
+      )}
+
+      {/* Quiz Display */}
       {quiz.length > 0 && (
-        <div>
-          <h3>📝 Quiz</h3>
+        <div style={{ marginBottom: 20 }}>
+          <h3 style={{ marginBottom: 12, color: colors.text }}>
+            📝 Quiz {showBadge && '🏆'}
+          </h3>
           {quiz.map((q, idx) => (
-            <div key={idx} style={{ marginBottom: '2rem', background: '#f9f9f9', borderRadius: 8, padding: 16 }}>
-              <strong>Q{idx + 1}: {q.question}</strong>
-              <ul style={{ listStyle: 'none', paddingLeft: 0 }}>
+            <div key={idx} style={{ 
+              marginBottom: 20, 
+              padding: 16, 
+              background: colors.cardBackground,
+              borderRadius: 8,
+              border: `1px solid ${colors.border}`
+            }}>
+              <strong style={{ color: colors.text }}>
+                Q{idx + 1}: {q.question}
+              </strong>
+              <div style={{ marginTop: 8 }}>
                 {q.options.map((opt, optIdx) => (
-                  <li key={optIdx} style={{ marginBottom: 4 }}>
-                    <label>
-                      <input
-                        type="radio"
-                        name={`q${idx}`}
-                        value={opt}
-                        checked={userAnswers[idx] === opt}
-                        onChange={() => handleAnswer(idx, opt)}
-                        style={{ marginRight: 6 }}
-                      />
-                      {opt}
-                    </label>
-                  </li>
+                  <label key={optIdx} style={{ 
+                    display: 'block', 
+                    marginBottom: 4,
+                    cursor: 'pointer'
+                  }}>
+                    <input
+                      type="radio"
+                      name={`q${idx}`}
+                      value={opt}
+                      checked={userAnswers[idx] === opt}
+                      onChange={() => handleAnswer(idx, opt)}
+                      style={{ marginRight: 8 }}
+                    />
+                    {opt}
+                  </label>
                 ))}
-              </ul>
+              </div>
               {userAnswers[idx] && (
-                <div style={{ color: userAnswers[idx] === q.answer ? 'green' : 'red', marginTop: 6 }}>
-                  {userAnswers[idx] === q.answer ? '✅ Correct!' : '❌ Incorrect.'} <br/>
-                  <span style={{ fontWeight: 500 }}>Correct: {q.answer}</span>  <br/>
-                  <span style={{ color: '#555' }}>🧾 {q.explanation}</span>
+                <div style={{ 
+                  marginTop: 8,
+                  padding: 8,
+                  borderRadius: 4,
+                  background: userAnswers[idx] === q.answer ? '#e8f5e8' : '#ffebee',
+                  color: userAnswers[idx] === q.answer ? '#2e7d32' : '#c62828'
+                }}>
+                  ✅ Correct: {q.answer}  
+                  <br/>
+                  🧾 {q.explanation}
                 </div>
               )}
             </div>
           ))}
-          <div style={{ fontWeight: 600, fontSize: 18, marginTop: 16 }}>
-            Score: {score}%
-            {showBadge && <span style={{ marginLeft: 12, color: '#1976d2', fontSize: 22 }}>🏅 Video Learning Badge!</span>}
-          </div>
+          
+          {Object.keys(userAnswers).length === quiz.length && (
+            <div style={{ 
+              padding: 16, 
+              background: colors.cardBackground,
+              borderRadius: 8,
+              border: `1px solid ${colors.border}`,
+              textAlign: 'center'
+            }}>
+              <h4 style={{ marginBottom: 8, color: colors.text }}>
+                Quiz Complete! 🎉
+              </h4>
+              <p style={{ fontSize: '1.2em', fontWeight: 'bold', color: colors.text }}>
+                Score: {score}% ({correctCount}/{quiz.length} correct)
+              </p>
+              {showBadge && (
+                <p style={{ color: '#4caf50', fontWeight: 'bold' }}>
+                  🏆 Excellent! You've mastered this content!
+                </p>
+              )}
+            </div>
+          )}
         </div>
       )}
+
+      {/* Clear Button */}
+      <button 
+        onClick={handleClear}
+        style={{ 
+          padding: '12px 20px', 
+          borderRadius: 8, 
+          border: `1px solid ${colors.border}`,
+          background: colors.cardBackground,
+          color: colors.text,
+          cursor: 'pointer'
+        }}
+      >
+        🗑️ Clear All
+      </button>
     </div>
   );
 }
