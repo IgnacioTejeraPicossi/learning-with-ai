@@ -88,6 +88,13 @@ const GlobalSearch = ({ onNavigate, isOpen, onClose }) => {
       keywords: ["skills", "forecast", "prediction", "trends", "future"]
     },
     {
+      id: "presentation-agent",
+      title: "Presentation Agent",
+      description: "AI-powered presentation and Q&A for demos",
+      icon: "🎤",
+      keywords: ["presentation", "agent", "demo", "pitch", "speech", "hackathon", "q&a"]
+    },
+    {
       id: "saved-lessons",
       title: "Saved Lessons",
       description: "View and manage your saved micro-lessons",

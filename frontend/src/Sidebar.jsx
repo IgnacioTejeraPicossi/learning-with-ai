@@ -19,7 +19,8 @@ const Icon = ({ name, size = 20 }) => {
     "chevron-left": "◀️",
     "chevron-right": "▶️",
     test: "🧪",
-    robot: "🤖"
+    robot: "🤖",
+    microphone: "🎤"
   };
 
   return (
@@ -40,6 +41,7 @@ const navItems = [
   { key: "certifications", label: "Certifications", icon: "award" },
   { key: "coach", label: "AI Career Coach", icon: "user-check" },
   { key: "skills-forecast", label: "Skills Forecast", icon: "bar-chart" },
+  { key: "presentation-agent", label: "Presentation Agent", icon: "microphone" },
   { key: "saved-lessons", label: "Saved Lessons", icon: "archive" },
   { key: "saved-videos", label: "Saved Videos", icon: "play-circle" },
   { key: "idea-log", label: "Idea Log", icon: "lightbulb" },

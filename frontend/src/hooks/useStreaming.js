@@ -146,5 +146,23 @@ export const STATUS_MESSAGES = {
     'Identifying patterns...',
     'Generating insights...',
     'Creating recommendations...'
+  ],
+  PRESENTATION: [
+    'Analyzing project features...',
+    'Creating presentation structure...',
+    'Generating engaging content...',
+    'Finalizing script...'
+  ],
+  QA: [
+    'Understanding question...',
+    'Analyzing project context...',
+    'Generating response...',
+    'Finalizing answer...'
+  ],
+  DEMO: [
+    'Preparing slide content...',
+    'Generating demo script...',
+    'Adding technical details...',
+    'Finalizing presentation...'
   ]
 }; 

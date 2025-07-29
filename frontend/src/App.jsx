@@ -13,6 +13,7 @@ import TeamDynamics from "./TeamDynamics";
 import Certifications from "./Certifications";
 import GlobalSearch from "./GlobalSearch";
 import RunTest from "./RunTest";
+import PresentationAgent from "./PresentationAgent";
 import { auth } from './firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import Auth from './Auth';
@@ -311,6 +312,7 @@ function AppContent() {
             {activeModule === 'certification' && <Certifications query={userQuery} />}
             {activeModule === 'video-lessons' && <VideoLesson query={userQuery} />}
             {activeModule === 'saved-videos' && <SavedVideos user={user} />}
+            {activeModule === 'presentation-agent' && <PresentationAgent query={userQuery} />}
             {!activeModule && section === "dashboard" && <Dashboard user={user} onSectionSelect={setSection} />}
             {!activeModule && section === "ai-concepts" && <Concepts />}
             {!activeModule && section === "micro-lessons" && <MicroLesson />}
@@ -321,6 +323,7 @@ function AppContent() {
             {!activeModule && section === "certifications" && <Certifications />}
             {!activeModule && section === "coach" && <CareerCoach />}
             {!activeModule && section === "skills-forecast" && <SkillsForecast />}
+            {!activeModule && section === "presentation-agent" && <PresentationAgent />}
             {!activeModule && section === "saved-lessons" && <LessonList user={user} />}
             {!activeModule && section === "saved-videos" && <SavedVideos user={user} />}
             {!activeModule && section === "run-test" && <RunTest />}
