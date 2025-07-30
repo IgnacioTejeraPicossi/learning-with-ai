@@ -13,6 +13,11 @@ function PresentationAgent() {
   const [customTiming, setCustomTiming] = useState(60); // seconds per slide
   const [language, setLanguage] = useState('en');
   const [voiceGender, setVoiceGender] = useState('male'); // 'male' or 'female'
+  const [voiceTrainingMode, setVoiceTrainingMode] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingTime, setRecordingTime] = useState(0);
+  const [audioBlob, setAudioBlob] = useState(null);
+  const [voiceTrainingStatus, setVoiceTrainingStatus] = useState('idle'); // 'idle', 'recording', 'processing', 'completed', 'failed'
   const [exportFormat, setExportFormat] = useState('pdf');
   const [showExportOptions, setShowExportOptions] = useState(false);
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
@@ -35,6 +40,60 @@ function PresentationAgent() {
 
   // Speech synthesis
   const speechRef = useRef(null);
+  const mediaRecorderRef = useRef(null);
+  const recordingIntervalRef = useRef(null);
+
+  // Voice recording functions
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorderRef.current = new MediaRecorder(stream);
+      const chunks = [];
+
+      mediaRecorderRef.current.ondataavailable = (event) => {
+        chunks.push(event.data);
+      };
+
+      mediaRecorderRef.current.onstop = () => {
+        const blob = new Blob(chunks, { type: 'audio/wav' });
+        setAudioBlob(blob);
+        setVoiceTrainingStatus('processing');
+        // Here you would send the blob to your backend for voice training
+        console.log('Recording completed, blob size:', blob.size);
+      };
+
+      mediaRecorderRef.current.start();
+      setIsRecording(true);
+      setRecordingTime(0);
+      setVoiceTrainingStatus('recording');
+
+      // Start timer
+      recordingIntervalRef.current = setInterval(() => {
+        setRecordingTime(prev => prev + 1);
+      }, 1000);
+
+    } catch (error) {
+      console.error('Error starting recording:', error);
+      alert('Could not access microphone. Please check permissions.');
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
+      setIsRecording(false);
+      
+      if (recordingIntervalRef.current) {
+        clearInterval(recordingIntervalRef.current);
+      }
+    }
+  };
+
+  const handleVoiceTraining = () => {
+    setVoiceTrainingMode(true);
+    setPresentationMode('voice-training');
+  };
 
   // Presentation slides structure
   const presentationSlides = [
@@ -965,6 +1024,32 @@ This demonstrates the comprehensive learning journey our platform provides.`,
                 lineHeight: 1.4
               }}>
                 Start 4-minute automated presentation
+              </p>
+            </div>
+
+            {/* Train Your Agent's Voice */}
+            <div
+              style={{
+                padding: 20,
+                background: colors.cardBackground,
+                borderRadius: 12,
+                border: `2px solid ${colors.border}`,
+                textAlign: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+              onClick={handleVoiceTraining}
+              onMouseEnter={(e) => e.target.style.borderColor = colors.primary}
+              onMouseLeave={(e) => e.target.style.borderColor = colors.border}
+            >
+              <div style={{ fontSize: '2.5em', marginBottom: 12 }}>🎤</div>
+              <h3 style={{ marginBottom: 8, color: colors.text }}>Train Your Agent's Voice</h3>
+              <p style={{ 
+                color: colors.textSecondary, 
+                fontSize: '0.9em',
+                lineHeight: 1.4
+              }}>
+                Record your voice to clone it for presentations
               </p>
             </div>
           </div>
@@ -1995,6 +2080,319 @@ This demonstrates the comprehensive learning journey our platform provides.`,
           >
             Try Again
           </button>
+        </div>
+      )}
+
+      {/* Voice Training Mode */}
+      {presentationMode === 'voice-training' && (
+        <div style={{ marginBottom: 24 }}>
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: 12, 
+            marginBottom: 16,
+            padding: 12,
+            background: colors.primaryLight,
+            borderRadius: 8
+          }}>
+            <span style={{ fontSize: '1.5em' }}>🎤</span>
+            <div>
+              <h3 style={{ margin: 0, color: colors.text }}>
+                Train Your Agent's Voice
+              </h3>
+              <p style={{ margin: 0, fontSize: '0.9em', color: colors.textSecondary }}>
+                Record your voice to create a personalized voice clone for presentations
+              </p>
+            </div>
+          </div>
+
+          {/* Recording Instructions */}
+          <div style={{ 
+            padding: 16,
+            background: colors.background,
+            borderRadius: 8,
+            border: `1px solid ${colors.border}`,
+            marginBottom: 20
+          }}>
+            <h4 style={{ margin: '0 0 12px 0', color: colors.text }}>📋 Recording Instructions</h4>
+            <ul style={{ 
+              margin: 0, 
+              paddingLeft: 20, 
+              color: colors.text,
+              lineHeight: 1.6
+            }}>
+              <li>Find a quiet environment with minimal background noise</li>
+              <li>Speak clearly and naturally for 30-60 seconds</li>
+              <li>Read a sample text or speak about any topic</li>
+              <li>Maintain consistent volume and pace</li>
+              <li>Your voice will be used to generate personalized presentations</li>
+            </ul>
+          </div>
+
+          {/* Recording Controls */}
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            gap: 16,
+            marginBottom: 20
+          }}>
+            {!isRecording ? (
+              <button
+                onClick={startRecording}
+                disabled={voiceTrainingStatus === 'processing'}
+                style={{
+                  padding: '16px 24px',
+                  borderRadius: 8,
+                  border: 'none',
+                  background: voiceTrainingStatus === 'processing' ? colors.border : colors.primary,
+                  color: '#fff',
+                  cursor: voiceTrainingStatus === 'processing' ? 'not-allowed' : 'pointer',
+                  fontSize: '1.1em',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8
+                }}
+              >
+                <span style={{ fontSize: '1.2em' }}>🎙️</span>
+                Start Recording
+              </button>
+            ) : (
+              <button
+                onClick={stopRecording}
+                style={{
+                  padding: '16px 24px',
+                  borderRadius: 8,
+                  border: 'none',
+                  background: '#dc3545',
+                  color: '#fff',
+                  cursor: 'pointer',
+                  fontSize: '1.1em',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8
+                }}
+              >
+                <span style={{ fontSize: '1.2em' }}>⏹️</span>
+                Stop Recording
+              </button>
+            )}
+          </div>
+
+          {/* Recording Status */}
+          {isRecording && (
+            <div style={{ 
+              textAlign: 'center',
+              padding: 16,
+              background: colors.primaryLight,
+              borderRadius: 8,
+              border: `1px solid ${colors.primary}`,
+              marginBottom: 20
+            }}>
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                gap: 8,
+                marginBottom: 8
+              }}>
+                <div style={{
+                  width: '12px',
+                  height: '12px',
+                  borderRadius: '50%',
+                  background: '#dc3545',
+                  animation: 'pulse 1s infinite'
+                }} />
+                <span style={{ 
+                  color: colors.primary, 
+                  fontWeight: 'bold',
+                  fontSize: '1.1em'
+                }}>
+                  Recording in Progress
+                </span>
+              </div>
+              <div style={{ 
+                fontSize: '2em', 
+                fontWeight: 'bold',
+                color: colors.primary,
+                fontFamily: 'monospace'
+              }}>
+                {Math.floor(recordingTime / 60)}:{(recordingTime % 60).toString().padStart(2, '0')}
+              </div>
+              <p style={{ 
+                margin: '8px 0 0 0',
+                color: colors.textSecondary,
+                fontSize: '0.9em'
+              }}>
+                Speak clearly and naturally
+              </p>
+            </div>
+          )}
+
+          {/* Processing Status */}
+          {voiceTrainingStatus === 'processing' && (
+            <div style={{ 
+              textAlign: 'center',
+              padding: 16,
+              background: colors.background,
+              borderRadius: 8,
+              border: `1px solid ${colors.border}`,
+              marginBottom: 20
+            }}>
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                gap: 8,
+                marginBottom: 8
+              }}>
+                <span style={{ fontSize: '1.5em' }}>⏳</span>
+                <span style={{ 
+                  color: colors.text, 
+                  fontWeight: 'bold'
+                }}>
+                  Processing Your Voice
+                </span>
+              </div>
+              <p style={{ 
+                margin: 0,
+                color: colors.textSecondary,
+                fontSize: '0.9em'
+              }}>
+                Training AI model with your voice sample...
+              </p>
+            </div>
+          )}
+
+          {/* Audio Preview */}
+          {audioBlob && voiceTrainingStatus !== 'processing' && (
+            <div style={{ 
+              padding: 16,
+              background: colors.cardBackground,
+              borderRadius: 8,
+              border: `1px solid ${colors.border}`,
+              marginBottom: 20
+            }}>
+              <h4 style={{ margin: '0 0 12px 0', color: colors.text }}>🎵 Audio Preview</h4>
+              <audio 
+                controls 
+                style={{ width: '100%' }}
+                src={URL.createObjectURL(audioBlob)}
+              />
+              <div style={{ 
+                marginTop: 12,
+                display: 'flex',
+                gap: 8
+              }}>
+                <button
+                  onClick={() => {
+                    setAudioBlob(null);
+                    setVoiceTrainingStatus('idle');
+                    setRecordingTime(0);
+                  }}
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: 6,
+                    border: `1px solid ${colors.border}`,
+                    background: colors.cardBackground,
+                    color: colors.text,
+                    cursor: 'pointer',
+                    fontSize: '0.9em'
+                  }}
+                >
+                  🔄 Record Again
+                </button>
+                <button
+                  onClick={() => {
+                    // Here you would send the audioBlob to your backend
+                    console.log('Sending audio for voice training...');
+                    setVoiceTrainingStatus('processing');
+                  }}
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: 6,
+                    border: 'none',
+                    background: colors.primary,
+                    color: '#fff',
+                    cursor: 'pointer',
+                    fontSize: '0.9em'
+                  }}
+                >
+                  🚀 Train Voice Model
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Voice Training Benefits */}
+          <div style={{ 
+            padding: 16,
+            background: colors.background,
+            borderRadius: 8,
+            border: `1px solid ${colors.border}`
+          }}>
+            <h4 style={{ margin: '0 0 12px 0', color: colors.text }}>✨ Benefits of Voice Training</h4>
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
+              gap: 12 
+            }}>
+              <div style={{ 
+                padding: '8px 12px',
+                background: colors.cardBackground,
+                borderRadius: 6,
+                border: `1px solid ${colors.border}`
+              }}>
+                <div style={{ fontSize: '1.2em', marginBottom: 4 }}>🎯</div>
+                <div style={{ fontWeight: 'bold', fontSize: '0.9em', color: colors.text }}>Personalized Voice</div>
+                <div style={{ fontSize: '0.8em', color: colors.textSecondary }}>Presentations sound like you</div>
+              </div>
+              <div style={{ 
+                padding: '8px 12px',
+                background: colors.cardBackground,
+                borderRadius: 6,
+                border: `1px solid ${colors.border}`
+              }}>
+                <div style={{ fontSize: '1.2em', marginBottom: 4 }}>🌍</div>
+                <div style={{ fontWeight: 'bold', fontSize: '0.9em', color: colors.text }}>Multi-language</div>
+                <div style={{ fontSize: '0.8em', color: colors.textSecondary }}>Works with all supported languages</div>
+              </div>
+              <div style={{ 
+                padding: '8px 12px',
+                background: colors.cardBackground,
+                borderRadius: 6,
+                border: `1px solid ${colors.border}`
+              }}>
+                <div style={{ fontSize: '1.2em', marginBottom: 4 }}>🔒</div>
+                <div style={{ fontWeight: 'bold', fontSize: '0.9em', color: colors.text }}>Secure Storage</div>
+                <div style={{ fontSize: '0.8em', color: colors.textSecondary }}>Your voice data is private</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Back to Main Menu */}
+          <div style={{ textAlign: 'center', marginTop: 20 }}>
+            <button
+              onClick={() => {
+                setVoiceTrainingMode(false);
+                setPresentationMode('');
+                setAudioBlob(null);
+                setVoiceTrainingStatus('idle');
+                setRecordingTime(0);
+              }}
+              style={{
+                padding: '12px 20px',
+                borderRadius: 8,
+                border: `1px solid ${colors.border}`,
+                background: colors.cardBackground,
+                color: colors.text,
+                cursor: 'pointer',
+                fontSize: '1em'
+              }}
+            >
+              ← Back to Main Menu
+            </button>
+          </div>
         </div>
       )}
     </div>
