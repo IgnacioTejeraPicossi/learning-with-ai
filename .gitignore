@@ -7,6 +7,9 @@ yarn.lock
 docs/
 docs-md/
 
+# README.md - Temporarily hidden until after hackathon
+README.md
+
 # Build output
 dist/
 build/
