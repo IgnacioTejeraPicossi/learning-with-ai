@@ -1,14 +1,16 @@
 # FastAPI app skeleton for AI Workplace Learning
-from fastapi import FastAPI, Request, Body, HTTPException, Depends, status
+from fastapi import FastAPI, Request, Body, HTTPException, Depends, status, UploadFile, Form, File
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse, FileResponse
 from pydantic import BaseModel
+from pathlib import Path
+import json
+import os
+from datetime import datetime
+import uuid
+from typing import List, Optional, Dict, Any
 from backend.prompts import CONCEPT_PROMPT, MICROLESSON_PROMPT, SIMULATION_PROMPT, RECOMMENDATION_PROMPT, PROMPTS, CERTIFICATION_RECOMMENDATION_PROMPT, CERTIFICATION_STUDY_PLAN_PROMPT, CERTIFICATION_SIMULATION_PROMPT, CERTIFICATION_CAREER_COACH_PROMPT, video_quiz_prompt, video_summary_prompt
 from backend.llm import ask_openai, web_search_query, classify_intent, generate_scaffold
-from typing import List, Optional
-from fastapi.staticfiles import StaticFiles
-import os
-import datetime
-import json
 from backend.db import lessons_collection, career_coach_sessions, skills_forecasts, teams_collection, team_members_collection, team_analytics_collection, certifications_collection, study_plans_collection, certification_simulations_collection, unknown_intents_collection, scaffold_history_collection
 from bson import ObjectId
 
@@ -151,7 +153,7 @@ async def micro_lesson(request: Request, user=Depends(verify_token)):
         "lesson": lesson_text,
         "user_id": user["uid"],
         "user_email": user.get("email", ""),
-        "created_at": datetime.datetime.utcnow()
+        "created_at": datetime.utcnow()
     })
     return {"lesson": lesson_text}
 
@@ -255,7 +257,7 @@ async def career_coach(request: Request, user=Depends(verify_token)):
             "user_email": user.get("email", ""),
             "history": history,
             "response": result,
-            "created_at": datetime.datetime.utcnow()
+            "created_at": datetime.utcnow()
         })
     except Exception as e:
         print(f"Failed to save career coach session: {e}")
@@ -279,7 +281,7 @@ async def skills_forecast(request: Request, user=Depends(verify_token)):
             "history": history,
             "keywords": keywords,
             "forecast": result,
-            "created_at": datetime.datetime.utcnow()
+            "created_at": datetime.utcnow()
         })
     except Exception as e:
         print(f"Failed to save skills forecast: {e}")
@@ -313,8 +315,8 @@ async def create_team(request: TeamCreateRequest, user=Depends(verify_token)):
         "description": request.description,
         "created_by": user["uid"],
         "created_by_email": user.get("email", ""),
-        "created_at": datetime.datetime.utcnow(),
-        "updated_at": datetime.datetime.utcnow()
+        "created_at": datetime.utcnow(),
+        "updated_at": datetime.utcnow()
     }
     
     # Insert team
@@ -331,7 +333,7 @@ async def create_team(request: TeamCreateRequest, user=Depends(verify_token)):
             "email": member.email,
             "skills": member.skills,
             "performance_score": member.performance_score,
-            "created_at": datetime.datetime.utcnow()
+            "created_at": datetime.utcnow()
         }
         member_docs.append(member_doc)
     
@@ -388,7 +390,7 @@ async def update_team(team_id: str, request: TeamUpdateRequest, user=Depends(ver
         raise HTTPException(status_code=404, detail="Team not found")
     
     # Prepare update data
-    update_data = {"updated_at": datetime.datetime.utcnow()}
+    update_data = {"updated_at": datetime.utcnow()}
     if request.name is not None:
         update_data["name"] = request.name
     if request.description is not None:
@@ -440,7 +442,7 @@ async def add_team_member(team_id: str, member: TeamMember, user=Depends(verify_
         "email": member.email,
         "skills": member.skills,
         "performance_score": member.performance_score,
-        "created_at": datetime.datetime.utcnow()
+        "created_at": datetime.utcnow()
     }
     
     result = await team_members_collection.insert_one(member_doc)
@@ -563,7 +565,7 @@ async def generate_team_analytics(team_id: str, request: TeamAnalyticsRequest, u
         "user_id": user["uid"],
         "metrics": request.metrics,
         "analysis": analysis_result,
-        "created_at": datetime.datetime.utcnow()
+        "created_at": datetime.utcnow()
     }
     
     await team_analytics_collection.insert_one(analytics_doc)
@@ -605,7 +607,7 @@ async def save_user_profile(request: CertificationProfile, user=Depends(verify_t
                     "user_email": user.get("email", ""),
                     "type": "profile",
                     "profile": request.dict(),
-                    "updated_at": datetime.datetime.utcnow()
+                    "updated_at": datetime.utcnow()
                 }
             },
             upsert=True
@@ -656,7 +658,7 @@ async def recommend_certifications(request: CertificationProfile, user=Depends(v
             "user_email": user.get("email", ""),
             "profile": request.dict(),
             "recommendation": result,
-            "created_at": datetime.datetime.utcnow()
+            "created_at": datetime.utcnow()
         })
     except Exception as e:
         print(f"Failed to save certification recommendation: {e}")
@@ -682,7 +684,7 @@ async def generate_study_plan(request: CertificationStudyPlan, user=Depends(veri
             "user_email": user.get("email", ""),
             "certification_name": request.certification_name,
             "study_plan": result,
-            "created_at": datetime.datetime.utcnow()
+            "created_at": datetime.utcnow()
         })
     except Exception as e:
         print(f"Failed to save study plan: {e}")
@@ -705,7 +707,7 @@ async def certification_simulation(request: CertificationSimulation, user=Depend
             "user_email": user.get("email", ""),
             "certification_name": request.certification_name,
             "simulation": result,
-            "created_at": datetime.datetime.utcnow()
+            "created_at": datetime.utcnow()
         })
     except Exception as e:
         print(f"Failed to save certification simulation: {e}")
@@ -801,7 +803,7 @@ async def handle_intent(input_data: IntentInput):
     await unknown_intents_collection.insert_one({
         "user_input": input_data.query,
         "classification": result,
-        "created_at": datetime.datetime.utcnow()
+        "created_at": datetime.utcnow()
     })
     return result 
 
@@ -862,7 +864,7 @@ async def generate_scaffold_endpoint(req: ScaffoldRequest, user: Optional[str] =
         "feature_summary": req.feature_summary,
         "scaffold_type": req.scaffold_type,
         "code": code,
-        "created_at": datetime.datetime.utcnow(),
+        "created_at": datetime.utcnow(),
         "user": user or "anonymous"
     })
     return {"code": code} 
@@ -884,8 +886,153 @@ async def approve_scaffold(scaffold_id: str, data: dict = Body(...)):
         {"$set": {
             "approved": True,
             "admin_comment": admin_comment,
-            "approved_at": datetime.datetime.utcnow(),
+            "approved_at": datetime.utcnow(),
             "approved_by": approved_by
         }}
     )
     return {"success": result.modified_count == 1} 
+
+# Import voice cloning
+from voice_cloning import voice_cloning_manager
+
+# Voice Cloning Endpoints
+@app.post("/voice-cloning/upload-sample")
+async def upload_voice_sample(
+    file: UploadFile = File(...),
+    user_id: str = Form(...)
+):
+    """Upload voice sample for training"""
+    try:
+        # Read audio file
+        audio_data = await file.read()
+        
+        # Save voice sample
+        result = await voice_cloning_manager.save_voice_sample(
+            user_id=user_id,
+            audio_data=audio_data,
+            filename=file.filename
+        )
+        
+        if result["success"]:
+            return {
+                "success": True,
+                "message": "Voice sample uploaded successfully",
+                "audio_path": result["audio_path"]
+            }
+        else:
+            return JSONResponse(
+                status_code=400,
+                content={"success": False, "error": result["error"]}
+            )
+            
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"success": False, "error": str(e)}
+        )
+
+@app.post("/voice-cloning/train")
+async def train_voice_model(
+    user_id: str = Form(...),
+    audio_path: str = Form(...)
+):
+    """Train voice model for user"""
+    try:
+        result = await voice_cloning_manager.train_voice_model(
+            user_id=user_id,
+            audio_path=audio_path
+        )
+        
+        if result["success"]:
+            return {
+                "success": True,
+                "message": "Voice training started",
+                "training_id": result["training_id"]
+            }
+        else:
+            return JSONResponse(
+                status_code=400,
+                content={"success": False, "error": result["error"]}
+            )
+            
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"success": False, "error": str(e)}
+        )
+
+@app.get("/voice-cloning/training-status/{training_id}")
+async def get_training_status(training_id: str):
+    """Get voice training status"""
+    try:
+        status = await voice_cloning_manager.get_training_status(training_id)
+        return {"success": True, "status": status}
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"success": False, "error": str(e)}
+        )
+
+@app.post("/voice-cloning/synthesize")
+async def synthesize_speech(
+    user_id: str = Form(...),
+    text: str = Form(...),
+    language: str = Form(default="en")
+):
+    """Synthesize speech using trained voice"""
+    try:
+        result = await voice_cloning_manager.synthesize_speech(
+            user_id=user_id,
+            text=text,
+            language=language
+        )
+        
+        if result["success"]:
+            # Return audio file
+            audio_path = Path(result["audio_path"])
+            if audio_path.exists():
+                return FileResponse(
+                    path=str(audio_path),
+                    media_type="audio/wav",
+                    filename=result["filename"]
+                )
+            else:
+                return JSONResponse(
+                    status_code=404,
+                    content={"success": False, "error": "Generated audio not found"}
+                )
+        else:
+            return JSONResponse(
+                status_code=400,
+                content={"success": False, "error": result["error"]}
+            )
+            
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"success": False, "error": str(e)}
+        )
+
+@app.get("/voice-cloning/user-models/{user_id}")
+async def get_user_voice_models(user_id: str):
+    """Get all voice models for a user"""
+    try:
+        result = await voice_cloning_manager.get_user_voice_models(user_id)
+        return {"success": True, "voice_models": result.get("voice_models", [])}
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"success": False, "error": str(e)}
+        )
+
+@app.delete("/voice-cloning/user-models/{user_id}")
+async def delete_voice_model(user_id: str):
+    """Delete user's voice model"""
+    try:
+        result = await voice_cloning_manager.delete_voice_model(user_id)
+        return {"success": True, "message": result.get("message", "Voice model deleted")}
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"success": False, "error": str(e)}
+        ) 

@@ -55,39 +55,162 @@ function PresentationAgent() {
         chunks.push(event.data);
       };
 
-      mediaRecorderRef.current.onstop = () => {
-        const blob = new Blob(chunks, { type: 'audio/wav' });
-        setAudioBlob(blob);
-        setVoiceTrainingStatus('processing');
-        // Here you would send the blob to your backend for voice training
-        console.log('Recording completed, blob size:', blob.size);
+      mediaRecorderRef.current.onstop = async () => {
+        const audioBlob = new Blob(chunks, { type: 'audio/wav' });
+        setAudioBlob(audioBlob);
+        setVoiceTrainingStatus('uploading');
+        
+        // Upload to backend
+        await uploadVoiceSample(audioBlob);
       };
 
       mediaRecorderRef.current.start();
       setIsRecording(true);
       setRecordingTime(0);
-      setVoiceTrainingStatus('recording');
-
+      
       // Start timer
       recordingIntervalRef.current = setInterval(() => {
         setRecordingTime(prev => prev + 1);
       }, 1000);
-
+      
     } catch (error) {
       console.error('Error starting recording:', error);
-      alert('Could not access microphone. Please check permissions.');
+      setVoiceTrainingStatus('error');
     }
   };
 
   const stopRecording = () => {
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
-      mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
       setIsRecording(false);
       
       if (recordingIntervalRef.current) {
         clearInterval(recordingIntervalRef.current);
       }
+      
+      // Stop all tracks
+      mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
+    }
+  };
+
+  const uploadVoiceSample = async (audioBlob) => {
+    try {
+      setVoiceTrainingStatus('uploading');
+      
+      const formData = new FormData();
+      formData.append('file', audioBlob, 'voice_sample.wav');
+      formData.append('user_id', 'user123'); // Replace with actual user ID
+      
+      const response = await fetch('/api/voice-cloning/upload-sample', {
+        method: 'POST',
+        body: formData
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        setVoiceTrainingStatus('training');
+        // Start training
+        await startVoiceTraining(result.audio_path);
+      } else {
+        setVoiceTrainingStatus('error');
+        console.error('Upload failed:', result.error);
+      }
+      
+    } catch (error) {
+      console.error('Error uploading voice sample:', error);
+      setVoiceTrainingStatus('error');
+    }
+  };
+
+  const startVoiceTraining = async (audioPath) => {
+    try {
+      const formData = new FormData();
+      formData.append('user_id', 'user123'); // Replace with actual user ID
+      formData.append('audio_path', audioPath);
+      
+      const response = await fetch('/api/voice-cloning/train', {
+        method: 'POST',
+        body: formData
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        // Poll training status
+        pollTrainingStatus(result.training_id);
+      } else {
+        setVoiceTrainingStatus('error');
+        console.error('Training failed:', result.error);
+      }
+      
+    } catch (error) {
+      console.error('Error starting training:', error);
+      setVoiceTrainingStatus('error');
+    }
+  };
+
+  const pollTrainingStatus = async (trainingId) => {
+    const pollInterval = setInterval(async () => {
+      try {
+        const response = await fetch(`/api/voice-cloning/training-status/${trainingId}`);
+        const result = await response.json();
+        
+        if (result.success) {
+          const status = result.status;
+          
+          if (status.status === 'completed') {
+            setVoiceTrainingStatus('completed');
+            setHasTrainedVoice(true);
+            clearInterval(pollInterval);
+          } else if (status.status === 'failed') {
+            setVoiceTrainingStatus('error');
+            console.error('Training failed:', status.error);
+            clearInterval(pollInterval);
+          }
+          // Continue polling if status is 'training'
+        } else {
+          setVoiceTrainingStatus('error');
+          clearInterval(pollInterval);
+        }
+        
+      } catch (error) {
+        console.error('Error polling training status:', error);
+        setVoiceTrainingStatus('error');
+        clearInterval(pollInterval);
+      }
+    }, 2000); // Poll every 2 seconds
+  };
+
+  const synthesizeWithTrainedVoice = async (text, language = 'en') => {
+    try {
+      const formData = new FormData();
+      formData.append('user_id', 'user123'); // Replace with actual user ID
+      formData.append('text', text);
+      formData.append('language', language);
+      
+      const response = await fetch('/api/voice-cloning/synthesize', {
+        method: 'POST',
+        body: formData
+      });
+      
+      if (response.ok) {
+        const audioBlob = await response.blob();
+        const audioUrl = URL.createObjectURL(audioBlob);
+        
+        // Play the synthesized audio
+        const audio = new Audio(audioUrl);
+        audio.play();
+        
+        return audioUrl;
+      } else {
+        console.error('Synthesis failed');
+        return null;
+      }
+      
+    } catch (error) {
+      console.error('Error synthesizing speech:', error);
+      return null;
     }
   };
 
@@ -426,7 +549,21 @@ Would you like me to elaborate on any specific aspect of our platform?`,
   };
 
   // Speech synthesis with voice selection
-  const speakText = (text) => {
+  const speakText = async (text) => {
+    // If user has trained voice and it's selected, use backend synthesis
+    if (voiceGender === 'my-voice' && hasTrainedVoice) {
+      try {
+        const audioUrl = await synthesizeWithTrainedVoice(text, language);
+        if (audioUrl) {
+          return; // Audio will play automatically
+        }
+      } catch (error) {
+        console.error('Error using trained voice:', error);
+        // Fallback to browser synthesis
+      }
+    }
+    
+    // Fallback to browser speech synthesis
     if ('speechSynthesis' in window) {
       // Stop any current speech
       stopSpeaking();
@@ -437,16 +574,7 @@ Would you like me to elaborate on any specific aspect of our platform?`,
       const voices = speechSynthesis.getVoices();
       let selectedVoice = null;
       
-      if (voiceGender === 'my-voice' && hasTrainedVoice) {
-        // Use trained voice model - this would integrate with your backend voice cloning
-        console.log('Using trained voice model for speech synthesis');
-        // For now, we'll use a default voice but in the future this would use the trained model
-        selectedVoice = voices.find(voice => 
-          voice.name.toLowerCase().includes('male') || 
-          voice.name.toLowerCase().includes('david') ||
-          voice.name.toLowerCase().includes('james')
-        );
-      } else if (voiceGender === 'male') {
+      if (voiceGender === 'male') {
         // Prefer male voices
         selectedVoice = voices.find(voice => 
           voice.name.toLowerCase().includes('male') || 
