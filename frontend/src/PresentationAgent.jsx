@@ -12,6 +12,7 @@ function PresentationAgent() {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [customTiming, setCustomTiming] = useState(60); // seconds per slide
   const [language, setLanguage] = useState('en');
+  const [voiceGender, setVoiceGender] = useState('male'); // 'male' or 'female'
   const [exportFormat, setExportFormat] = useState('pdf');
   const [showExportOptions, setShowExportOptions] = useState(false);
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
@@ -150,10 +151,10 @@ function PresentationAgent() {
       - Build simulations for team-based learning
       
       Key Features to Highlight:
-      1. AI Concepts Generation - Real-time streaming of educational concepts
+      1. AI Concepts Generation - Real-time streaming of educational concepts powered by GPT-4
       2. Micro-lessons - Bite-sized learning with AI-powered content
       3. Scenario Simulator - Interactive workplace simulations
-      4. AI Career Coach - Personalized career guidance
+      4. AI Career Coach - Personalized career guidance using GPT-4
       5. Skills Forecasting - AI-powered skill development predictions
       6. Team Dynamics Analyzer - Team collaboration insights
       7. Certifications - AI-powered certification recommendations
@@ -161,7 +162,7 @@ function PresentationAgent() {
       
       Technical Highlights:
       - React frontend with modern streaming UI
-      - FastAPI backend with OpenAI integration
+      - FastAPI backend with OpenAI GPT-4 integration
       - MongoDB for user-specific data persistence
       - Firebase authentication
       - Real-time streaming responses like ChatGPT
@@ -364,24 +365,87 @@ Would you like me to elaborate on any specific aspect of our platform?`,
     );
   };
 
-  // Speech synthesis
+  // Speech synthesis with voice selection
   const speakText = (text) => {
     if ('speechSynthesis' in window) {
-      if (speechRef.current) {
-        speechSynthesis.cancel();
-      }
+      // Stop any current speech
+      stopSpeaking();
       
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 0.9;
-      utterance.pitch = 1;
-      utterance.volume = 1;
       
-      utterance.onstart = () => setIsSpeaking(true);
-      utterance.onend = () => setIsSpeaking(false);
-      utterance.onerror = () => setIsSpeaking(false);
+      // Set voice based on gender preference
+      const voices = speechSynthesis.getVoices();
+      let selectedVoice = null;
       
-      speechRef.current = utterance;
+      if (voiceGender === 'male') {
+        // Prefer male voices
+        selectedVoice = voices.find(voice => 
+          voice.name.toLowerCase().includes('male') || 
+          voice.name.toLowerCase().includes('david') ||
+          voice.name.toLowerCase().includes('james') ||
+          voice.name.toLowerCase().includes('john') ||
+          voice.name.toLowerCase().includes('mark') ||
+          voice.name.toLowerCase().includes('peter') ||
+          voice.name.toLowerCase().includes('steve') ||
+          voice.name.toLowerCase().includes('tom') ||
+          voice.name.toLowerCase().includes('alex') ||
+          voice.name.toLowerCase().includes('daniel')
+        );
+      } else {
+        // Prefer female voices
+        selectedVoice = voices.find(voice => 
+          voice.name.toLowerCase().includes('female') || 
+          voice.name.toLowerCase().includes('samantha') ||
+          voice.name.toLowerCase().includes('victoria') ||
+          voice.name.toLowerCase().includes('karen') ||
+          voice.name.toLowerCase().includes('helena') ||
+          voice.name.toLowerCase().includes('zira') ||
+          voice.name.toLowerCase().includes('monica') ||
+          voice.name.toLowerCase().includes('lisa') ||
+          voice.name.toLowerCase().includes('anna') ||
+          voice.name.toLowerCase().includes('maria')
+        );
+      }
+      
+      // Fallback to first available voice if preferred voice not found
+      if (!selectedVoice && voices.length > 0) {
+        selectedVoice = voices[0];
+      }
+      
+      if (selectedVoice) {
+        utterance.voice = selectedVoice;
+      }
+      
+      // Set language based on selection
+      utterance.lang = language === 'no' ? 'nb-NO' : 
+                      language === 'sv' ? 'sv-SE' : 
+                      language === 'es' ? 'es-ES' : 
+                      language === 'de' ? 'de-DE' : 
+                      language === 'fr' ? 'fr-FR' : 'en-US';
+      
+      // Set speech parameters for professional presentation
+      utterance.rate = 0.9; // Slightly slower for clarity
+      utterance.pitch = voiceGender === 'male' ? 0.8 : 1.1; // Lower pitch for male voices
+      utterance.volume = 1.0;
+      
+      utterance.onstart = () => {
+        setIsSpeaking(true);
+        speechRef.current = utterance;
+      };
+      
+      utterance.onend = () => {
+        setIsSpeaking(false);
+        speechRef.current = null;
+      };
+      
+      utterance.onerror = () => {
+        setIsSpeaking(false);
+        speechRef.current = null;
+      };
+      
       speechSynthesis.speak(utterance);
+    } else {
+      alert('Speech synthesis is not supported in this browser.');
     }
   };
 
@@ -709,7 +773,7 @@ This demonstrates the comprehensive learning journey our platform provides.`,
       questions: [
         {
           question: "What's your tech stack?",
-          answer: "Our platform uses a modern, scalable tech stack with React frontend, FastAPI backend, OpenAI integration, MongoDB database, and Firebase authentication.",
+          answer: "Our platform uses a modern, scalable tech stack with React frontend, FastAPI backend, OpenAI GPT-4 integration, MongoDB database, and Firebase authentication.",
           liveData: false
         },
         {
@@ -1064,8 +1128,9 @@ This demonstrates the comprehensive learning journey our platform provides.`,
                   }}
                 >
                   <option value="en">🇺🇸 English</option>
-                  <option value="es">🇪🇸 Spanish</option>
+                  <option value="no">🇳🇴 Norwegian</option>
                   <option value="sv">🇸🇪 Swedish</option>
+                  <option value="es">🇪🇸 Spanish</option>
                   <option value="de">🇩🇪 German</option>
                   <option value="fr">🇫🇷 French</option>
                 </select>
@@ -1078,6 +1143,46 @@ This demonstrates the comprehensive learning journey our platform provides.`,
                 borderRadius: 4
               }}>
                 💡 Language support for script generation and Q&A responses
+              </div>
+            </div>
+
+            {/* Voice Selection */}
+            <div>
+              <h4 style={{ margin: '0 0 12px 0', color: colors.text }}>🎤 Voice</h4>
+              <div style={{ marginBottom: 12 }}>
+                <label style={{ 
+                  display: 'block', 
+                  marginBottom: 6, 
+                  color: colors.textSecondary,
+                  fontSize: '0.9em'
+                }}>
+                  Presentation Voice:
+                </label>
+                <select
+                  value={voiceGender}
+                  onChange={(e) => setVoiceGender(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    borderRadius: 6,
+                    border: `1px solid ${colors.border}`,
+                    background: colors.cardBackground,
+                    color: colors.text,
+                    fontSize: '0.9em'
+                  }}
+                >
+                  <option value="male">👨 Male Voice</option>
+                  <option value="female">👩 Female Voice</option>
+                </select>
+              </div>
+              <div style={{ 
+                fontSize: '0.8em', 
+                color: colors.textSecondary,
+                padding: '8px',
+                background: colors.background,
+                borderRadius: 4
+              }}>
+                🎵 Voice selection for speech synthesis and audio presentations
               </div>
             </div>
 
