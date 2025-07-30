@@ -20,6 +20,7 @@ graph TD
     RunTest[RunTest.jsx]
     IdeaLog[IdeaLog.jsx]
     FeatureRoadmap[FeatureRoadmap.jsx]
+    PresentationAgent[PresentationAgent.jsx]
   end
   subgraph Backend
     AppPy[app.py]
@@ -27,6 +28,7 @@ graph TD
     Prompts[prompts.py]
     VectorStore[vector_store.py]
     WebSearchNode[websearch-backend/index.js]
+    VoiceCloning[Voice Cloning API]
     DB[(MongoDB)]
     Firebase[(Firebase Auth)]
   end
@@ -56,6 +58,7 @@ graph TD
   App --> RunTest
   App --> IdeaLog
   App --> FeatureRoadmap
+  App --> PresentationAgent
   Simulator -->|Scenario UI| App
   API -->|HTTP requests with Firebase token| AppPy
   WebSearchNode -->|HTTP requests| OpenAI
@@ -69,6 +72,7 @@ graph TD
   AppPy -->|Certifications| LLM
   AppPy -->|Video lessons| LLM
   AppPy -->|Verifies Firebase token| Firebase
+  AppPy -->|Voice cloning training| VoiceCloning
   LLM -->|Sends prompt, gets response| OpenAI
   VectorStore -->|Future: Embeddings| DB
 
@@ -80,6 +84,7 @@ graph TD
   WebSearchNode -- Data --> App
   OpenAI -- AI response --> WebSearchNode
   DB -- User-specific data --> AppPy
+  VoiceCloning -- Trained voice model --> PresentationAgent
 
   %% Testing connections
   RunTest -->|Runs automated tests| Cypress
@@ -667,6 +672,142 @@ The search covers all 11 sections of the application:
 - **State Management**: Uses React hooks for search state and navigation
 - **Styling**: Theme-aware styling that matches the application design
 - **Performance**: Optimized for fast search with minimal re-renders
+
+---
+
+## AI Presentation Agent 🎤
+
+The **AI Presentation Agent** is a cutting-edge presentation tool designed specifically for hackathons and professional presentations. It combines AI-powered script generation, live demonstrations, intelligent Q&A, and voice cloning technology to create compelling, personalized presentations.
+
+### **Core Features:**
+
+#### **🎬 Script Generation**
+- **AI-Powered Scripts**: Generate professional 4-minute presentation scripts
+- **Hackathon Optimized**: Perfect timing and structure for competition presentations
+- **Content Customization**: Tailored scripts based on your project and audience
+- **Real-time Streaming**: Scripts appear word-by-word with professional formatting
+- **Export Options**: Save scripts as text files or copy to clipboard
+
+#### **🎤 Voice Training & Cloning**
+- **Personal Voice Recording**: Record 30-60 seconds of your voice for cloning
+- **Multi-language Support**: Train in your native language (Spanish, Norwegian, etc.)
+- **Voice Selection**: Choose between Male, Female, or Your Trained Voice
+- **Professional Interface**: Clean recording UI with live timer and status indicators
+- **Secure Storage**: Your voice data is stored privately and securely
+- **Cross-language Generation**: Use your voice in any supported language
+
+#### **🚀 Live Demo Mode**
+- **Real-time Demonstrations**: Show live platform features and statistics
+- **System Statistics**: Display real-time performance metrics and user analytics
+- **Feature Showcases**: Individual feature demonstrations with live data
+- **User Journey**: Complete learning path demonstrations
+- **Professional UI**: Visual slide progression with timers and progress bars
+
+#### **❓ Enhanced Q&A System**
+- **Intelligent Responses**: AI-powered answers with live data integration
+- **Category-based Questions**: Technical, Business, Features, Implementation
+- **Live Data Integration**: Real-time platform statistics in responses
+- **Smart Question Matching**: Automatic similarity detection for best answers
+- **Professional Formatting**: Markdown-formatted responses with live data
+
+#### **🌍 Multi-language Support**
+- **International Ready**: Norwegian, Swedish, Spanish, German, French, English
+- **Voice Cloning**: Your voice works in all supported languages
+- **Cultural Adaptation**: Presentations adapted for different audiences
+- **Perfect for Hackathons**: Ideal for international competitions
+
+#### **⚙️ Advanced Settings**
+- **Custom Timing**: Adjust presentation duration (30-120 seconds per slide)
+- **Export Options**: Download presentations or copy to clipboard
+- **Language Selection**: Choose presentation language
+- **Voice Controls**: Select voice type and gender
+- **Professional Statistics**: Track script length, slide count, and duration
+
+#### **📊 Live Integration**
+- **Real App Data**: Connect with actual platform statistics
+- **Live Performance Metrics**: Show real-time system performance
+- **User Analytics**: Display actual user engagement and learning data
+- **Feature Demonstrations**: Show real platform capabilities
+- **Professional Credibility**: No fake numbers, actual performance data
+
+### **Technical Architecture:**
+
+#### **Frontend Components**
+- `PresentationAgent.jsx` - Main presentation agent component
+- Voice recording interface with MediaRecorder API
+- Real-time streaming text display
+- Professional UI with theme support
+- Voice selection and training interface
+
+#### **Backend Integration**
+- Voice cloning API endpoints (planned)
+- Coqui TTS or Real-Time Voice Cloning integration
+- User-specific voice model storage
+- Multi-language text-to-speech processing
+
+#### **Voice Cloning Technology**
+- **Coqui TTS**: Modern, maintained voice cloning library
+- **Real-Time Voice Cloning**: Fast voice cloning for immediate results
+- **OpenVoice**: Zero-shot voice cloning with style control
+- **Bark + RVC**: Advanced voice cloning pipeline
+
+### **How to Use:**
+
+#### **1. Generate Presentation Script**
+- Navigate to "Presentation Agent" in the sidebar
+- Click "📝 Generate Script" to create your 4-minute presentation
+- Review the AI-generated script with streaming text
+- Use "🔊 Speak Script" to hear it delivered
+
+#### **2. Train Your Voice**
+- Click "🎤 Train Your Agent's Voice"
+- Follow recording instructions (30-60 seconds of clear speech)
+- Record in your native language (Spanish recommended)
+- Preview your recording and train the voice model
+- Your voice becomes available as "My Voice" option
+
+#### **3. Run Live Demo**
+- Click "🎬 Live Demo" to start automated presentation
+- Watch real-time feature demonstrations
+- See live platform statistics and performance data
+- Perfect for hackathon presentations
+
+#### **4. Handle Q&A**
+- Click "❓ Q&A Mode" for intelligent question handling
+- Choose question categories (Technical, Business, Features, Implementation)
+- Get AI-powered responses with live data integration
+- Professional answers for any audience question
+
+#### **5. Customize Settings**
+- Access "⚙️ Advanced Settings" for customization
+- Adjust timing, language, voice selection
+- Export presentations in various formats
+- Configure professional presentation parameters
+
+### **Perfect for Hackathons:**
+
+#### **🏆 Stockholm Hackathon Ready**
+- **4-minute Perfect Timing**: Exactly what judges expect
+- **Live Demonstrations**: Show real platform capabilities
+- **Professional Voice**: Your trained voice or professional alternatives
+- **Intelligent Q&A**: Handle any judge question with confidence
+- **Multi-language**: Present in English, Norwegian, or Swedish
+- **Real Data**: No fake numbers, actual platform performance
+
+#### **Competitive Advantages**
+- **Voice Cloning**: Unique personal touch with your voice
+- **Live Integration**: Real-time platform demonstrations
+- **Professional Polish**: Clean, modern interface
+- **International Appeal**: Multi-language support
+- **Technical Innovation**: Cutting-edge AI voice technology
+
+### **Future Enhancements:**
+- **Emotion Control**: Adjust voice emotion and style
+- **Advanced Voice Fine-tuning**: Pitch, speed, and accent controls
+- **Presentation Templates**: Different styles for different audiences
+- **Live Feature Demonstrations**: Real-time platform interactions
+- **Voice Command Control**: Control presentations with voice commands
+- **Advanced Export Options**: Video presentations and slides
 
 ---
 

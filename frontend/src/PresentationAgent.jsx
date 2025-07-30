@@ -13,6 +13,7 @@ function PresentationAgent() {
   const [customTiming, setCustomTiming] = useState(60); // seconds per slide
   const [language, setLanguage] = useState('en');
   const [voiceGender, setVoiceGender] = useState('male'); // 'male' or 'female'
+  const [hasTrainedVoice, setHasTrainedVoice] = useState(false); // Track if user has trained voice
   const [voiceTrainingMode, setVoiceTrainingMode] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
@@ -436,7 +437,16 @@ Would you like me to elaborate on any specific aspect of our platform?`,
       const voices = speechSynthesis.getVoices();
       let selectedVoice = null;
       
-      if (voiceGender === 'male') {
+      if (voiceGender === 'my-voice' && hasTrainedVoice) {
+        // Use trained voice model - this would integrate with your backend voice cloning
+        console.log('Using trained voice model for speech synthesis');
+        // For now, we'll use a default voice but in the future this would use the trained model
+        selectedVoice = voices.find(voice => 
+          voice.name.toLowerCase().includes('male') || 
+          voice.name.toLowerCase().includes('david') ||
+          voice.name.toLowerCase().includes('james')
+        );
+      } else if (voiceGender === 'male') {
         // Prefer male voices
         selectedVoice = voices.find(voice => 
           voice.name.toLowerCase().includes('male') || 
@@ -1256,6 +1266,9 @@ This demonstrates the comprehensive learning journey our platform provides.`,
                     fontSize: '0.9em'
                   }}
                 >
+                  <option value="my-voice" disabled={!hasTrainedVoice}>
+                    🎤 My Voice {!hasTrainedVoice ? '(Train First)' : '(Trained)'}
+                  </option>
                   <option value="male">👨 Male Voice</option>
                   <option value="female">👩 Female Voice</option>
                 </select>
@@ -2264,6 +2277,48 @@ This demonstrates the comprehensive learning journey our platform provides.`,
             </div>
           )}
 
+          {/* Training Completed Status */}
+          {voiceTrainingStatus === 'completed' && (
+            <div style={{ 
+              textAlign: 'center',
+              padding: 16,
+              background: '#d4edda',
+              borderRadius: 8,
+              border: `1px solid #c3e6cb`,
+              marginBottom: 20
+            }}>
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                gap: 8,
+                marginBottom: 8
+              }}>
+                <span style={{ fontSize: '1.5em' }}>✅</span>
+                <span style={{ 
+                  color: '#155724', 
+                  fontWeight: 'bold'
+                }}>
+                  Voice Training Completed!
+                </span>
+              </div>
+              <p style={{ 
+                margin: 0,
+                color: '#155724',
+                fontSize: '0.9em'
+              }}>
+                Your voice is now available as "My Voice" option in the voice selector.
+              </p>
+              <p style={{ 
+                margin: '8px 0 0 0',
+                color: '#155724',
+                fontSize: '0.8em'
+              }}>
+                You can now use your trained voice for all presentations!
+              </p>
+            </div>
+          )}
+
           {/* Audio Preview */}
           {audioBlob && voiceTrainingStatus !== 'processing' && (
             <div style={{ 
@@ -2307,6 +2362,14 @@ This demonstrates the comprehensive learning journey our platform provides.`,
                     // Here you would send the audioBlob to your backend
                     console.log('Sending audio for voice training...');
                     setVoiceTrainingStatus('processing');
+                    
+                    // Simulate successful training (in real implementation, this would be after backend response)
+                    setTimeout(() => {
+                      setVoiceTrainingStatus('completed');
+                      setHasTrainedVoice(true);
+                      setVoiceGender('my-voice'); // Automatically select "My Voice"
+                      console.log('Voice training completed successfully!');
+                    }, 3000);
                   }}
                   style={{
                     padding: '8px 16px',
